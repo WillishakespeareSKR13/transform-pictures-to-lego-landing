@@ -1,0 +1,50 @@
+{
+  "compilerOptions": {
+    "baseUrl": "./",
+    "paths": {
+      "@Src/*": ["src/*"],
+      "@Hooks/*": ["src/hooks/*"],
+      "@Animations/*": ["src/animations/*"],
+      "@Public/*": ["public/*"],
+      "@Config/*": ["src/config/*"],
+      "@Atoms/*": ["src/components/@atoms/*"],
+      "@Molecules/*": ["src/components/@molecules/*"],
+      "@Organisms/*": ["src/components/@organisms/*"],
+      "@Section/*": ["src/components/sections/*"],
+      "@Templates/*": ["src/components/templates/*"],
+      "@Layouts/*": ["src/layouts/*"],
+      "@Auth/*": ["src/auth/*"],
+      "@Utils/*": ["src/utils/*"],
+      "@Assets/*": ["src/assets/*"],
+      "@Styles/*": ["src/styles/*"],
+      "@Apollo/*": ["src/apollo/*"],
+      "@Redux/*": ["src/redux/*"],
+      "@ApolloQuery/*": ["src/apollo/query/*"],
+      "@ApolloMutation/*": ["src/apollo/mutation/*"]
+    },
+    "target": "es2020",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "incremental": true
+  },
+  "exclude": ["node_modules", ".next"],
+  "include": [
+    "next-env.d.ts",
+    "index.d.ts",
+    "graphql.d.ts",
+    "**/*.d.ts",
+    "emotion.d.ts",
+    "**/*.ts",
+    "**/*.tsx"
+  ]
+}

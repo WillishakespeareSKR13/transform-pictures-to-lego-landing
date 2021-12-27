@@ -18,7 +18,7 @@ const httpLink = createHttpLink({
 const authLink = setContext((_, { headers }) => ({
   headers: {
     ...headers,
-    orgcode: CONFIG.ORG_CODE,
+    // orgcode: CONFIG.ORG_CODE,
     authorization: `Bearer ${cookie.get(`bearer`)}`
   }
 }));

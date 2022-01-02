@@ -1,1 +1,1 @@
-export { default as OrganimsHeader } from './OrganimsHeader';
+export { default as OrganismsHeader } from './OrganismsHeader';

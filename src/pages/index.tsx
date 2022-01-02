@@ -15,14 +15,23 @@ import * as Yup from 'yup';
 import { useFormik } from 'formik';
 import { NextPageFC } from 'next';
 import Cropper from 'react-easy-crop';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import {
+  Dispatch,
+  SetStateAction,
+  useCallback,
+  useEffect,
+  useRef,
+  useState
+} from 'react';
 import styled from '@emotion/styled';
 import getCroppedImg from '@Src/utils/getCropImage';
 import OrganismsLoadImage from '@Src/components/@organisms/OrganismsLoadImage';
+import { brick } from '@Src/utils/legobricks';
 
 const PageIndex: NextPageFC = () => {
   const [blob, setBlob] = useState('');
   const [file, setFile] = useState({} as File);
+  const [cropImage, setCropImage] = useState<string[]>([]);
   const ref = useRef<HTMLImageElement>(null);
   const refInput = useRef<HTMLInputElement>(null);
   const [factor, setFactor] = useState(0.03125);
@@ -38,6 +47,14 @@ const PageIndex: NextPageFC = () => {
           const croppedImage = await getCroppedImg(file, croppedAreaPixels, 0);
           ref.current?.setAttribute('data-src-original', croppedImage);
           setCroppedImage(croppedImage);
+          cropAndFilter(
+            ref.current as HTMLImageElement,
+            croppedImage,
+            setCropImage,
+            factor,
+            4,
+            3
+          );
         }
       } catch (e) {
         console.error(e);
@@ -73,7 +90,6 @@ const PageIndex: NextPageFC = () => {
       setFile(imagefile);
     }
   });
-
   return (
     <AtomPage>
       {blob === '' ? (
@@ -237,6 +253,23 @@ const PageIndex: NextPageFC = () => {
               </AtomButton>
             </AtomWrapper>
           </AtomWrapper>
+          <AtomWrapper
+            customCSS={css`
+              display: grid;
+              grid-template-columns: 60px 60px 60px 60px;
+              grid-row: auto auto;
+              grid-column-gap: 3px;
+              grid-row-gap: 3px;
+              img {
+                width: 60px;
+                height: 60px;
+              }
+            `}
+          >
+            {cropImage.map((image, i) => (
+              <img key={`image${i}`} src={image} alt="croppedImage" />
+            ))}
+          </AtomWrapper>
         </AtomWrapper>
       )}
     </AtomPage>
@@ -251,3 +284,77 @@ type styledImageProps = {
 const StyledImage = styled.img<styledImageProps>`
   ${({ customCSS }) => customCSS}
 `;
+
+function createImage(src: string) {
+  const image = new Image();
+  image.setAttribute('src', src);
+  return image;
+}
+
+const cropAndFilter = (
+  img: HTMLImageElement,
+  blob: string,
+  setState: Dispatch<SetStateAction<string[]>>,
+  factor: number,
+  splitx: number,
+  splity: number
+) => {
+  const getDimension = (property: string) => {
+    return parseInt(getComputedStyle(img).getPropertyValue(property), 10);
+  };
+  // const parts = [];
+  const blobcreateImage = createImage(blob);
+  blobcreateImage.addEventListener('load', () => {
+    const canvas = document.createElement('canvas');
+    const context = canvas.getContext('2d') as CanvasRenderingContext2D;
+    const w2 = getDimension('width') / splitx;
+    const h2 = getDimension('height') / splity;
+    canvas.width = w2;
+    canvas.height = h2;
+    const size = 400 * 0.0078125;
+    const blendMode = 'overlay';
+    const small = { height: h2 / size, width: w2 / size };
+    const corrd = Array.from({ length: splity }, (_, a1i) => a1i)
+      .map((ai) =>
+        Array.from({ length: splitx }, (_, a2i) => a2i).map((bi) => ({
+          x: w2 * bi,
+          y: h2 * ai
+        }))
+      )
+      .flat();
+    const getArray = Array.from({ length: splity * splitx }, (_, i) => i).map(
+      (i) => {
+        context.imageSmoothingEnabled = false;
+        const x = -corrd[i].x,
+          y = -corrd[i].y;
+        context.drawImage(blobcreateImage, 0, 0, small.width, small.height); // img, x, y, w, h
+        context.rect(0, 0, w2, h2);
+        context.drawImage(
+          canvas,
+          0,
+          0,
+          small.width,
+          small.height,
+          x,
+          y,
+          w2 * splitx,
+          h2 * splity
+        );
+        const svg = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+                       height="${h2}" width="${w2}">
+                     <defs>
+                         <pattern id="bricks" patternUnits="userSpaceOnUse" width="${size}" height="${size}">
+                             <image xlink:href="${brick}" width="${size}" height="${size}" x="0" y="0" />
+                         </pattern>
+                     </defs>
+                     <g transform="scale(${1})">
+                         <image width="${w2}" height="${h2}" x="0" y="0" xlink:href="${canvas.toDataURL()}" />
+                         <rect style="mix-blend-mode: ${blendMode}" fill="url(#bricks)" x="0" y="0" width="${w2}" height="${h2}" />
+                     </g>
+                  </svg>`;
+        return `data:image/svg+xml;base64,${btoa(svg)}`;
+      }
+    );
+    setState(getArray);
+  });
+};

@@ -1,6 +1,5 @@
 import { FC } from 'react';
 import LayoutAnimation from '@sweetsyui/ui/build/@layouts/LayoutAnimation';
-import AuthContext from '@Src/hooks/authContext';
 import { OrganismsHeader } from '@Src/components/@organisms';
 import { css } from '@emotion/react';
 
@@ -9,7 +8,7 @@ type Props = {
 };
 
 const DefaultLayout: FC<Props> = ({ children }) => (
-  <AuthContext type="PUBLIC">
+  <>
     <OrganismsHeader />
     <LayoutAnimation
       margin="90px 0 0 0"
@@ -23,6 +22,6 @@ const DefaultLayout: FC<Props> = ({ children }) => (
     >
       {children}
     </LayoutAnimation>
-  </AuthContext>
+  </>
 );
 export default DefaultLayout;

@@ -24,6 +24,7 @@
     "@apollo/client": "^3.4.16",
     "@emotion/react": "^11.5.0",
     "@emotion/styled": "^11.3.0",
+    "@react-pdf/renderer": "2.0.21",
     "@sweetsyui/ui": "1.0.1",
     "formik": "2.2.9",
     "framer-motion": "^5.0.0",

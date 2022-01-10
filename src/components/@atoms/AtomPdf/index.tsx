@@ -9,6 +9,7 @@ import {
   Image,
   PDFDownloadLink
 } from '@react-pdf/renderer';
+import { AtomButton } from '@sweetsyui/ui';
 
 // Create styles
 const styles = StyleSheet.create({
@@ -59,7 +60,13 @@ const DownloadPdf: FC<DocumentProps> = (props) => {
   return (
     <div>
       <PDFDownloadLink document={Document} fileName="somename.pdf">
-        {({ loading }) => (loading ? 'cargando documento...' : 'Descargar!')}
+        {({ loading }) =>
+          loading ? (
+            <AtomButton backgroundColor="#ed7001">LOAD DOCUMENT</AtomButton>
+          ) : (
+            <AtomButton backgroundColor="#ed7001">DOWNLOAD</AtomButton>
+          )
+        }
       </PDFDownloadLink>
     </div>
   );

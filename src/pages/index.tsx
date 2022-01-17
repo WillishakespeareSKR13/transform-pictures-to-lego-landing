@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { css, SerializedStyles } from '@emotion/react';
 import { AtomPage } from '@Src/components/@atoms';
 import { AtomButton, AtomLoader, AtomText, AtomWrapper } from '@sweetsyui/ui';
@@ -151,11 +152,16 @@ const iconsSquare = {
   }
 };
 
+type ColorType = {
+  [key: string]: { value: string; count: number; color: string };
+};
+
 const PageIndex: NextPageFC = () => {
   const [blob, setBlob] = useState('');
   const [file, setFile] = useState({} as File);
   const [croppedImage, setCroppedImage] = useState('');
   const [cropImage, setCropImage] = useState<string[]>([]);
+  const [colors, setColors] = useState<ColorType[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const refInput = useRef<HTMLInputElement>(null);
   const ref = createRef();
@@ -389,7 +395,8 @@ const PageIndex: NextPageFC = () => {
                     setCropImage,
                     AllSizes[sizes][sizeSelected].x,
                     AllSizes[sizes][sizeSelected].y,
-                    setLoading
+                    setLoading,
+                    setColors
                   );
                   setQuantity(
                     AllSizes[sizes][sizeSelected].x *
@@ -514,7 +521,7 @@ const PageIndex: NextPageFC = () => {
                   TRANSFORM IMAGE TO DOWNLOAD
                 </AtomButton>
               ) : (
-                <DownloadPdf images={cropImage} />
+                <DownloadPdf images={cropImage} colors={colors} />
               )}
             </AtomWrapper>
           </AtomWrapper>
@@ -545,11 +552,13 @@ const cropAndFilter = (
   setState: Dispatch<SetStateAction<string[]>>,
   splitx: number,
   splity: number,
-  setStateLoading: Dispatch<SetStateAction<boolean>>
+  setStateLoading: Dispatch<SetStateAction<boolean>>,
+  setColors: Dispatch<SetStateAction<ColorType[]>>
 ) => {
   setStateLoading(true);
   const blobcreateImage = createImage(blob);
   setState([]);
+  setColors([]);
   blobcreateImage.addEventListener('load', () => {
     const canvas = document.createElement('canvas');
     const context = canvas.getContext('2d') as CanvasRenderingContext2D;
@@ -652,9 +661,92 @@ const cropAndFilter = (
           scale: 8,
           palette: mypalette
         };
+        // console.log(mypalette);
         const px = new Pixel(config);
         px.draw().pixelate().convertPalette().saveImage();
         const size = 12.5;
+
+        const data = context2.getImageData(0, 0, w2, h2).data;
+        // console.log(data.length);
+
+        function rgb2hex(rgb: string) {
+          const rgb2 = rgb.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/) ?? [
+            '0',
+            '0',
+            '0'
+          ];
+          function hex(x: string) {
+            return ('0' + parseInt(x).toString(16)).slice(-2);
+          }
+          return '#' + hex(rgb2[1]) + hex(rgb2[2]) + hex(rgb2[3]);
+        }
+
+        const colorList: string[] = [];
+        for (let i = 0, n = data.length; i < n; i += 4) {
+          // const r = data[i];
+          // const g = data[i + 1];
+          // const b = data[i + 2];
+          //If you need the alpha value it's data[i + 3]
+          // const hex = rgb2hex('rgb(' + r + ',' + g + ',' + b + ')');
+
+          const colorSim = (
+            rgbColor: string | any[],
+            compareColor: number[]
+          ) => {
+            let i;
+            let max;
+            let d = 0;
+            for (i = 0, max = rgbColor.length; i < max; i++) {
+              d +=
+                (rgbColor[i] - compareColor[i]) *
+                (rgbColor[i] - compareColor[i]);
+            }
+            return Math.sqrt(d);
+          };
+
+          const similarColor = (actualColor: number[], palette: any[]) => {
+            let selectedColor: string[] = [];
+            let currentSim = colorSim(actualColor, palette[0]);
+            let nextColor;
+            palette.forEach((color: any[]) => {
+              nextColor = colorSim(actualColor, color);
+              if (nextColor <= currentSim) {
+                selectedColor = color;
+                currentSim = nextColor;
+              }
+            });
+            const hex = rgb2hex(
+              'rgb(' +
+                selectedColor[0] +
+                ',' +
+                selectedColor[1] +
+                ',' +
+                selectedColor[2] +
+                ')'
+            );
+            return hex;
+          };
+          colorList.push(
+            similarColor([data[i], data[i + 1], data[i + 2]], mypalette)
+          );
+        }
+
+        setColors((colorState) => [
+          ...colorState,
+          colorList.reduce((acc, curr) => {
+            // const isColor = color.find((g) => g.hex === curr);
+            const isRepeat = acc[curr] ? true : false;
+            // console.log(curr);
+            return {
+              ...acc,
+              [curr]: {
+                color: curr,
+                value: curr,
+                count: isRepeat ? acc[curr].count + 1 : 1
+              }
+            };
+          }, {} as ColorType)
+        ]);
         // console.log((400 - 87.5 * ((splitx + splity) / 2 - 2)) * 0.03125);
         const svg = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
                        height="${h2}" width="${w2}">

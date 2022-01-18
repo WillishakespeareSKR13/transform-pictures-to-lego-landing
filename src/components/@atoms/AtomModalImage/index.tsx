@@ -134,6 +134,7 @@ const AtomModalImage: FC<AtomModalImageProps> = (props) => {
           </AtomWrapper>
           <AtomWrapper
             flexDirection="row"
+            width="max-content"
             maxWidth="90vw"
             // flexWrap="wrap"
             margin="60px 0px -30px 0px"

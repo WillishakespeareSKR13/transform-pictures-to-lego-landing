@@ -49,13 +49,88 @@ const styles = StyleSheet.create({
 
 type AtomPdfProps = {
   images: string[];
+  width?: string;
+  height?: string;
   colors?: ColorType[];
 };
 
 export const AtomPdf: FC<AtomPdfProps> = (props) => {
-  const { images, colors } = props;
+  const { images, colors, width, height } = props;
+  const stylesImg = StyleSheet.create({
+    image: {
+      width: 400 / Number(width),
+      height: 400 / Number(width)
+    }
+  });
   return (
     <Document>
+      <Page>
+        <View style={styles.section}>
+          <View style={styles.main}>
+            {colors
+              ?.map((color) =>
+                Object.entries(color).map(([_, value]) => ({
+                  ...value,
+                  count: Math.round(value.count / 156.25)
+                }))
+              )
+              .flat()
+              .reduce((acc, curr) => {
+                const isColor = acc.find((color) => color.value === curr.value);
+                return isColor
+                  ? acc.map((e) =>
+                      e.value === curr.value
+                        ? { ...e, count: e.count + curr.count }
+                        : e
+                    )
+                  : [...acc, curr];
+              }, [] as { value: string; count: number; color: string }[])
+              .map((color) => (
+                <View key={color.value} style={styles.mainContainer}>
+                  <View
+                    style={{
+                      width: '20px',
+                      height: '20px',
+                      backgroundColor: color.value
+                    }}
+                  ></View>
+                  <Text style={styles.text}>{color.count}</Text>
+                </View>
+              ))}
+          </View>
+          <View
+            style={{
+              display: 'flex',
+              flexDirection: 'row',
+              flexWrap: 'wrap',
+              width: (400 / Number(height)) * Number(width) + Number(width) * 2
+            }}
+          >
+            {images.map((image, index) => (
+              <View
+                key={index}
+                style={{
+                  position: 'relative',
+                  border: '2px solid white'
+                }}
+              >
+                <Image style={stylesImg.image} src={image} />
+                <Text
+                  style={{
+                    position: 'absolute',
+                    color: '#ffffff',
+                    top: '59px',
+                    left: '59px',
+                    fontSize: 32
+                  }}
+                >
+                  {index + 1}
+                </Text>
+              </View>
+            ))}
+          </View>
+        </View>
+      </Page>
       {images?.map((image, index) => (
         <Page key={`${index + 1}`} size="A4" style={styles.page}>
           <View style={styles.section} key={index}>
@@ -104,15 +179,19 @@ type ColorType = {
 type DocumentProps = {
   images: string[];
   colors?: ColorType[];
+  width?: string;
+  height?: string;
 };
 
 const DownloadPdf: FC<DocumentProps> = (props) => {
-  const { images, colors } = props;
+  const { images, colors, width, height } = props;
   const [Document, setDocument] = useState(
     <AtomPdf images={images} colors={colors} />
   );
   useEffect(() => {
-    setDocument(<AtomPdf images={images} colors={colors} />);
+    setDocument(
+      <AtomPdf images={images} colors={colors} height={height} width={width} />
+    );
   }, [images, colors]);
   return (
     <div>

@@ -521,7 +521,12 @@ const PageIndex: NextPageFC = () => {
                   TRANSFORM IMAGE TO DOWNLOAD
                 </AtomButton>
               ) : (
-                <DownloadPdf images={cropImage} colors={colors} />
+                <DownloadPdf
+                  images={cropImage}
+                  colors={colors}
+                  height={`${AllSizes[sizes][sizeSelected].y}`}
+                  width={`${AllSizes[sizes][sizeSelected].x}`}
+                />
               )}
             </AtomWrapper>
           </AtomWrapper>

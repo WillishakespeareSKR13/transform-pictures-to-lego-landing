@@ -97,13 +97,19 @@ export const AtomPdf: FC<AtomPdfProps> = (props) => {
                   <Text style={styles.text}>{color.count}</Text>
                 </View>
               ))}
+            <Text style={styles.text}>
+              Total: {1024 * Number(width) * Number(height)}
+            </Text>
           </View>
           <View
             style={{
               display: 'flex',
               flexDirection: 'row',
               flexWrap: 'wrap',
-              width: (400 / Number(height)) * Number(width) + Number(width) * 2
+              width:
+                Number(width) > Number(height)
+                  ? (400 / Number(height)) * Number(width)
+                  : (400 / Number(width)) * Number(height) + Number(width) * 4
             }}
           >
             {images.map((image, index) => (
@@ -119,8 +125,8 @@ export const AtomPdf: FC<AtomPdfProps> = (props) => {
                   style={{
                     position: 'absolute',
                     color: '#ffffff',
-                    top: '59px',
-                    left: '59px',
+                    top: `${400 / Number(width) / 2 - 7}px`,
+                    left: `${400 / Number(width) / 2 - 7}px`,
                     fontSize: 32
                   }}
                 >
@@ -153,6 +159,7 @@ export const AtomPdf: FC<AtomPdfProps> = (props) => {
                     <Text style={styles.text}>{color.count}</Text>
                   </View>
                 ))}
+              <Text style={styles.text}>Total: {1024}</Text>
             </View>
 
             {/* <Text style={styles.text}>

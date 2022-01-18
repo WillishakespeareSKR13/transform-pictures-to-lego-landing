@@ -22,6 +22,7 @@ import OrganismsLoadImage from '@Src/components/@organisms/OrganismsLoadImage';
 import DownloadPdf from '@Src/components/@atoms/AtomPdf';
 import { brick } from '@Src/utils/legobricks';
 import color from '@Src/utils/colors';
+import AtomModalImage from '@Src/components/@atoms/AtomModalImage';
 
 const AllSizes = {
   VERTICAL: [
@@ -160,7 +161,12 @@ const PageIndex: NextPageFC = () => {
   const [blob, setBlob] = useState('');
   const [file, setFile] = useState({} as File);
   const [croppedImage, setCroppedImage] = useState('');
-  const [cropImage, setCropImage] = useState<string[]>([]);
+  const [cropImage, setCropImage] = useState<
+    {
+      id: number;
+      image: string;
+    }[]
+  >([]);
   const [colors, setColors] = useState<ColorType[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const refInput = useRef<HTMLInputElement>(null);
@@ -175,6 +181,8 @@ const PageIndex: NextPageFC = () => {
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
   const [quantity, setQuantity] = useState(0);
+  const [modalImage, setModalImage] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(0);
 
   const onCropComplete = useCallback(
     async (_, croppedAreaPixels) => {
@@ -218,321 +226,342 @@ const PageIndex: NextPageFC = () => {
   // console.log(cropImage);
 
   return (
-    <AtomPage>
-      {blob === '' ? (
-        <OrganismsLoadImage formik={formik} />
-      ) : (
-        <AtomWrapper
-          customCSS={css`
-            background-color: #f5f5f5;
-            border-radius: 10px;
-            margin: 30px;
-            padding: 30px;
-            width: 100%;
-            height: 100%;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-            align-items: center;
-            justify-content: center;
-          `}
-        >
-          <AtomWrapper justifyContent="center" alignItems="flex-end">
-            <AtomWrapper
-              maxWidth="100%"
-              flexDirection="row"
-              alignItems="flex-end"
-              justifyContent="flex-start"
-              margin="0px 0px 20px 0px"
-            >
-              <AtomWrapper maxWidth="max-content">
-                <AtomText
-                  margin="0px 0px 5px 25px"
-                  fontSize="12px"
-                  fontWeight={600}
-                >
-                  {`
+    <>
+      <AtomPage>
+        {blob === '' ? (
+          <OrganismsLoadImage formik={formik} />
+        ) : (
+          <AtomWrapper
+            customCSS={css`
+              background-color: #f5f5f5;
+              border-radius: 10px;
+              margin: 30px;
+              padding: 30px;
+              width: 100%;
+              height: 100%;
+              box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+              align-items: center;
+              justify-content: center;
+            `}
+          >
+            <AtomWrapper justifyContent="center" alignItems="flex-end">
+              <AtomWrapper
+                maxWidth="100%"
+                flexDirection="row"
+                alignItems="flex-end"
+                justifyContent="flex-start"
+                margin="0px 0px 20px 0px"
+              >
+                <AtomWrapper maxWidth="max-content">
+                  <AtomText
+                    margin="0px 0px 5px 25px"
+                    fontSize="12px"
+                    fontWeight={600}
+                  >
+                    {`
                   Size: 
                   ${Object.entries(AllSizes).find((e) => sizes === e[0])?.[0]}`}
-                </AtomText>
-                <AtomWrapper
-                  margin="0px 0px 0px 10px"
-                  maxWidth="max-content"
-                  flexWrap="wrap"
-                  justifyContent="space-evenly"
-                  flexDirection="row"
-                  alignItems="flex-end"
-                >
-                  {Object.entries(AllSizes).map((e) => (
-                    <AtomButton
-                      margin="0px 10px"
-                      key={`Item${e[0]}`}
-                      backgroundColor={sizes === e[0] ? '#ed7001' : '#1482dc'}
-                      padding="5px 5px"
-                      width={
-                        iconsSquare[e[0] as keyof typeof iconsSquare]?.width ||
-                        '50px'
-                      }
-                      height={
-                        iconsSquare[e[0] as keyof typeof iconsSquare]?.height ||
-                        '50px'
-                      }
-                      onClick={() => {
-                        setSizes(e[0] as keyof typeof AllSizes);
-                        setSize(SizeImage[e[0] as keyof typeof SizeImage]);
-                        setCropImage([]);
-                      }}
-                    >
-                      <AtomWrapper
-                        width="100%"
-                        height="100%"
-                        borderRadius="5px"
-                        border="2px solid white"
-                        alignItems="center"
-                        justifyContent="center"
+                  </AtomText>
+                  <AtomWrapper
+                    margin="0px 0px 0px 10px"
+                    maxWidth="max-content"
+                    flexWrap="wrap"
+                    justifyContent="space-evenly"
+                    flexDirection="row"
+                    alignItems="flex-end"
+                  >
+                    {Object.entries(AllSizes).map((e) => (
+                      <AtomButton
+                        margin="0px 10px"
+                        key={`Item${e[0]}`}
+                        backgroundColor={sizes === e[0] ? '#ed7001' : '#1482dc'}
+                        padding="5px 5px"
+                        width={
+                          iconsSquare[e[0] as keyof typeof iconsSquare]
+                            ?.width || '50px'
+                        }
+                        height={
+                          iconsSquare[e[0] as keyof typeof iconsSquare]
+                            ?.height || '50px'
+                        }
+                        onClick={() => {
+                          setSizes(e[0] as keyof typeof AllSizes);
+                          setSize(SizeImage[e[0] as keyof typeof SizeImage]);
+                          setCropImage([]);
+                        }}
                       >
-                        {e[0]?.substring(0, 1).toUpperCase()}
-                      </AtomWrapper>
-                    </AtomButton>
-                  ))}
+                        <AtomWrapper
+                          width="100%"
+                          height="100%"
+                          borderRadius="5px"
+                          border="2px solid white"
+                          alignItems="center"
+                          justifyContent="center"
+                        >
+                          {e[0]?.substring(0, 1).toUpperCase()}
+                        </AtomWrapper>
+                      </AtomButton>
+                    ))}
+                  </AtomWrapper>
                 </AtomWrapper>
-              </AtomWrapper>
-              <AtomWrapper maxWidth="max-content">
-                <AtomText
-                  margin="0px 0px 5px 15px"
-                  fontSize="12px"
-                  fontWeight={600}
-                >
-                  {`
+                <AtomWrapper maxWidth="max-content">
+                  <AtomText
+                    margin="0px 0px 5px 15px"
+                    fontSize="12px"
+                    fontWeight={600}
+                  >
+                    {`
                   Size: 
                   ${AllSizes[sizes].find((_, i) => i === sizeSelected)?.title}`}
-                </AtomText>
+                  </AtomText>
+                  <AtomWrapper
+                    maxWidth="max-content"
+                    alignItems="center"
+                    flexWrap="wrap"
+                    flexDirection="row"
+                  >
+                    {AllSizes[sizes].map((e, i) => (
+                      <AtomButton
+                        key={e.title}
+                        onClick={() => {
+                          setSizeSelected(i);
+                          setCropImage([]);
+                        }}
+                        customCSS={css`
+                          padding: 8px 18px;
+                          background-color: ${sizeSelected === i
+                            ? '#ed7001'
+                            : '#1482dc'};
+                          margin: 0px 0px 0px 15px;
+                        `}
+                      >
+                        {e.title.substring(0, 1)}
+                      </AtomButton>
+                    ))}
+                  </AtomWrapper>
+                </AtomWrapper>
                 <AtomWrapper
-                  maxWidth="max-content"
-                  alignItems="center"
-                  flexWrap="wrap"
+                  width="max-content"
                   flexDirection="row"
+                  alignItems="center"
+                  margin="0px 0px 0px 20px"
                 >
-                  {AllSizes[sizes].map((e, i) => (
-                    <AtomButton
-                      key={e.title}
-                      onClick={() => {
-                        setSizeSelected(i);
-                        setCropImage([]);
-                      }}
-                      customCSS={css`
-                        padding: 8px 18px;
-                        background-color: ${sizeSelected === i
-                          ? '#ed7001'
-                          : '#1482dc'};
-                        margin: 0px 0px 0px 15px;
-                      `}
-                    >
-                      {e.title.substring(0, 1)}
-                    </AtomButton>
-                  ))}
+                  <input
+                    type="checkbox"
+                    onChange={(e) => setShowBorder(e.target.checked)}
+                  />
+                  <AtomText
+                    margin="0px 0px 0px 10px"
+                    fontSize="12px"
+                    fontWeight={600}
+                  >
+                    SHOW BORDERS
+                  </AtomText>
                 </AtomWrapper>
               </AtomWrapper>
               <AtomWrapper
-                width="max-content"
                 flexDirection="row"
                 alignItems="center"
-                margin="0px 0px 0px 20px"
-              >
-                <input
-                  type="checkbox"
-                  onChange={(e) => setShowBorder(e.target.checked)}
-                />
-                <AtomText
-                  margin="0px 0px 0px 10px"
-                  fontSize="12px"
-                  fontWeight={600}
-                >
-                  SHOW BORDERS
-                </AtomText>
-              </AtomWrapper>
-            </AtomWrapper>
-            <AtomWrapper
-              flexDirection="row"
-              alignItems="center"
-              justifyContent="space-between"
-              customCSS={css`
-                min-height: 400px;
-                img {
-                  object-fit: cover;
-                }
-              `}
-            >
-              <AtomWrapper width="400px">
-                <AtomWrapper
-                  width="100%"
-                  height="400px"
-                  customCSS={css`
-                    .reactEasyCrop_Container {
-                      position: relative;
-                      width: 100%;
-                      height: 100%;
-                    }
-                    .reactEasyCrop_CropArea .reactEasyCrop_CropAreaGrid {
-                      width: 100%;
-                    }
-                  `}
-                >
-                  <Cropper
-                    image={blob}
-                    crop={crop}
-                    zoom={zoom}
-                    aspect={AllSizes[sizes][sizeSelected].aspect}
-                    onCropChange={setCrop}
-                    onCropComplete={onCropComplete}
-                    onZoomChange={setZoom}
-                  />
-                </AtomWrapper>
-              </AtomWrapper>
-              <AtomButton
-                onClick={() => {
-                  cropAndFilter(
-                    size,
-                    croppedImage,
-                    setCropImage,
-                    AllSizes[sizes][sizeSelected].x,
-                    AllSizes[sizes][sizeSelected].y,
-                    setLoading,
-                    setColors
-                  );
-                  setQuantity(
-                    AllSizes[sizes][sizeSelected].x *
-                      AllSizes[sizes][sizeSelected].y
-                  );
-                }}
-              >
-                TRANSFORM
-              </AtomButton>
-
-              {cropImage.length === 0 && !loading ? (
-                <AtomWrapper
-                  customCSS={css`
-                    width: 400px;
-                    height: 400px;
-                    align-items: center;
-                    justify-content: center;
-                    background-color: #cccccc;
-                  `}
-                >
-                  <AtomText
-                    fontWeight={600}
-                    fontSize="22px"
-                    color="white"
-                    align="center"
-                  >
-                    TRANSFORM IMAGE TO DOWNLOAD
-                  </AtomText>
-                </AtomWrapper>
-              ) : (
-                <AtomWrapper
-                  customCSS={css`
-                    width: ${(400 / AllSizes[sizes][sizeSelected].y) *
-                    AllSizes[sizes][sizeSelected].x}px;
-                    height: 400px;
-                    align-items: center;
-                    justify-content: center;
-                    background-color: #cccccc;
-                  `}
-                >
-                  {loading ? (
-                    <AtomLoader
-                      isLoading
-                      colorLoading="#ed7001"
-                      type="small"
-                      width="100%"
-                      height="100%"
-                    />
-                  ) : (
-                    <AtomWrapper
-                      refObject={ref}
-                      customCSS={css`
-                        flex-direction: row;
-                        flex-wrap: wrap;
-                        align-items: flex-start;
-                        justify-content: flex-start;
-                        width: max-content;
-                        height: max-content;
-                      `}
-                    >
-                      {cropImage.map((image, i) => (
-                        <>
-                          <StyledImage
-                            key={`image${i}`}
-                            src={image}
-                            alt="croppedImage"
-                            customCSS={css`
-                              ${showBorder &&
-                              css`
-                                border: 1px solid #ffffff;
-                              `}
-                              width: ${400 / AllSizes[sizes][sizeSelected].y}px;
-                              height: ${400 /
-                              AllSizes[sizes][sizeSelected].y}px;
-
-                              /* width: ${size.x /
-                              AllSizes[sizes][sizeSelected].x}px;
-                            height: ${size.y /
-                              AllSizes[sizes][sizeSelected].y}px; */
-                            `}
-                          />
-                          {/* {400 / AllSizes[sizes][sizeSelected].y} */}
-                        </>
-                      ))}
-                    </AtomWrapper>
-                  )}
-                </AtomWrapper>
-              )}
-            </AtomWrapper>
-            <AtomWrapper
-              margin="15px 0px 0px 0px"
-              flexDirection="row"
-              justifyContent="space-between"
-            >
-              <AtomButton
-                backgroundColor="#ed7001"
-                onClick={() => {
-                  refInput.current?.click();
-                }}
+                justifyContent="space-between"
                 customCSS={css`
-                  input {
-                    display: none;
+                  min-height: 400px;
+                  img {
+                    object-fit: cover;
                   }
                 `}
               >
-                CHANGE IMAGE
-                <input
-                  ref={refInput}
-                  type="file"
-                  onChange={(e) => {
-                    if (e.target.files) {
-                      const file = e?.target?.files[0];
-                      const blob = new Blob([file], { type: 'image/png' });
-                      setBlob(URL.createObjectURL(blob));
-                      setFile(file);
-                    }
+                <AtomWrapper width="400px">
+                  <AtomWrapper
+                    width="100%"
+                    height="400px"
+                    customCSS={css`
+                      .reactEasyCrop_Container {
+                        position: relative;
+                        width: 100%;
+                        height: 100%;
+                      }
+                      .reactEasyCrop_CropArea .reactEasyCrop_CropAreaGrid {
+                        width: 100%;
+                      }
+                    `}
+                  >
+                    <Cropper
+                      image={blob}
+                      crop={crop}
+                      zoom={zoom}
+                      aspect={AllSizes[sizes][sizeSelected].aspect}
+                      onCropChange={setCrop}
+                      onCropComplete={onCropComplete}
+                      onZoomChange={setZoom}
+                    />
+                  </AtomWrapper>
+                </AtomWrapper>
+                <AtomButton
+                  onClick={() => {
+                    cropAndFilter(
+                      size,
+                      croppedImage,
+                      setCropImage,
+                      AllSizes[sizes][sizeSelected].x,
+                      AllSizes[sizes][sizeSelected].y,
+                      setLoading,
+                      setColors
+                    );
+                    setQuantity(
+                      AllSizes[sizes][sizeSelected].x *
+                        AllSizes[sizes][sizeSelected].y
+                    );
                   }}
-                />
-              </AtomButton>
-              {cropImage.length === 0 ? (
-                <AtomButton backgroundColor="#ed7001">
-                  TRANSFORM IMAGE TO DOWNLOAD
+                >
+                  TRANSFORM
                 </AtomButton>
-              ) : (
-                <DownloadPdf
-                  images={cropImage}
-                  colors={colors}
-                  height={`${AllSizes[sizes][sizeSelected].y}`}
-                  width={`${AllSizes[sizes][sizeSelected].x}`}
-                />
-              )}
+
+                {cropImage.length === 0 && !loading ? (
+                  <AtomWrapper
+                    customCSS={css`
+                      width: 400px;
+                      height: 400px;
+                      align-items: center;
+                      justify-content: center;
+                      background-color: #cccccc;
+                    `}
+                  >
+                    <AtomText
+                      fontWeight={600}
+                      fontSize="22px"
+                      color="white"
+                      align="center"
+                    >
+                      TRANSFORM IMAGE TO DOWNLOAD
+                    </AtomText>
+                  </AtomWrapper>
+                ) : (
+                  <AtomWrapper
+                    customCSS={css`
+                      width: ${(400 / AllSizes[sizes][sizeSelected].y) *
+                      AllSizes[sizes][sizeSelected].x}px;
+                      height: 400px;
+                      align-items: center;
+                      justify-content: center;
+                      background-color: #cccccc;
+                    `}
+                  >
+                    {loading ? (
+                      <AtomLoader
+                        isLoading
+                        colorLoading="#ed7001"
+                        type="small"
+                        width="100%"
+                        height="100%"
+                      />
+                    ) : (
+                      <AtomWrapper
+                        refObject={ref}
+                        customCSS={css`
+                          flex-direction: row;
+                          flex-wrap: wrap;
+                          align-items: flex-start;
+                          justify-content: flex-start;
+                          width: max-content;
+                          height: max-content;
+                        `}
+                      >
+                        {cropImage.map((image, i) => (
+                          <AtomButton
+                            key={`image${i}`}
+                            customCSS={css`
+                              display: flex;
+                              padding: 0px;
+                            `}
+                            onClick={() => {
+                              setModalImage(true);
+                              setSelectedImage(i);
+                            }}
+                          >
+                            <StyledImage
+                              src={image.image}
+                              alt="croppedImage"
+                              customCSS={css`
+                                ${showBorder &&
+                                css`
+                                  border: 1px solid #ffffff;
+                                `}
+                                width: ${400 /
+                                AllSizes[sizes][sizeSelected].y}px;
+                                height: ${400 /
+                                AllSizes[sizes][sizeSelected].y}px;
+
+                                /* width: ${size.x /
+                                AllSizes[sizes][sizeSelected].x}px;
+                            height: ${size.y /
+                                AllSizes[sizes][sizeSelected].y}px; */
+                              `}
+                            />
+                            {/* {400 / AllSizes[sizes][sizeSelected].y} */}
+                          </AtomButton>
+                        ))}
+                      </AtomWrapper>
+                    )}
+                  </AtomWrapper>
+                )}
+              </AtomWrapper>
+              <AtomWrapper
+                margin="15px 0px 0px 0px"
+                flexDirection="row"
+                justifyContent="space-between"
+              >
+                <AtomButton
+                  backgroundColor="#ed7001"
+                  onClick={() => {
+                    refInput.current?.click();
+                  }}
+                  customCSS={css`
+                    input {
+                      display: none;
+                    }
+                  `}
+                >
+                  CHANGE IMAGE
+                  <input
+                    ref={refInput}
+                    type="file"
+                    onChange={(e) => {
+                      if (e.target.files) {
+                        const file = e?.target?.files[0];
+                        const blob = new Blob([file], { type: 'image/png' });
+                        setBlob(URL.createObjectURL(blob));
+                        setFile(file);
+                      }
+                    }}
+                  />
+                </AtomButton>
+                {cropImage.length === 0 ? (
+                  <AtomButton backgroundColor="#ed7001">
+                    TRANSFORM IMAGE TO DOWNLOAD
+                  </AtomButton>
+                ) : (
+                  <DownloadPdf
+                    images={cropImage.map((image) => image.image)}
+                    colors={colors}
+                    height={`${AllSizes[sizes][sizeSelected].y}`}
+                    width={`${AllSizes[sizes][sizeSelected].x}`}
+                  />
+                )}
+              </AtomWrapper>
             </AtomWrapper>
           </AtomWrapper>
-        </AtomWrapper>
-      )}
-    </AtomPage>
+        )}
+      </AtomPage>
+      <AtomModalImage
+        state={modalImage}
+        setState={setModalImage}
+        selected={selectedImage}
+        setSelected={setSelectedImage}
+        images={cropImage
+          .sort((a, b) => (a.id > b.id ? 1 : b.id > a.id ? -1 : 0))
+          .map((image) => image.image)}
+      />
+    </>
   );
 };
 
@@ -554,7 +583,14 @@ function createImage(src: string) {
 const cropAndFilter = (
   sizeCanvas: { x: number; y: number },
   blob: string,
-  setState: Dispatch<SetStateAction<string[]>>,
+  setState: Dispatch<
+    SetStateAction<
+      {
+        id: number;
+        image: string;
+      }[]
+    >
+  >,
   splitx: number,
   splity: number,
   setStateLoading: Dispatch<SetStateAction<boolean>>,
@@ -641,7 +677,7 @@ const cropAndFilter = (
         return imagesvg;
       }
     );
-    getArray.map((image) => {
+    getArray.map((image, idx) => {
       const imgElement = createImage(image);
       imgElement.addEventListener('load', () => {
         const canvas2 = document.createElement('canvas');
@@ -775,7 +811,15 @@ const cropAndFilter = (
           canvas3.width = w2;
           canvas3.height = h2;
           context3.drawImage(imgElement3, 0, 0);
-          setState((state) => [...state, canvas3.toDataURL()]);
+          setState((state) =>
+            [
+              ...state,
+              {
+                id: idx,
+                image: canvas3.toDataURL()
+              }
+            ].sort((a, b) => (a.id > b.id ? 1 : b.id > a.id ? -1 : 0))
+          );
 
           // setState((state) => [...new Set([...state, canvas2.toDataURL()])]);
         });

@@ -171,7 +171,69 @@ export const AtomPdf: FC<AtomPdfProps> = (props) => {
                 .filter((color) => color.count > 0)
                 .reduce((acc, color) => acc + color.count, 0)}
             </Text> */}
-            <Image src={image} style={styles.image} />
+            <View
+              style={{
+                width: '440px',
+                height: '440px'
+              }}
+            >
+              <View
+                style={{
+                  width: '440px',
+                  height: '20px',
+                  flexDirection: 'row',
+                  padding: '0px 0px 0px 20px',
+                  justifyContent: 'space-between',
+                  alignItems: 'center'
+                }}
+              >
+                {Array.from({ length: 32 }, (_, idx) => (
+                  <Text
+                    style={{
+                      fontSize: '9px',
+                      fontWeight: 600
+                    }}
+                  >
+                    {idx}
+                  </Text>
+                ))}
+              </View>
+              <View
+                style={{
+                  width: '440px',
+                  height: '420px',
+                  flexDirection: 'row'
+                }}
+              >
+                <View
+                  style={{
+                    width: '20px',
+                    height: '420px',
+                    padding: '0px 0px 0px 0px',
+                    justifyContent: 'space-between',
+                    alignItems: 'center'
+                  }}
+                >
+                  {Array.from({ length: 32 }, (_, idx) => (
+                    <Text
+                      style={{
+                        fontSize: '9px',
+                        fontWeight: 600
+                      }}
+                    >
+                      {idx}
+                    </Text>
+                  ))}
+                </View>
+                <Image
+                  src={image}
+                  style={{
+                    width: '420px',
+                    height: '420px'
+                  }}
+                />
+              </View>
+            </View>
           </View>
         </Page>
       ))}
@@ -202,7 +264,10 @@ const DownloadPdf: FC<DocumentProps> = (props) => {
   }, [images, colors]);
   return (
     <div>
-      <PDFDownloadLink document={Document} fileName="somename.pdf">
+      <PDFDownloadLink
+        document={Document}
+        fileName={`${new Date().toLocaleString()}.pdf`}
+      >
         {({ loading }) =>
           loading ? (
             <AtomButton backgroundColor="#ed7001">LOAD DOCUMENT</AtomButton>

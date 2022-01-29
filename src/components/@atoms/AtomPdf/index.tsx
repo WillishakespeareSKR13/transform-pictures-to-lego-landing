@@ -52,10 +52,11 @@ type AtomPdfProps = {
   width?: string;
   height?: string;
   colors?: ColorType[];
+  isPortrait?: boolean;
 };
 
 export const AtomPdf: FC<AtomPdfProps> = (props) => {
-  const { images, colors, width, height } = props;
+  const { images, colors, width, height, isPortrait } = props;
   const stylesImg = StyleSheet.create({
     image: {
       width: 400 / Number(width),
@@ -187,14 +188,14 @@ export const AtomPdf: FC<AtomPdfProps> = (props) => {
                   alignItems: 'center'
                 }}
               >
-                {Array.from({ length: 32 }, (_, idx) => (
+                {Array.from({ length: isPortrait ? 50 : 32 }, (_, idx) => (
                   <Text
                     style={{
-                      fontSize: '9px',
+                      fontSize: `${isPortrait ? 6 : 9}px`,
                       fontWeight: 600
                     }}
                   >
-                    {idx}
+                    {idx + 1}
                   </Text>
                 ))}
               </View>
@@ -214,14 +215,14 @@ export const AtomPdf: FC<AtomPdfProps> = (props) => {
                     alignItems: 'center'
                   }}
                 >
-                  {Array.from({ length: 32 }, (_, idx) => (
+                  {Array.from({ length: isPortrait ? 50 : 32 }, (_, idx) => (
                     <Text
                       style={{
-                        fontSize: '9px',
+                        fontSize: `${isPortrait ? 6 : 9}px`,
                         fontWeight: 600
                       }}
                     >
-                      {idx}
+                      {idx + 1}
                     </Text>
                   ))}
                 </View>
@@ -250,16 +251,29 @@ type DocumentProps = {
   colors?: ColorType[];
   width?: string;
   height?: string;
+  isPortrait?: boolean;
 };
 
 const DownloadPdf: FC<DocumentProps> = (props) => {
-  const { images, colors, width, height } = props;
+  const { images, colors, width, height, isPortrait } = props;
   const [Document, setDocument] = useState(
-    <AtomPdf images={images} colors={colors} />
+    <AtomPdf
+      images={images}
+      colors={colors}
+      height={height}
+      width={width}
+      isPortrait={isPortrait}
+    />
   );
   useEffect(() => {
     setDocument(
-      <AtomPdf images={images} colors={colors} height={height} width={width} />
+      <AtomPdf
+        images={images}
+        colors={colors}
+        height={height}
+        width={width}
+        isPortrait={isPortrait}
+      />
     );
   }, [images, colors]);
   return (

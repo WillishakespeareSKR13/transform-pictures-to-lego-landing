@@ -30,31 +30,36 @@ const AllSizes = {
       aspect: 2 / 3,
       title: 'SMALL',
       x: 2,
-      y: 3
+      y: 3,
+      isPortrait: false
     },
     {
       aspect: 2 / 3,
       title: 'MEDIUM',
       x: 3,
-      y: 4
+      y: 4,
+      isPortrait: false
     },
     {
       aspect: 2 / 3,
       title: 'LARGE',
       x: 3,
-      y: 5
+      y: 5,
+      isPortrait: false
     },
     {
       aspect: 2 / 3,
       title: 'XLARGE',
       x: 4,
-      y: 5
+      y: 5,
+      isPortrait: false
     },
     {
       aspect: 2 / 3,
       title: 'JUMBO',
       x: 4,
-      y: 6
+      y: 6,
+      isPortrait: false
     }
   ],
   HORIZONTAL: [
@@ -62,31 +67,36 @@ const AllSizes = {
       aspect: 3 / 2,
       title: 'SMALL',
       x: 3,
-      y: 2
+      y: 2,
+      isPortrait: false
     },
     {
       aspect: 3 / 2,
       title: 'MEDIUM',
       x: 4,
-      y: 3
+      y: 3,
+      isPortrait: false
     },
     {
       aspect: 3 / 2,
       title: 'LARGE',
       x: 5,
-      y: 3
+      y: 3,
+      isPortrait: false
     },
     {
       aspect: 3 / 2,
       title: 'XLARGE',
       x: 5,
-      y: 4
+      y: 4,
+      isPortrait: false
     },
     {
       aspect: 3 / 2,
       title: 'JUMBO',
       x: 6,
-      y: 4
+      y: 4,
+      isPortrait: false
     }
   ],
   SQUARE: [
@@ -94,31 +104,45 @@ const AllSizes = {
       aspect: 3 / 3,
       title: 'SMALL',
       x: 2,
-      y: 2
+      y: 2,
+      isPortrait: false
     },
     {
       aspect: 3 / 3,
       title: 'MEDIUM',
       x: 3,
-      y: 3
+      y: 3,
+      isPortrait: false
     },
     {
       aspect: 3 / 3,
       title: 'LARGE',
       x: 4,
-      y: 4
+      y: 4,
+      isPortrait: false
     },
     {
       aspect: 3 / 3,
       title: 'XLARGE',
       x: 5,
-      y: 5
+      y: 5,
+      isPortrait: false
     },
     {
       aspect: 3 / 3,
       title: 'JUMBO',
       x: 6,
-      y: 6
+      y: 6,
+      isPortrait: false
+    }
+  ],
+  PORTRAIT: [
+    {
+      aspect: 3 / 3,
+      title: 'PORTRAIT',
+      x: 1,
+      y: 1,
+      isPortrait: true
     }
   ]
 };
@@ -135,6 +159,10 @@ const SizeImage = {
   SQUARE: {
     x: 400,
     y: 400
+  },
+  PORTRAIT: {
+    x: 400,
+    y: 400
   }
 };
 
@@ -148,6 +176,10 @@ const iconsSquare = {
     height: '40px'
   },
   SQUARE: {
+    width: '40px',
+    height: '40px'
+  },
+  PORTRAIT: {
     width: '40px',
     height: '40px'
   }
@@ -405,7 +437,8 @@ const PageIndex: NextPageFC = () => {
                       AllSizes[sizes][sizeSelected].x,
                       AllSizes[sizes][sizeSelected].y,
                       setLoading,
-                      setColors
+                      setColors,
+                      AllSizes[sizes][sizeSelected].isPortrait
                     );
                     setQuantity(
                       AllSizes[sizes][sizeSelected].x *
@@ -545,6 +578,7 @@ const PageIndex: NextPageFC = () => {
                     colors={colors}
                     height={`${AllSizes[sizes][sizeSelected].y}`}
                     width={`${AllSizes[sizes][sizeSelected].x}`}
+                    isPortrait={AllSizes[sizes][sizeSelected].isPortrait}
                   />
                 )}
               </AtomWrapper>
@@ -594,7 +628,8 @@ const cropAndFilter = (
   splitx: number,
   splity: number,
   setStateLoading: Dispatch<SetStateAction<boolean>>,
-  setColors: Dispatch<SetStateAction<ColorType[]>>
+  setColors: Dispatch<SetStateAction<ColorType[]>>,
+  isPortrait: boolean
 ) => {
   setStateLoading(true);
   const blobcreateImage = createImage(blob);
@@ -699,13 +734,13 @@ const cropAndFilter = (
         const config = {
           to: canvas2,
           from: imgElement,
-          scale: 8,
+          scale: isPortrait ? 12.5 : 8,
           palette: mypalette
         };
         // console.log(mypalette);
         const px = new Pixel(config);
         px.draw().pixelate().convertPalette().saveImage();
-        const size = 12.5;
+        const size = isPortrait ? 8 : 12.5;
 
         const data = context2.getImageData(0, 0, w2, h2).data;
         // console.log(data.length);

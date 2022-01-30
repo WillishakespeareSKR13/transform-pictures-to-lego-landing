@@ -439,14 +439,12 @@ const PageIndex: NextPageFC = () => {
                         padding: 0px 20px;
                         flex-direction: row;
                         background-color: white;
-                        position: absolute;
                         bottom: 40px;
                         left: 50%;
-                        width: 80%;
+                        width: 100%;
                         border-radius: 5px;
                         height: 40px;
                         z-index: 1;
-                        transform: translateX(-50%);
                         box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
                         input {
                           margin: 0px 0px 0px 10px;
@@ -488,24 +486,26 @@ const PageIndex: NextPageFC = () => {
                 </AtomButton>
 
                 {cropImage.length === 0 && !loading ? (
-                  <AtomWrapper
-                    customCSS={css`
-                      width: 400px;
-                      height: 400px;
-                      align-items: center;
-                      justify-content: center;
-                      background-color: #cccccc;
-                    `}
-                  >
-                    <AtomText
-                      fontWeight={600}
-                      fontSize="22px"
-                      color="white"
-                      align="center"
+                  <>
+                    <AtomWrapper
+                      customCSS={css`
+                        width: 400px;
+                        height: 400px;
+                        align-items: center;
+                        justify-content: center;
+                        background-color: #cccccc;
+                      `}
                     >
-                      TRANSFORM IMAGE TO DOWNLOAD
-                    </AtomText>
-                  </AtomWrapper>
+                      <AtomText
+                        fontWeight={600}
+                        fontSize="22px"
+                        color="white"
+                        align="center"
+                      >
+                        TRANSFORM IMAGE TO DOWNLOAD
+                      </AtomText>
+                    </AtomWrapper>
+                  </>
                 ) : (
                   <AtomWrapper
                     customCSS={css`

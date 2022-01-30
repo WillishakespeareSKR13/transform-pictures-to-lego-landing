@@ -5,6 +5,26 @@ const color = [
     id: 1
   },
   {
+    name: 'White',
+    hex: '#ebebeb',
+    id: 111
+  },
+  {
+    name: 'White',
+    hex: '#b0b0b0',
+    id: 112
+  },
+  {
+    name: 'White',
+    hex: '#a5a5a5',
+    id: 112
+  },
+  {
+    name: 'White',
+    hex: '#d2d2d2',
+    id: 112
+  },
+  {
     name: 'Skin Color',
     hex: '#EBBFA5',
     id: 2

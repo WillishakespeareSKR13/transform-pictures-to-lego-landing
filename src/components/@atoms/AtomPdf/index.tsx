@@ -99,7 +99,7 @@ export const AtomPdf: FC<AtomPdfProps> = (props) => {
                 </View>
               ))}
             <Text style={styles.text}>
-              Total: {1024 * Number(width) * Number(height)}
+              Total: {isPortrait ? 2500 : 1024 * Number(width) * Number(height)}
             </Text>
           </View>
           <View
@@ -160,7 +160,7 @@ export const AtomPdf: FC<AtomPdfProps> = (props) => {
                     <Text style={styles.text}>{color.count}</Text>
                   </View>
                 ))}
-              <Text style={styles.text}>Total: {1024}</Text>
+              <Text style={styles.text}>Total: {isPortrait ? 2500 : 1024}</Text>
             </View>
 
             {/* <Text style={styles.text}>

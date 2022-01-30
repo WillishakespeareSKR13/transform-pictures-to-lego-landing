@@ -1,6 +1,16 @@
 const color = [
   {
     name: 'White',
+    hex: '#ffffff',
+    id: 0
+  },
+  {
+    name: 'White',
+    hex: '#f8e7e3',
+    id: 0
+  },
+  {
+    name: 'White',
     hex: '#d7d6dd',
     id: 1
   },

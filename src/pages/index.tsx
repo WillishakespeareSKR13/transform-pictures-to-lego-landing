@@ -679,7 +679,7 @@ const cropAndFilter = (
     // const factor = 400 * sizes;
     // const size = sizeCanvas.x * ((5 * 0.05) / ((8 + splitx - 1) * splitx - 1));
     // const size = w2 * ((splitx * factor) / 2);
-    const blendMode = 'overlay';
+    const blendMode = 'normal';
     const small = { height: h2, width: w2 };
     // const small = { height: h2, width: w2 };
     const corrd = Array.from({ length: splity }, (_, a1i) => a1i)

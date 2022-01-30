@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { css, SerializedStyles } from '@emotion/react';
 import { AtomPage } from '@Src/components/@atoms';
-import { AtomButton, AtomLoader, AtomText, AtomWrapper } from '@sweetsyui/ui';
+import { AtomLoader, AtomText, AtomWrapper } from '@sweetsyui/ui';
 import * as Yup from 'yup';
 import Pixel from '@Utils/pixelit';
 import { useFormik } from 'formik';
@@ -23,6 +23,7 @@ import DownloadPdf from '@Src/components/@atoms/AtomPdf';
 import { brick } from '@Src/utils/legobricks';
 import color from '@Src/utils/colors';
 import AtomModalImage from '@Src/components/@atoms/AtomModalImage';
+import AtomButton from '@Src/components/@atoms/AtomButton';
 
 const AllSizes = {
   VERTICAL: [
@@ -304,6 +305,7 @@ const PageIndex: NextPageFC = () => {
                   >
                     {Object.entries(AllSizes).map((e) => (
                       <AtomButton
+                        disabled={loading}
                         margin="0px 10px"
                         key={`Item${e[0]}`}
                         backgroundColor={sizes === e[0] ? '#ed7001' : '#1482dc'}
@@ -329,6 +331,7 @@ const PageIndex: NextPageFC = () => {
                           border="2px solid white"
                           alignItems="center"
                           justifyContent="center"
+                          cursor="pointer"
                         >
                           {e[0]?.substring(0, 1).toUpperCase()}
                         </AtomWrapper>
@@ -354,16 +357,17 @@ const PageIndex: NextPageFC = () => {
                   >
                     {AllSizes[sizes].map((e, i) => (
                       <AtomButton
+                        disabled={loading}
                         key={e.title}
+                        backgroundColor={
+                          sizeSelected === i ? '#ed7001' : '#1482dc'
+                        }
                         onClick={() => {
                           setSizeSelected(i);
                           setCropImage([]);
                         }}
                         customCSS={css`
                           padding: 8px 18px;
-                          background-color: ${sizeSelected === i
-                            ? '#ed7001'
-                            : '#1482dc'};
                           margin: 0px 0px 0px 15px;
                         `}
                       >
@@ -379,6 +383,7 @@ const PageIndex: NextPageFC = () => {
                   margin="0px 0px 0px 20px"
                 >
                   <input
+                    disabled={loading}
                     type="checkbox"
                     onChange={(e) => setShowBorder(e.target.checked)}
                   />
@@ -422,7 +427,7 @@ const PageIndex: NextPageFC = () => {
                       image={blob}
                       crop={crop}
                       zoom={zoom}
-                      aspect={AllSizes[sizes][sizeSelected].aspect}
+                      aspect={AllSizes[sizes][sizeSelected]?.aspect}
                       onCropChange={setCrop}
                       onCropComplete={onCropComplete}
                       onZoomChange={setZoom}

@@ -228,6 +228,52 @@ const color = [
     name: 'Bronze',
     hex: '#9A866A',
     id: 40
+  },
+  /////////
+  {
+    name: 'Green',
+    hex: '#6e923b',
+    id: 200
+  },
+  {
+    name: 'Deep Green',
+    hex: '#5e8a3b',
+    id: 201
+  },
+  {
+    name: 'light Green',
+    hex: '#b3b102',
+    id: 202
+  },
+  {
+    name: 'Sky Blue',
+    hex: '#3390d8',
+    id: 203
+  },
+  {
+    name: 'Ocean Blue',
+    hex: '#37b5cd',
+    id: 204
+  },
+  {
+    name: 'Deep Ocean Blue',
+    hex: '#0979a7',
+    id: 205
+  },
+  {
+    name: 'lips',
+    hex: '#de4843',
+    id: 206
+  },
+  {
+    name: 'Red Lips',
+    hex: '#ed5150',
+    id: 207
+  },
+  {
+    name: 'deep lips',
+    hex: '#a94f4e',
+    id: 208
   }
 ];
 

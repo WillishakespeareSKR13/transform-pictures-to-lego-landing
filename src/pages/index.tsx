@@ -44,22 +44,22 @@ const AllSizes = {
     {
       aspect: 2 / 3,
       title: 'LARGE',
-      x: 3,
+      x: 4,
       y: 5,
       isPortrait: false
     },
     {
       aspect: 2 / 3,
       title: 'XLARGE',
-      x: 4,
-      y: 5,
+      x: 5,
+      y: 6,
       isPortrait: false
     },
     {
       aspect: 2 / 3,
       title: 'JUMBO',
-      x: 4,
-      y: 6,
+      x: 6,
+      y: 7,
       isPortrait: false
     }
   ],
@@ -82,21 +82,21 @@ const AllSizes = {
       aspect: 3 / 2,
       title: 'LARGE',
       x: 5,
-      y: 3,
+      y: 4,
       isPortrait: false
     },
     {
       aspect: 3 / 2,
       title: 'XLARGE',
-      x: 5,
-      y: 4,
+      x: 6,
+      y: 5,
       isPortrait: false
     },
     {
       aspect: 3 / 2,
       title: 'JUMBO',
-      x: 6,
-      y: 4,
+      x: 7,
+      y: 6,
       isPortrait: false
     }
   ],
@@ -466,6 +466,7 @@ const PageIndex: NextPageFC = () => {
                   </AtomWrapper>
                 </AtomWrapper>
                 <AtomButton
+                  disabled={loading}
                   onClick={() => {
                     cropAndFilter(
                       size,

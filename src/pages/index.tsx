@@ -28,75 +28,75 @@ import AtomButton from '@Src/components/@atoms/AtomButton';
 const AllSizes = {
   VERTICAL: [
     {
-      aspect: 2 / 3,
+      aspect: 1 / 2,
       title: 'SMALL',
-      x: 2,
-      y: 3,
+      x: 1,
+      y: 2,
       isPortrait: false
     },
     {
-      aspect: 2 / 3,
+      aspect: 1 / 2,
       title: 'MEDIUM',
-      x: 3,
+      x: 2,
       y: 4,
       isPortrait: false
     },
     {
-      aspect: 2 / 3,
+      aspect: 1 / 2,
       title: 'LARGE',
-      x: 4,
-      y: 5,
-      isPortrait: false
-    },
-    {
-      aspect: 2 / 3,
-      title: 'XLARGE',
-      x: 5,
+      x: 3,
       y: 6,
       isPortrait: false
     },
     {
-      aspect: 2 / 3,
+      aspect: 1 / 2,
+      title: 'XLARGE',
+      x: 4,
+      y: 8,
+      isPortrait: false
+    },
+    {
+      aspect: 1 / 2,
       title: 'JUMBO',
-      x: 6,
-      y: 7,
+      x: 5,
+      y: 10,
       isPortrait: false
     }
   ],
   HORIZONTAL: [
     {
-      aspect: 3 / 2,
+      aspect: 2 / 1,
       title: 'SMALL',
-      x: 3,
+      x: 2,
+      y: 1,
+      isPortrait: false
+    },
+    {
+      aspect: 2 / 1,
+      title: 'MEDIUM',
+      x: 4,
       y: 2,
       isPortrait: false
     },
     {
-      aspect: 3 / 2,
-      title: 'MEDIUM',
-      x: 4,
+      aspect: 2 / 1,
+      title: 'LARGE',
+      x: 6,
       y: 3,
       isPortrait: false
     },
     {
-      aspect: 3 / 2,
-      title: 'LARGE',
-      x: 5,
+      aspect: 2 / 1,
+      title: 'XLARGE',
+      x: 8,
       y: 4,
       isPortrait: false
     },
     {
-      aspect: 3 / 2,
-      title: 'XLARGE',
-      x: 6,
-      y: 5,
-      isPortrait: false
-    },
-    {
-      aspect: 3 / 2,
+      aspect: 2 / 1,
       title: 'JUMBO',
-      x: 7,
-      y: 6,
+      x: 10,
+      y: 5,
       isPortrait: false
     }
   ],
@@ -486,26 +486,24 @@ const PageIndex: NextPageFC = () => {
                 </AtomButton>
 
                 {cropImage.length === 0 && !loading ? (
-                  <>
-                    <AtomWrapper
-                      customCSS={css`
-                        width: 400px;
-                        height: 400px;
-                        align-items: center;
-                        justify-content: center;
-                        background-color: #cccccc;
-                      `}
+                  <AtomWrapper
+                    customCSS={css`
+                      width: 400px;
+                      height: 400px;
+                      align-items: center;
+                      justify-content: center;
+                      background-color: #cccccc;
+                    `}
+                  >
+                    <AtomText
+                      fontWeight={600}
+                      fontSize="22px"
+                      color="white"
+                      align="center"
                     >
-                      <AtomText
-                        fontWeight={600}
-                        fontSize="22px"
-                        color="white"
-                        align="center"
-                      >
-                        TRANSFORM IMAGE TO DOWNLOAD
-                      </AtomText>
-                    </AtomWrapper>
-                  </>
+                      TRANSFORM IMAGE TO DOWNLOAD
+                    </AtomText>
+                  </AtomWrapper>
                 ) : (
                   <AtomWrapper
                     customCSS={css`

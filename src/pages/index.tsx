@@ -507,9 +507,19 @@ const PageIndex: NextPageFC = () => {
                 ) : (
                   <AtomWrapper
                     customCSS={css`
-                      width: ${(400 / AllSizes[sizes][sizeSelected].y) *
-                      AllSizes[sizes][sizeSelected].x}px;
-                      height: 400px;
+                      ${AllSizes[sizes][sizeSelected].y >
+                      AllSizes[sizes][sizeSelected].x
+                        ? css`
+                            width: ${(400 / AllSizes[sizes][sizeSelected].y) *
+                            AllSizes[sizes][sizeSelected].x}px;
+                            height: 400px;
+                          `
+                        : css`
+                            height: ${(400 / AllSizes[sizes][sizeSelected].x) *
+                            AllSizes[sizes][sizeSelected].y}px;
+                            width: 400px;
+                          `}
+
                       align-items: center;
                       justify-content: center;
                       background-color: #cccccc;
@@ -555,12 +565,20 @@ const PageIndex: NextPageFC = () => {
                                 css`
                                   border: 1px solid #ffffff;
                                 `}
-                                width: ${400 /
-                                AllSizes[sizes][sizeSelected].y}px;
-                                height: ${400 /
-                                AllSizes[sizes][sizeSelected].y}px;
-
-                                /* width: ${size.x /
+                                ${AllSizes[sizes][sizeSelected].y >
+                                AllSizes[sizes][sizeSelected].x
+                                  ? css`
+                                      width: ${400 /
+                                      AllSizes[sizes][sizeSelected].y}px;
+                                      height: ${400 /
+                                      AllSizes[sizes][sizeSelected].y}px;
+                                    `
+                                  : css`
+                                      width: ${400 /
+                                      AllSizes[sizes][sizeSelected].x}px;
+                                      height: ${400 /
+                                      AllSizes[sizes][sizeSelected].x}px;
+                                    `} /* width: ${size.x /
                                 AllSizes[sizes][sizeSelected].x}px;
                             height: ${size.y /
                                 AllSizes[sizes][sizeSelected].y}px; */

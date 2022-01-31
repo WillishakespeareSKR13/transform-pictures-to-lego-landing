@@ -28,75 +28,75 @@ import AtomButton from '@Src/components/@atoms/AtomButton';
 const AllSizes = {
   VERTICAL: [
     {
-      aspect: 1 / 2,
+      aspect: 2 / 3,
       title: 'SMALL',
-      x: 1,
-      y: 2,
+      x: 2,
+      y: 3,
       isPortrait: false
     },
     {
-      aspect: 1 / 2,
+      aspect: 3 / 4,
       title: 'MEDIUM',
-      x: 2,
+      x: 3,
       y: 4,
       isPortrait: false
     },
     {
-      aspect: 1 / 2,
+      aspect: 3 / 5,
       title: 'LARGE',
       x: 3,
-      y: 6,
+      y: 5,
       isPortrait: false
     },
     {
-      aspect: 1 / 2,
+      aspect: 4 / 5,
       title: 'XLARGE',
       x: 4,
-      y: 8,
+      y: 5,
       isPortrait: false
     },
     {
-      aspect: 1 / 2,
+      aspect: 4 / 6,
       title: 'JUMBO',
-      x: 5,
-      y: 10,
+      x: 4,
+      y: 6,
       isPortrait: false
     }
   ],
   HORIZONTAL: [
     {
-      aspect: 2 / 1,
+      aspect: 3 / 2,
       title: 'SMALL',
-      x: 2,
-      y: 1,
-      isPortrait: false
-    },
-    {
-      aspect: 2 / 1,
-      title: 'MEDIUM',
-      x: 4,
+      x: 3,
       y: 2,
       isPortrait: false
     },
     {
-      aspect: 2 / 1,
-      title: 'LARGE',
-      x: 6,
+      aspect: 4 / 3,
+      title: 'MEDIUM',
+      x: 4,
       y: 3,
       isPortrait: false
     },
     {
-      aspect: 2 / 1,
+      aspect: 5 / 3,
+      title: 'LARGE',
+      x: 5,
+      y: 3,
+      isPortrait: false
+    },
+    {
+      aspect: 5 / 4,
       title: 'XLARGE',
-      x: 8,
+      x: 5,
       y: 4,
       isPortrait: false
     },
     {
-      aspect: 2 / 1,
+      aspect: 6 / 4,
       title: 'JUMBO',
-      x: 10,
-      y: 5,
+      x: 6,
+      y: 4,
       isPortrait: false
     }
   ],

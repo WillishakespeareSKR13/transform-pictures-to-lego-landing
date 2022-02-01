@@ -446,7 +446,7 @@ const PageIndex: NextPageFC = () => {
                     height="400px"
                     customCSS={css`
                       position: relative;
-                      background-color: #3c3c3c;
+                      background-color: black;
                       .reactEasyCrop_Container {
                         position: relative;
                         width: 100%;
@@ -496,6 +496,7 @@ const PageIndex: NextPageFC = () => {
                         type="range"
                         min="1"
                         max="3"
+                        step="0.5"
                         value={zoom}
                         onChange={(e) => setZoom(Number(e.target.value))}
                       />

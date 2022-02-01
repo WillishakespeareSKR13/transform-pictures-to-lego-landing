@@ -29,35 +29,40 @@ const AllSizes = {
   VERTICAL: [
     {
       aspect: 2 / 3,
-      title: 'SMALL',
+      title:
+        'Small - 2 x 3 (6 total boards) 51.20cm x 76.80cm / 20.16in x 30.24in',
       x: 2,
       y: 3,
       isPortrait: false
     },
     {
       aspect: 3 / 4,
-      title: 'MEDIUM',
+      title:
+        'Medium - 3 x 4 (12 total boards) 76.80cm x 102.40cm / 30.24in x 40.32in',
       x: 3,
       y: 4,
       isPortrait: false
     },
     {
       aspect: 3 / 5,
-      title: 'LARGE',
+      title:
+        'Large - 3 x 5 (15 total boards) 76.80cm x 128cm / 30.24in x 50.40in',
       x: 3,
       y: 5,
       isPortrait: false
     },
     {
       aspect: 4 / 5,
-      title: 'XLARGE',
+      title:
+        'XLarge - 4 x 5 (20 total boards) 102.40cm x 128cm / 40.32in x 50.40in',
       x: 4,
       y: 5,
       isPortrait: false
     },
     {
       aspect: 4 / 6,
-      title: 'JUMBO',
+      title:
+        'Jumbo - 4 x 6 (24 total boards) 102.40cm x 153.60cm / 40.32in x 60.48in',
       x: 4,
       y: 6,
       isPortrait: false
@@ -66,35 +71,40 @@ const AllSizes = {
   HORIZONTAL: [
     {
       aspect: 3 / 2,
-      title: 'SMALL',
+      title:
+        'Small - 3 x 2 (6 total boards) 76.80cm x 51.20cm / 30.24in x 20.16in ',
       x: 3,
       y: 2,
       isPortrait: false
     },
     {
       aspect: 4 / 3,
-      title: 'MEDIUM',
+      title:
+        'Medium - 4 x 3 (12 total boards) 102.40cm x 76.80cm / 40.32in x 30.24',
       x: 4,
       y: 3,
       isPortrait: false
     },
     {
       aspect: 5 / 3,
-      title: 'LARGE',
+      title:
+        'Large - 5 x 3 (15 total boards) 128cm x 76.80cm / 50.40in x 30.24in',
       x: 5,
       y: 3,
       isPortrait: false
     },
     {
       aspect: 5 / 4,
-      title: 'XLARGE',
+      title:
+        'XLarge - 5 x 4 (20 total boards) 128cm x 102.40cm / 50.40in x 40.32in',
       x: 5,
       y: 4,
       isPortrait: false
     },
     {
       aspect: 6 / 4,
-      title: 'JUMBO',
+      title:
+        'Jumbo - 6 x 4 (24 total boards) 153.60cm x 102.40cm / 60.48in x 40.32in',
       x: 6,
       y: 4,
       isPortrait: false
@@ -103,35 +113,40 @@ const AllSizes = {
   SQUARE: [
     {
       aspect: 3 / 3,
-      title: 'SMALL',
+      title:
+        'Small -  2 x 2 (4 total boards) 51.20cm x 51.20cm / 20.16in x 20.16in',
       x: 2,
       y: 2,
       isPortrait: false
     },
     {
       aspect: 3 / 3,
-      title: 'MEDIUM',
+      title:
+        'Medium - 3 x 3 (9 total boards) 76.80cm x 76.80cm / 30.24in x 30.24in',
       x: 3,
       y: 3,
       isPortrait: false
     },
     {
       aspect: 3 / 3,
-      title: 'LARGE',
+      title:
+        'Large - 4 x 4 (16 total boards) 102.40cm x 102.40cm / 40.32in x 40.32in',
       x: 4,
       y: 4,
       isPortrait: false
     },
     {
       aspect: 3 / 3,
-      title: 'XLARGE',
+      title:
+        'XLarge - 5 x 5 (25 total boards) 128cm x 128cm / 50.40in x 50.40in',
       x: 5,
       y: 5,
       isPortrait: false
     },
     {
       aspect: 3 / 3,
-      title: 'JUMBO',
+      title:
+        'Jumbo - 6 x 6 (36 total boards) 153.60cm x 153.60cm / 60.40in x 60.40in',
       x: 6,
       y: 6,
       isPortrait: false
@@ -140,7 +155,8 @@ const AllSizes = {
   PORTRAIT: [
     {
       aspect: 3 / 3,
-      title: 'PORTRAIT',
+      title:
+        'Portait - 1 x 1 (1 total boards) 51.20cm x 51.20cm / 20.16in x 20.16in',
       x: 1,
       y: 1,
       isPortrait: true
@@ -204,7 +220,7 @@ const PageIndex: NextPageFC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const refInput = useRef<HTMLInputElement>(null);
   const ref = createRef();
-  const [showBorder, setShowBorder] = useState(false);
+  const [showBorder, setShowBorder] = useState(true);
   const [size, setSize] = useState({
     x: 400,
     y: 400
@@ -287,7 +303,15 @@ const PageIndex: NextPageFC = () => {
               >
                 <AtomWrapper maxWidth="max-content">
                   <AtomText
-                    margin="0px 0px 5px 25px"
+                    color="#262626"
+                    margin="0px 0px 5px 20px"
+                    fontSize="22px"
+                    fontWeight={600}
+                  >
+                    Layout Menu
+                  </AtomText>
+                  <AtomText
+                    margin="0px 0px 5px 20px"
                     fontSize="12px"
                     fontWeight={600}
                   >
@@ -347,7 +371,11 @@ const PageIndex: NextPageFC = () => {
                   >
                     {`
                   Size: 
-                  ${AllSizes[sizes].find((_, i) => i === sizeSelected)?.title}`}
+                  ${
+                    AllSizes[sizes].find(
+                      (_, i) => i === (sizes === 'PORTRAIT' ? 0 : sizeSelected)
+                    )?.title
+                  }`}
                   </AtomText>
                   <AtomWrapper
                     maxWidth="max-content"
@@ -369,6 +397,10 @@ const PageIndex: NextPageFC = () => {
                         customCSS={css`
                           padding: 8px 18px;
                           margin: 0px 0px 0px 15px;
+                          ${sizes === 'PORTRAIT' &&
+                          css`
+                            opacity: 0;
+                          `}
                         `}
                       >
                         {e.title.substring(0, 1)}
@@ -385,6 +417,7 @@ const PageIndex: NextPageFC = () => {
                   <input
                     disabled={loading}
                     type="checkbox"
+                    checked={showBorder}
                     onChange={(e) => setShowBorder(e.target.checked)}
                   />
                   <AtomText
@@ -413,6 +446,7 @@ const PageIndex: NextPageFC = () => {
                     height="400px"
                     customCSS={css`
                       position: relative;
+                      background-color: #3c3c3c;
                       .reactEasyCrop_Container {
                         position: relative;
                         width: 100%;
@@ -421,13 +455,18 @@ const PageIndex: NextPageFC = () => {
                       .reactEasyCrop_CropArea .reactEasyCrop_CropAreaGrid {
                         width: 100%;
                       }
+                      .reactEasyCrop_CropArea {
+                      }
                     `}
                   >
                     <Cropper
                       image={blob}
                       crop={crop}
                       zoom={zoom}
-                      aspect={AllSizes[sizes][sizeSelected]?.aspect}
+                      aspect={
+                        AllSizes[sizes][sizes === 'PORTRAIT' ? 0 : sizeSelected]
+                          ?.aspect
+                      }
                       onCropChange={setCrop}
                       onCropComplete={onCropComplete}
                       onZoomChange={setZoom}
@@ -442,7 +481,7 @@ const PageIndex: NextPageFC = () => {
                         bottom: 40px;
                         left: 50%;
                         width: 100%;
-                        border-radius: 5px;
+                        border-radius: 0px;
                         height: 40px;
                         z-index: 1;
                         box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
@@ -470,15 +509,20 @@ const PageIndex: NextPageFC = () => {
                       size,
                       croppedImage,
                       setCropImage,
-                      AllSizes[sizes][sizeSelected].x,
-                      AllSizes[sizes][sizeSelected].y,
+                      AllSizes[sizes][sizes === 'PORTRAIT' ? 0 : sizeSelected]
+                        .x,
+                      AllSizes[sizes][sizes === 'PORTRAIT' ? 0 : sizeSelected]
+                        .y,
                       setLoading,
                       setColors,
-                      AllSizes[sizes][sizeSelected].isPortrait
+                      AllSizes[sizes][sizes === 'PORTRAIT' ? 0 : sizeSelected]
+                        .isPortrait
                     );
                     setQuantity(
-                      AllSizes[sizes][sizeSelected].x *
-                        AllSizes[sizes][sizeSelected].y
+                      AllSizes[sizes][sizes === 'PORTRAIT' ? 0 : sizeSelected]
+                        .x *
+                        AllSizes[sizes][sizes === 'PORTRAIT' ? 0 : sizeSelected]
+                          .y
                     );
                   }}
                 >
@@ -507,16 +551,27 @@ const PageIndex: NextPageFC = () => {
                 ) : (
                   <AtomWrapper
                     customCSS={css`
-                      ${AllSizes[sizes][sizeSelected].y >
-                      AllSizes[sizes][sizeSelected].x
+                      ${AllSizes[sizes][sizes === 'PORTRAIT' ? 0 : sizeSelected]
+                        .y >
+                      AllSizes[sizes][sizes === 'PORTRAIT' ? 0 : sizeSelected].x
                         ? css`
-                            width: ${(400 / AllSizes[sizes][sizeSelected].y) *
-                            AllSizes[sizes][sizeSelected].x}px;
+                            width: ${(400 /
+                              AllSizes[sizes][
+                                sizes === 'PORTRAIT' ? 0 : sizeSelected
+                              ].y) *
+                            AllSizes[sizes][
+                              sizes === 'PORTRAIT' ? 0 : sizeSelected
+                            ].x}px;
                             height: 400px;
                           `
                         : css`
-                            height: ${(400 / AllSizes[sizes][sizeSelected].x) *
-                            AllSizes[sizes][sizeSelected].y}px;
+                            height: ${(400 /
+                              AllSizes[sizes][
+                                sizes === 'PORTRAIT' ? 0 : sizeSelected
+                              ].x) *
+                            AllSizes[sizes][
+                              sizes === 'PORTRAIT' ? 0 : sizeSelected
+                            ].y}px;
                             width: 400px;
                           `}
 
@@ -565,26 +620,42 @@ const PageIndex: NextPageFC = () => {
                                 css`
                                   border: 1px solid #ffffff;
                                 `}
-                                ${AllSizes[sizes][sizeSelected].y >
-                                AllSizes[sizes][sizeSelected].x
+                                ${AllSizes[sizes][
+                                  sizes === 'PORTRAIT' ? 0 : sizeSelected
+                                ].y >
+                                AllSizes[sizes][
+                                  sizes === 'PORTRAIT' ? 0 : sizeSelected
+                                ].x
                                   ? css`
                                       width: ${400 /
-                                      AllSizes[sizes][sizeSelected].y}px;
+                                      AllSizes[sizes][
+                                        sizes === 'PORTRAIT' ? 0 : sizeSelected
+                                      ].y}px;
                                       height: ${400 /
-                                      AllSizes[sizes][sizeSelected].y}px;
+                                      AllSizes[sizes][
+                                        sizes === 'PORTRAIT' ? 0 : sizeSelected
+                                      ].y}px;
                                     `
                                   : css`
                                       width: ${400 /
-                                      AllSizes[sizes][sizeSelected].x}px;
+                                      AllSizes[sizes][
+                                        sizes === 'PORTRAIT' ? 0 : sizeSelected
+                                      ].x}px;
                                       height: ${400 /
-                                      AllSizes[sizes][sizeSelected].x}px;
+                                      AllSizes[sizes][
+                                        sizes === 'PORTRAIT' ? 0 : sizeSelected
+                                      ].x}px;
                                     `} /* width: ${size.x /
-                                AllSizes[sizes][sizeSelected].x}px;
+                                AllSizes[sizes][
+                                  sizes === 'PORTRAIT' ? 0 : sizeSelected
+                                ].x}px;
                             height: ${size.y /
-                                AllSizes[sizes][sizeSelected].y}px; */
+                                AllSizes[sizes][
+                                  sizes === 'PORTRAIT' ? 0 : sizeSelected
+                                ].y}px; */
                               `}
                             />
-                            {/* {400 / AllSizes[sizes][sizeSelected].y} */}
+                            {/* {400 / AllSizes[sizes][sizes === 'PORTRAIT'?0:sizeSelected].y} */}
                           </AtomButton>
                         ))}
                       </AtomWrapper>
@@ -630,9 +701,16 @@ const PageIndex: NextPageFC = () => {
                   <DownloadPdf
                     images={cropImage.map((image) => image.image)}
                     colors={colors}
-                    height={`${AllSizes[sizes][sizeSelected].y}`}
-                    width={`${AllSizes[sizes][sizeSelected].x}`}
-                    isPortrait={AllSizes[sizes][sizeSelected].isPortrait}
+                    height={`${
+                      AllSizes[sizes][sizes === 'PORTRAIT' ? 0 : sizeSelected].y
+                    }`}
+                    width={`${
+                      AllSizes[sizes][sizes === 'PORTRAIT' ? 0 : sizeSelected].x
+                    }`}
+                    isPortrait={
+                      AllSizes[sizes][sizes === 'PORTRAIT' ? 0 : sizeSelected]
+                        .isPortrait
+                    }
                   />
                 )}
               </AtomWrapper>

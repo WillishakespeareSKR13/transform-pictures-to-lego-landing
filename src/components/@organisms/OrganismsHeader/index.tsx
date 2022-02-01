@@ -27,7 +27,7 @@ const DefaultHeader = () => {
         flexWrap="wrap"
       >
         <AtomLink
-          link="/"
+          href="/"
           customCSS={css`
             display: flex;
             align-items: center;

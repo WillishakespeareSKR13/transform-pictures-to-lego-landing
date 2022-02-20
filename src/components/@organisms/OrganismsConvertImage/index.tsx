@@ -39,7 +39,7 @@ const OrganismsConvertImage: FC = () => {
   const [quantity, setQuantity] = useState<number>(0);
   const [isLoading, setIsLoading] = useState(false);
 
-  console.warn(setSelectedRoom, colors);
+  console.warn(setSelectedRoom, colors, ROOMS);
 
   const loading = useMemo(
     () => cropImages.length !== quantity,

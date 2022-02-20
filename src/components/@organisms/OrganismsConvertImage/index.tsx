@@ -1,5 +1,5 @@
 import { css } from '@emotion/react';
-import { AtomImage, AtomText, AtomWrapper } from '@sweetsyui/ui';
+import { AtomImage, AtomTabs, AtomText, AtomWrapper } from '@sweetsyui/ui';
 import { FC, useCallback, useContext, useMemo, useState } from 'react';
 import { ContextFile } from '@Src/pages';
 import getCroppedImg from '@Src/utils/getCropImage';
@@ -58,7 +58,7 @@ const OrganismsConvertImage: FC = () => {
       >
         <AtomWrapper
           width="300px"
-          height="330px"
+          height="max-content"
           customCSS={css`
             border-radius: 10px;
             overflow: hidden;
@@ -66,8 +66,8 @@ const OrganismsConvertImage: FC = () => {
             background-color: black;
             .reactEasyCrop_Container {
               position: relative;
-              width: 100%;
-              height: 100%;
+              width: 300px;
+              height: 300px;
             }
             .reactEasyCrop_CropArea .reactEasyCrop_CropAreaGrid {
               width: 100%;
@@ -169,6 +169,50 @@ const OrganismsConvertImage: FC = () => {
               onChange={(e) => setZoom(Number(e.target.value))}
             />
           </AtomWrapper>
+          <AtomTabs
+            componentsProps={{
+              tabsProps: {
+                buttonActiveProps: {
+                  customCSS: css`
+                    background-color: #4a4a54;
+                    padding: 8px 40px;
+                    span {
+                      font-size: 12px;
+                    }
+                  `
+                },
+                buttonDisabledProps: {
+                  customCSS: css`
+                    background-color: #202024;
+                    padding: 8px 40px;
+                    span {
+                      font-size: 12px;
+                    }
+                  `
+                },
+                wrapperProps: {
+                  customCSS: css`
+                    padding: 10px;
+                    background-color: #313139;
+                    justify-content: center;
+                    align-items: center;
+                  `
+                }
+              }
+            }}
+            tabs={[
+              {
+                id: 'size',
+                title: 'Size',
+                content: <></>
+              },
+              {
+                id: 'shape',
+                title: 'Shape',
+                content: <></>
+              }
+            ]}
+          />
         </AtomWrapper>
       </AtomWrapper>
       <AtomWrapper

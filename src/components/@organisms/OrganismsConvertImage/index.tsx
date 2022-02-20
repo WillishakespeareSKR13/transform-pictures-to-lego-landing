@@ -16,11 +16,14 @@ import CONFIG, {
   CONFIGKEYS,
   CONFIGKEYSSIZE,
   CROPPEDIMAGE,
+  ROOMS,
+  ROOMSTYPES,
   SELECTEDCONFIG
 } from '@Src/config';
 import AtomButton from '@Src/components/@atoms/AtomButton';
 import { StyledImage } from './styles';
 import { cropAndFilter } from '@Src/utils/pixelit';
+import DownloadPdf from '@Src/components/@atoms/AtomPdf';
 
 const OrganismsConvertImage: FC = () => {
   const { file } = useContext(ContextFile);
@@ -50,6 +53,11 @@ const OrganismsConvertImage: FC = () => {
       ),
     [selected, selectedSize]
   ) as SELECTEDCONFIG;
+
+  const selectedRoomConfig = useMemo(
+    () => ROOMS.find(({ key }) => key === selectedRoom),
+    [selectedRoom]
+  ) as ROOMSTYPES;
 
   const blob = useMemo(
     () =>
@@ -450,7 +458,6 @@ const OrganismsConvertImage: FC = () => {
               font-size: 12px;
               font-weight: 600;
               margin: 15px 0px;
-              padding: 0px 20px;
               max-width: ${selectedConfig.size.width};
             `}
           >
@@ -460,89 +467,213 @@ const OrganismsConvertImage: FC = () => {
               )?.title
             }
           </AtomText>
-          {loading || isLoading ? (
-            <AtomLoader
-              isLoading
-              colorLoading="#e95c10"
-              type="small"
-              customCSS={css`
-                width: ${selectedConfig.size.width};
-                height: ${selectedConfig.size.height};
-              `}
-            />
-          ) : (
-            <AtomWrapper
-              customCSS={css`
-                flex-direction: row;
-                flex-wrap: wrap;
-                width: ${selectedConfig.size.width};
-                height: ${selectedConfig.size.height};
-                align-items: center;
-                justify-content: center;
-                background-color: #313139;
-              `}
-            >
-              {cropImages.length > 0 ? (
-                <>
-                  {cropImages.map((image, i) => (
-                    <AtomButton
-                      key={`image${i}`}
-                      customCSS={css`
-                        display: flex;
-                        padding: 0px;
-                      `}
-                      onClick={() => {
-                        // setModalImage(true);
-                        // setSelectedImage(i);
-                      }}
-                    >
-                      <StyledImage
-                        src={image.image}
-                        alt="croppedImage"
-                        customCSS={css`
-                          ${showBorder &&
-                          css`
-                            border: 1px solid #ffffff;
-                          `}
-                          ${selectedConfig.y > selectedConfig.x
-                            ? css`
-                                width: ${600 / selectedConfig.y}px;
-                                height: ${600 / selectedConfig.y}px;
-                              `
-                            : css`
-                                width: ${600 / selectedConfig.x}px;
-                                height: ${600 / selectedConfig.x}px;
-                              `}
-                        `}
-                      />
-                    </AtomButton>
-                  ))}
-                </>
-              ) : (
-                <AtomWrapper
-                  justifyContent="center"
-                  alignItems="center"
-                  width="max-content"
-                >
-                  <AtomText
-                    color="#4a4a54"
-                    fontSize="28px"
-                    fontWeight={600}
+          <>
+            {selectedRoom === 'DEFAULT' ? (
+              <>
+                {loading || isLoading ? (
+                  <AtomLoader
+                    isLoading
+                    colorLoading="#e95c10"
+                    type="small"
                     customCSS={css`
-                      text-align: center;
+                      width: ${selectedConfig.size.width};
+                      height: ${selectedConfig.size.height};
+                    `}
+                  />
+                ) : (
+                  <AtomWrapper
+                    customCSS={css`
+                      flex-direction: row;
+                      flex-wrap: wrap;
+                      width: ${selectedConfig.size.width};
+                      height: ${selectedConfig.size.height};
+                      align-items: center;
+                      justify-content: center;
+                      background-color: #313139;
                     `}
                   >
-                    Pixelit your image
-                  </AtomText>
+                    {cropImages.length > 0 ? (
+                      <>
+                        {cropImages.map((image, i) => (
+                          <AtomButton
+                            key={`image${i}`}
+                            customCSS={css`
+                              display: flex;
+                              padding: 0px;
+                            `}
+                            onClick={() => {
+                              // setModalImage(true);
+                              // setSelectedImage(i);
+                            }}
+                          >
+                            <StyledImage
+                              src={image.image}
+                              alt="croppedImage"
+                              customCSS={css`
+                                ${showBorder &&
+                                css`
+                                  border: 2px solid #202024;
+                                `}
+                                ${selectedConfig.y > selectedConfig.x
+                                  ? css`
+                                      width: ${600 / selectedConfig.y}px;
+                                      height: ${600 / selectedConfig.y}px;
+                                    `
+                                  : css`
+                                      width: ${600 / selectedConfig.x}px;
+                                      height: ${600 / selectedConfig.x}px;
+                                    `}
+                              `}
+                            />
+                          </AtomButton>
+                        ))}
+                      </>
+                    ) : (
+                      <AtomWrapper
+                        justifyContent="center"
+                        alignItems="center"
+                        width="max-content"
+                      >
+                        <AtomText
+                          color="#4a4a54"
+                          fontSize="28px"
+                          fontWeight={600}
+                          customCSS={css`
+                            text-align: center;
+                          `}
+                        >
+                          Pixelit your image
+                        </AtomText>
+                      </AtomWrapper>
+                    )}
+                  </AtomWrapper>
+                )}
+              </>
+            ) : (
+              <AtomWrapper
+                customCSS={css`
+                  width: 600px;
+                  height: 600px;
+                  background-image: url(${selectedRoomConfig.path});
+                  position: relative;
+                `}
+              >
+                <AtomWrapper
+                  customCSS={css`
+                    width: max-content;
+                    height: max-content;
+                    position: absolute;
+                    top: ${selectedRoomConfig.top[selected]};
+                    right: 50%;
+                    transform: translate(50%, 0);
+                  `}
+                >
+                  {loading || isLoading ? (
+                    <AtomLoader
+                      isLoading
+                      colorLoading="#e95c10"
+                      type="small"
+                      customCSS={css`
+                        width: ${Number(
+                          selectedConfig.size.width.replace('px', '')
+                        ) / 3}px;
+                        height: ${Number(
+                          selectedConfig.size.height.replace('px', '')
+                        ) / 3}px;
+                      `}
+                    />
+                  ) : (
+                    <AtomWrapper
+                      customCSS={css`
+                        flex-direction: row;
+                        flex-wrap: wrap;
+                        width: ${Number(
+                          selectedConfig.size.width.replace('px', '')
+                        ) / 3}px;
+                        height: ${Number(
+                          selectedConfig.size.height.replace('px', '')
+                        ) / 3}px;
+                        align-items: center;
+                        justify-content: center;
+                        background-color: #313139;
+                        box-shadow: 0px 2px 5px 2px rgba(0, 0, 0, 0.522);
+                      `}
+                    >
+                      {cropImages.length > 0 ? (
+                        <>
+                          {cropImages.map((image, i) => (
+                            <AtomButton
+                              key={`image${i}`}
+                              customCSS={css`
+                                display: flex;
+                                padding: 0px;
+                              `}
+                              onClick={() => {
+                                // setModalImage(true);
+                                // setSelectedImage(i);
+                              }}
+                            >
+                              <StyledImage
+                                src={image.image}
+                                alt="croppedImage"
+                                customCSS={css`
+                                  ${showBorder &&
+                                  css`
+                                    border: 2px solid #202024;
+                                  `}
+                                  ${selectedConfig.y > selectedConfig.x
+                                    ? css`
+                                        width: ${selectedRoomConfig.size /
+                                        selectedConfig.y}px;
+                                        height: ${selectedRoomConfig.size /
+                                        selectedConfig.y}px;
+                                      `
+                                    : css`
+                                        width: ${selectedRoomConfig.size /
+                                        selectedConfig.x}px;
+                                        height: ${selectedRoomConfig.size /
+                                        selectedConfig.x}px;
+                                      `}
+                                `}
+                              />
+                            </AtomButton>
+                          ))}
+                        </>
+                      ) : (
+                        <AtomWrapper
+                          justifyContent="center"
+                          alignItems="center"
+                          width="max-content"
+                        >
+                          <AtomText
+                            color="#4a4a54"
+                            fontSize="28px"
+                            fontWeight={600}
+                            customCSS={css`
+                              text-align: center;
+                            `}
+                          >
+                            Pixelit your image
+                          </AtomText>
+                        </AtomWrapper>
+                      )}
+                    </AtomWrapper>
+                  )}
                 </AtomWrapper>
-              )}
-            </AtomWrapper>
-          )}
+              </AtomWrapper>
+            )}
+          </>
 
           <AtomInput
             type="select"
             errorHeight="0px"
             value={selectedRoom}
+            options={ROOMS.map((room) => ({
+              id: room.id,
+              value: room.key,
+              label: room.name
+            }))}
+            onChange={(e) => setSelectedRoom(e.target.value)}
             labelWidth="250px"
             defaultText="Pick a demo room"
             customCSS={css`
@@ -550,7 +681,7 @@ const OrganismsConvertImage: FC = () => {
                 border: 3px solid #202024;
                 background-color: #313139;
                 option {
-                  color: #4a4a54;
+                  color: #79797e;
                 }
               }
               margin-top: -10px;
@@ -571,14 +702,14 @@ const OrganismsConvertImage: FC = () => {
                   display: none;
                 }
                 div {
-                  font-size: 14px;
+                  font-size: 12px;
                   font-weight: 700;
-                  color: #4a4a54;
+                  color: #ebebeb;
                 }
                 input[type='checkbox'] {
                   position: relative;
-                  width: 1.5em;
-                  height: 1.5em;
+                  width: 16px;
+                  height: 16px;
                   color: #6b6b6b;
                   background-color: #313139;
                   border: 1px solid #6b6b6b;
@@ -591,9 +722,9 @@ const OrganismsConvertImage: FC = () => {
                     position: absolute;
                     content: '';
                     display: block;
-                    top: 1px;
-                    left: 6px;
-                    width: 7px;
+                    top: 0px;
+                    left: 4px;
+                    width: 6px;
                     height: 12px;
                     border-style: solid;
                     border-color: white;
@@ -617,19 +748,25 @@ const OrganismsConvertImage: FC = () => {
             >
               Show Borders
             </AtomInput>
-            <AtomButton
-              disabled={loading || isLoading}
-              backgroundColor="#e95c10"
-              customCSS={css`
-                margin-left: 20px;
-                font-size: 12px;
-              `}
-              onClick={() => {
-                console.warn('clicked');
-              }}
-            >
-              DOWNLOAD
-            </AtomButton>
+            {cropImages.length === 0 || loading || isLoading ? (
+              <AtomButton
+                backgroundColor="#4a4a54"
+                customCSS={css`
+                  margin-left: 20px;
+                  font-size: 12px;
+                `}
+              >
+                PIXELIT YOUR IMAGE
+              </AtomButton>
+            ) : (
+              <DownloadPdf
+                images={cropImages.map((image) => image.image)}
+                colors={colors}
+                height={`${selectedConfig.y}`}
+                width={`${selectedConfig.x}`}
+                isPortrait={selectedConfig.isPortrait}
+              />
+            )}
           </AtomWrapper>
         </AtomWrapper>
       </AtomWrapper>

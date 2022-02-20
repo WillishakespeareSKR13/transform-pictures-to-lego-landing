@@ -1,6 +1,5 @@
 import { css } from '@emotion/react';
 import {
-  AtomImage,
   AtomInput,
   AtomLoader,
   AtomTabs,
@@ -37,12 +36,13 @@ const OrganismsConvertImage: FC = () => {
   const [quantity, setQuantity] = useState<number>(0);
   const [isLoading, setIsLoading] = useState(false);
 
+  console.warn(setSelectedRoom, colors);
+
   const loading = useMemo(
     () => cropImages.length !== quantity,
     [cropImages, quantity]
   );
 
-  console.log(cropImages, quantity);
   const selectedConfig = useMemo(
     () =>
       CONFIG.find(({ key }) => key === selected)?.sizes.find(
@@ -581,7 +581,7 @@ const OrganismsConvertImage: FC = () => {
                 font-size: 12px;
               `}
               onClick={() => {
-                console.log('clicked');
+                console.warn('clicked');
               }}
             >
               DOWNLOAD

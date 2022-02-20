@@ -4,12 +4,12 @@ import InputTextError from './error';
 import {
   InputTextLabelStyled,
   InputTextSpanStyled,
-  InputTextStyled,
+  InputTextStyled
 } from './style';
 import { AtomInputTypes } from './types';
 
 const Animation = {
-  whileTap: { scale: 0.98, opacity: 0.8 },
+  whileTap: { scale: 0.98, opacity: 0.8 }
 };
 
 const InputText: FC<AtomInputTypes> = (props) => {
@@ -24,7 +24,7 @@ const InputText: FC<AtomInputTypes> = (props) => {
     labelPadding,
     spanMargin,
     customCSS,
-    label,
+    label
   } = props;
   return (
     <InputTextLabelStyled
@@ -46,7 +46,7 @@ const InputText: FC<AtomInputTypes> = (props) => {
       <InputTextStyled
         {...Animation}
         {...props}
-        value={lodash.get(formik?.values, id) ?? value}
+        value={lodash.get(formik?.values, `${id}`) ?? value}
         onChange={formik?.handleChange ?? onChange}
         onBlur={formik?.handleBlur}
       />

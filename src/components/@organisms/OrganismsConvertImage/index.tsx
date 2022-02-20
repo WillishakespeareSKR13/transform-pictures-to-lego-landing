@@ -1,6 +1,7 @@
 import { css } from '@emotion/react';
 import {
   AtomImage,
+  AtomInput,
   AtomLoader,
   AtomTabs,
   AtomText,
@@ -30,6 +31,7 @@ const OrganismsConvertImage: FC = () => {
   const [zoom, setZoom] = useState(1);
   const [croppedImage, setCroppedImage] = useState('');
   const [showBorder, setShowBorder] = useState(false);
+  const [selectedRoom, setSelectedRoom] = useState('DEFAULT');
   const [cropImages, setCropImages] = useState<CROPPEDIMAGE>([]);
   const [colors, setColors] = useState<COLORTYPE[]>([]);
   const [quantity, setQuantity] = useState<number>(0);
@@ -429,13 +431,29 @@ const OrganismsConvertImage: FC = () => {
         <AtomWrapper
           customCSS={css`
             width: 600px;
-            align-items: flex-start;
+            align-items: center;
             justify-content: center;
             background-color: #202024;
             box-shadow: 0px 0px 10px rgba(16, 16, 16, 0.563);
             }
           `}
         >
+          <AtomText
+            customCSS={css`
+              width: 100%;
+              color: white;
+              font-size: 12px;
+              font-weight: 600;
+              margin: 15px 0px;
+              padding: 0px 20px;
+            `}
+          >
+            {
+              CONFIG.find((size) => size.key === selected)?.sizes.find(
+                (size) => size.key === selectedSize
+              )?.title
+            }
+          </AtomText>
           {loading || isLoading ? (
             <AtomLoader
               isLoading
@@ -508,29 +526,67 @@ const OrganismsConvertImage: FC = () => {
                       text-align: center;
                     `}
                   >
-                    No Image Selected
+                    Pixelit your image
                   </AtomText>
                 </AtomWrapper>
               )}
-
-              {/* <AtomImage src={croppedImage} alt="cropped" /> */}
             </AtomWrapper>
           )}
-          <AtomText
+
+          <AtomInput
+            type="select"
+            errorHeight="0px"
+            value={selectedRoom}
+            labelWidth="250px"
+            defaultText="Pick a demo room"
             customCSS={css`
-              color: white;
-              font-size: 16px;
-              font-weight: 600;
-              margin: 10px 0px;
-              padding: 0px 15px;
+              select {
+                border: 3px solid #202024;
+                background-color: #313139;
+                option {
+                  color: #4a4a54;
+                }
+              }
+              margin-top: -10px;
             `}
+          />
+          <AtomWrapper
+            flexDirection="row"
+            justifyContent="flex-end"
+            alignItems="center"
+            padding="0px 20px 20px 20px"
           >
-            {
-              CONFIG.find((size) => size.key === selected)?.sizes.find(
-                (size) => size.key === selectedSize
-              )?.title
-            }
-          </AtomText>
+            <AtomInput
+              type="checkbox"
+              checked={showBorder}
+              onChange={() => setShowBorder(!showBorder)}
+              customCSS={css`
+                span {
+                  display: none;
+                }
+                div {
+                  font-size: 14px;
+                  font-weight: 600;
+                  color: #4a4a54;
+                }
+              `}
+            >
+              Show Borders
+            </AtomInput>
+            <AtomButton
+              disabled={loading || isLoading}
+              backgroundColor="#e95c10"
+              customCSS={css`
+                margin-left: 20px;
+                font-size: 12px;
+              `}
+              onClick={() => {
+                console.log('clicked');
+              }}
+            >
+              DOWNLOAD
+            </AtomButton>
+          </AtomWrapper>
         </AtomWrapper>
       </AtomWrapper>
     </AtomWrapper>

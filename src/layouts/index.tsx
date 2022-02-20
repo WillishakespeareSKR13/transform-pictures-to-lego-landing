@@ -1,14 +1,8 @@
 import { FC } from 'react';
-import AdminLayout from './AdminLayout';
-import DefaultLayout from './DefaultLayout';
-import LoginLayout from './LoginLayout';
-import ProfileLayout from './ProfileLayout';
+import DefaultLayout from './_defaultLayout';
 
 export const AllLayouts = {
-  login: LoginLayout,
-  admin: AdminLayout,
-  default: DefaultLayout,
-  profile: ProfileLayout
+  default: DefaultLayout
 };
 
 export type LayoutType = {

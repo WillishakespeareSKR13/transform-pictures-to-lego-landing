@@ -1,25 +1,15 @@
 import { css } from '@emotion/react';
-import {
-  AtomButton,
-  AtomIcon,
-  AtomImage,
-  AtomInput,
-  AtomText,
-  AtomWrapper
-} from '@sweetsyui/ui';
-import { FormikValues } from 'formik';
-import React, { FC } from 'react';
+import { AtomIcon, AtomImage, AtomText, AtomWrapper } from '@sweetsyui/ui';
+import AtomInput from '@Atoms/AtomInput';
+import { FC, useContext } from 'react';
+import { ContextFile } from '@Src/pages';
 
-interface OrganismsLoadeImageProps {
-  formik: FormikValues;
-}
-
-const OrganismsLoadImage: FC<OrganismsLoadeImageProps> = (props) => {
-  const { formik } = props;
+const OrganismsLoadImage: FC = () => {
+  const { setFile } = useContext(ContextFile);
   return (
     <AtomWrapper
       customCSS={css`
-        background-color: #f5f5f5;
+        background-color: #313139;
         border-radius: 10px;
         padding: 30px;
         width: 70%;
@@ -40,10 +30,10 @@ const OrganismsLoadImage: FC<OrganismsLoadeImageProps> = (props) => {
           box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
           position: absolute;
           width: 400px;
-          padding: 15px 30px;
+          padding: 20px 30px;
           align-items: center;
           justify-content: center;
-          background-color: #fff;
+          background-color: #313139;
           @media (max-width: 820px) {
             position: relative;
             width: 100%;
@@ -64,7 +54,7 @@ const OrganismsLoadImage: FC<OrganismsLoadeImageProps> = (props) => {
             margin-top: 10px;
             font-size: 12px;
             font-weight: bold;
-            color: #333;
+            color: #dfdfdf;
             text-align: center;
           `}
         >
@@ -74,7 +64,7 @@ const OrganismsLoadImage: FC<OrganismsLoadeImageProps> = (props) => {
           customCSS={css`
             margin-top: 5px;
             font-size: 12px;
-            color: #333;
+            color: #dfdfdf;
             text-align: center;
           `}
         >
@@ -86,25 +76,31 @@ const OrganismsLoadImage: FC<OrganismsLoadeImageProps> = (props) => {
       <AtomText
         align="center"
         customCSS={css`
-          padding: 5px 0px 15px 0px;
-          font-size: 24px;
+          padding: 0px 0px 30px 0px;
+          font-size: 20px;
           font-weight: bold;
-          color: #333;
+          color: #dfdfdf;
+          font-size: 22px;
         `}
       >
         SELECT ONE IMAGE TO UPLOAD
       </AtomText>
       <AtomInput
         id="imagefile"
-        formik={formik}
+        onChangeDrop={(e) => setFile(e)}
         placeholderDragDrop={() => (
           <AtomWrapper flexDirection="row">
             <AtomIcon
-              color="#ed7002"
+              color="#dfdfdf"
               height="20px"
               icon="https://storage.googleapis.com/cdn-bucket-ixulabs-platform/assets/svgs/PFS-0001/upload.svg"
             />
-            <AtomText margin="0px 5px" color="#ed7002" fontWeight={600}>
+            <AtomText
+              margin="0px 10px"
+              color="#dfdfdf"
+              fontWeight={600}
+              fontSize="16px"
+            >
               Drag and drop your image here
             </AtomText>
           </AtomWrapper>
@@ -112,17 +108,26 @@ const OrganismsLoadImage: FC<OrganismsLoadeImageProps> = (props) => {
         type="dragdrop"
         customCSS={css`
           display: flex;
-          background-color: #eeeeee;
+          background-color: #202024;
           width: 100%;
-          height: max-content;
+          height: 
           align-items: center;
           justify-content: center;
-          background-image: url('/images/bg.png');
+          cursor: pointer;
+          *{
+            cursor: pointer;
+          }
+          span{
+            display: none;
+          }
           div {
             display: flex;
             font-weight: 600;
             align-items: center;
             justify-content: center;
+            span{
+              display: flex;
+            }
             img {
               max-width: 100%;
               width: max-content;
@@ -131,26 +136,11 @@ const OrganismsLoadImage: FC<OrganismsLoadeImageProps> = (props) => {
           label {
             width: 100%;
             height: 100vh;
-            max-height: 250px;
+            max-height: 300px;
             background-color: transparent;
           }
         `}
       />
-      <AtomWrapper
-        justifyContent="center"
-        alignItems="flex-end"
-        padding="15px 0px 0px 0px"
-      >
-        <AtomButton
-          backgroundColor="#ed7001"
-          onClick={() => {
-            formik.validateForm();
-            formik.submitForm();
-          }}
-        >
-          NEXT
-        </AtomButton>
-      </AtomWrapper>
     </AtomWrapper>
   );
 };

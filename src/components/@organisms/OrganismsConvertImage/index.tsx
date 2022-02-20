@@ -120,9 +120,13 @@ const OrganismsConvertImage: FC = () => {
             image={blob}
             crop={crop}
             zoom={zoom}
-            aspect={3 / 3}
+            aspect={selectedConfig.aspect}
             zoomSpeed={0.1}
-            cropSize={{ width: 220, height: 220 }}
+            cropSize={
+              ['PORTRAIT', 'SQUARE'].includes(selected)
+                ? { width: 220, height: 220 }
+                : undefined
+            }
             onCropChange={setCrop}
             onCropComplete={onCropComplete}
             onZoomChange={(e) => setZoom(Number(e.toFixed(2)))}
@@ -460,8 +464,10 @@ const OrganismsConvertImage: FC = () => {
               colorLoading="#e95c10"
               type="small"
               customCSS={css`
-                width: 600px;
-                height: 600px;
+                width: ${CONFIG.find((size) => size.key === selected)?.size
+                  .width};
+                height: ${CONFIG.find((size) => size.key === selected)?.size
+                  .height};
               `}
             />
           ) : (
@@ -469,8 +475,10 @@ const OrganismsConvertImage: FC = () => {
               customCSS={css`
                 flex-direction: row;
                 flex-wrap: wrap;
-                width: 600px;
-                height: 600px;
+                width: ${CONFIG.find((size) => size.key === selected)?.size
+                  .width};
+                height: ${CONFIG.find((size) => size.key === selected)?.size
+                  .height};
                 align-items: center;
                 justify-content: center;
                 background-color: #313139;

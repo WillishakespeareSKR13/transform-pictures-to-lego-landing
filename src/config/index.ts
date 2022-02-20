@@ -37,6 +37,10 @@ const CONFIG = [
       width: '40px',
       height: '60px'
     },
+    size: {
+      width: '400px',
+      height: '600px'
+    },
     sizes: [
       {
         id: uuid(),
@@ -97,6 +101,10 @@ const CONFIG = [
     icon: {
       width: '60px',
       height: '40px'
+    },
+    size: {
+      width: '600px',
+      height: '400px'
     },
     sizes: [
       {
@@ -159,6 +167,10 @@ const CONFIG = [
       width: '40px',
       height: '40px'
     },
+    size: {
+      width: '600px',
+      height: '600px'
+    },
     sizes: [
       {
         id: uuid(),
@@ -219,6 +231,10 @@ const CONFIG = [
     icon: {
       width: '40px',
       height: '40px'
+    },
+    size: {
+      width: '600px',
+      height: '600px'
     },
     sizes: [
       {

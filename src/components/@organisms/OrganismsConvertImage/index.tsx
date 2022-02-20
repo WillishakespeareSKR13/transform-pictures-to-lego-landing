@@ -451,8 +451,7 @@ const OrganismsConvertImage: FC = () => {
               font-weight: 600;
               margin: 15px 0px;
               padding: 0px 20px;
-              max-width: ${CONFIG.find((size) => size.key === selected)?.size
-                .width};
+              max-width: ${selectedConfig.size.width};
             `}
           >
             {
@@ -467,10 +466,8 @@ const OrganismsConvertImage: FC = () => {
               colorLoading="#e95c10"
               type="small"
               customCSS={css`
-                width: ${CONFIG.find((size) => size.key === selected)?.size
-                  .width};
-                height: ${CONFIG.find((size) => size.key === selected)?.size
-                  .height};
+                width: ${selectedConfig.size.width};
+                height: ${selectedConfig.size.height};
               `}
             />
           ) : (
@@ -478,10 +475,8 @@ const OrganismsConvertImage: FC = () => {
               customCSS={css`
                 flex-direction: row;
                 flex-wrap: wrap;
-                width: ${CONFIG.find((size) => size.key === selected)?.size
-                  .width};
-                height: ${CONFIG.find((size) => size.key === selected)?.size
-                  .height};
+                width: ${selectedConfig.size.width};
+                height: ${selectedConfig.size.height};
                 align-items: center;
                 justify-content: center;
                 background-color: #313139;
@@ -577,8 +572,46 @@ const OrganismsConvertImage: FC = () => {
                 }
                 div {
                   font-size: 14px;
-                  font-weight: 600;
+                  font-weight: 700;
                   color: #4a4a54;
+                }
+                input[type='checkbox'] {
+                  position: relative;
+                  width: 1.5em;
+                  height: 1.5em;
+                  color: #6b6b6b;
+                  background-color: #313139;
+                  border: 1px solid #6b6b6b;
+                  border-radius: 4px;
+                  appearance: none;
+                  outline: 0;
+                  cursor: pointer;
+                  transition: background 175ms cubic-bezier(0.1, 0.1, 0.25, 1);
+                  &::before {
+                    position: absolute;
+                    content: '';
+                    display: block;
+                    top: 1px;
+                    left: 6px;
+                    width: 7px;
+                    height: 12px;
+                    border-style: solid;
+                    border-color: white;
+                    border-width: 0 2px 2px 0;
+                    transform: rotate(45deg);
+                    opacity: 0;
+                  }
+                  &:checked {
+                    color: #e95c10;
+                    border-color: #e95c10;
+                    background: #e95c10;
+                    &::before {
+                      opacity: 1;
+                    }
+                    ~ label::before {
+                      clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+                    }
+                  }
                 }
               `}
             >

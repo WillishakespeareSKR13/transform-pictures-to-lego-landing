@@ -434,7 +434,8 @@ const OrganismsConvertImage: FC = () => {
       >
         <AtomWrapper
           customCSS={css`
-            width: 600px;
+          padding: 0px 20px;
+            width: max-content;
             align-items: center;
             justify-content: center;
             background-color: #202024;
@@ -450,6 +451,8 @@ const OrganismsConvertImage: FC = () => {
               font-weight: 600;
               margin: 15px 0px;
               padding: 0px 20px;
+              max-width: ${CONFIG.find((size) => size.key === selected)?.size
+                .width};
             `}
           >
             {

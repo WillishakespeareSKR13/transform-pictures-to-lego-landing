@@ -7,7 +7,7 @@ const DefaultHeader = () => {
   useEffect(() => {
     const updateSize = () => {
       const scroll = window.scrollY;
-      setdownHeader(scroll > 50);
+      setdownHeader(scroll > 10);
     };
     window.addEventListener(`scroll`, updateSize, true);
     updateSize();

@@ -1,4 +1,3 @@
-import { AtomPage } from '@Src/components/@atoms';
 import OrganismsConvertImage from '@Src/components/@organisms/OrganismsConvertImage';
 import OrganismsLoadImage from '@Src/components/@organisms/OrganismsLoadImage';
 import { NextPageFC } from 'next';
@@ -21,9 +20,7 @@ const PageIndex: NextPageFC = () => {
         setFile
       }}
     >
-      <AtomPage>
-        {file ? <OrganismsConvertImage /> : <OrganismsLoadImage />}
-      </AtomPage>
+      {file ? <OrganismsConvertImage /> : <OrganismsLoadImage />}
     </ContextFile.Provider>
   );
 };

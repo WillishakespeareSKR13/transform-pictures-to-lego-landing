@@ -4,7 +4,7 @@ import StylesGlobal from '@sweetsyui/ui/build/@styles/stylesglobal';
 
 const GlobalStyles: FC = () => (
   <>
-    <StylesGlobal />;
+    <StylesGlobal />
     <Global
       styles={css`
         html,

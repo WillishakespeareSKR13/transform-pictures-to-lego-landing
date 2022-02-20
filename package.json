@@ -41,6 +41,7 @@
     "redux-devtools-extension": "^2.13.9",
     "redux-persist": "^6.0.0",
     "uuid": "8.3.2",
+    "uuidv4": "6.2.12",
     "yup": "0.32.11"
   },
   "devDependencies": {

@@ -508,10 +508,10 @@ export const ROOMS: ROOMSTYPES[] = [
     name: 'Room 1',
     path: '/rooms/1.jpg',
     top: {
-      VERTICAL: '130px',
-      HORIZONTAL: '140px',
-      SQUARE: '100px',
-      PORTRAIT: '100px'
+      VERTICAL: '200px',
+      HORIZONTAL: '200px',
+      SQUARE: '200px',
+      PORTRAIT: '200px'
     },
     size: 150
   },
@@ -521,10 +521,10 @@ export const ROOMS: ROOMSTYPES[] = [
     name: 'Room 2',
     path: '/rooms/2.jpg',
     top: {
-      VERTICAL: '80px',
-      HORIZONTAL: '100px',
-      SQUARE: '60px',
-      PORTRAIT: '60px'
+      VERTICAL: '160px',
+      HORIZONTAL: '170px',
+      SQUARE: '160px',
+      PORTRAIT: '160px'
     },
     size: 150
   },
@@ -534,10 +534,10 @@ export const ROOMS: ROOMSTYPES[] = [
     name: 'Room 3',
     path: '/rooms/3.jpg',
     top: {
-      VERTICAL: '90px',
-      HORIZONTAL: '110px',
-      SQUARE: '60px',
-      PORTRAIT: '60px'
+      VERTICAL: '180px',
+      HORIZONTAL: '180px',
+      SQUARE: '160px',
+      PORTRAIT: '160px'
     },
     size: 150
   },
@@ -547,10 +547,10 @@ export const ROOMS: ROOMSTYPES[] = [
     name: 'Room 4',
     path: '/rooms/4.jpg',
     top: {
-      VERTICAL: '130px',
-      HORIZONTAL: '150px',
-      SQUARE: '120px',
-      PORTRAIT: '120px'
+      VERTICAL: '210px',
+      HORIZONTAL: '220px',
+      SQUARE: '210px',
+      PORTRAIT: '210px'
     },
     size: 150
   }

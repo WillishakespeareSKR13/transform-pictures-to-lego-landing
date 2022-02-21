@@ -575,7 +575,7 @@ const OrganismsConvertImage: FC = () => {
                     position: absolute;
                     top: ${selectedRoomConfig.top[selected]};
                     right: 50%;
-                    transform: translate(50%, 0);
+                    transform: translate(50%, -50%);
                     background-color: #313139;
                     box-shadow: 0px 3px 5px 2px rgba(0, 0, 0, 0.522);
                     outline: 1px solid #6a6a6a5c;

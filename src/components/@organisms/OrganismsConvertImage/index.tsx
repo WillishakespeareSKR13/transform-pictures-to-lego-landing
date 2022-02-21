@@ -1,16 +1,9 @@
 import { css } from '@emotion/react';
-import {
-  AtomInput,
-  AtomLoader,
-  AtomTabs,
-  AtomText,
-  AtomWrapper
-} from '@sweetsyui/ui';
+import { AtomInput, AtomLoader, AtomText, AtomWrapper } from '@sweetsyui/ui';
 import { PinturaEditor } from 'react-pintura';
-import { getEditorDefaults } from 'pintura';
-import { FC, useContext, useMemo, useState } from 'react';
+import { EditorMethods, getEditorDefaults } from 'pintura';
+import { createRef, FC, useContext, useMemo, useState } from 'react';
 import { ContextFile } from '@Src/pages';
-import mapRange from '@Src/utils/mapRange';
 import CONFIG, {
   COLORTYPE,
   CONFIGKEYS,
@@ -26,21 +19,22 @@ import AtomButton from '@Src/components/@atoms/AtomButton';
 import { StyledImage } from './styles';
 import { cropAndFilter } from '@Src/utils/pixelit';
 import DownloadPdf from '@Src/components/@atoms/AtomPdf';
+import AtomModalImage from '@Src/components/@atoms/AtomModalImage';
 
 const OrganismsConvertImage: FC = () => {
   const { file } = useContext(ContextFile);
   const [selected, setSelected] = useState<CONFIGKEYS>('SQUARE');
   const [selectedSize, setSelectedSize] = useState<CONFIGKEYSSIZE>('SMALL');
-  const [zoom, setZoom] = useState(1);
-  const [croppedImage, setCroppedImage] = useState('');
   const [showBorder, setShowBorder] = useState(false);
   const [selectedRoom, setSelectedRoom] = useState('DEFAULT');
   const [cropImages, setCropImages] = useState<CROPPEDIMAGE>([]);
   const [colors, setColors] = useState<COLORTYPE[]>([]);
   const [quantity, setQuantity] = useState<number>(0);
   const [isLoading, setIsLoading] = useState(false);
-
-  console.warn(setSelectedRoom, colors, ROOMS);
+  const [modalImage, setModalImage] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(0);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const ref = createRef<any>();
 
   const loading = useMemo(
     () => cropImages.length !== quantity,
@@ -104,7 +98,7 @@ const OrganismsConvertImage: FC = () => {
         `}
       >
         <AtomWrapper
-          width="600px"
+          width="max-content"
           height="max-content"
           customCSS={css`
             border-radius: 10px;
@@ -115,9 +109,7 @@ const OrganismsConvertImage: FC = () => {
               width: 600px;
               height: 600px;
             }
-            .PinturaButton {
-              display: none;
-            }
+
             .PinturaRoot {
               background-color: #202024;
               * {
@@ -132,11 +124,23 @@ const OrganismsConvertImage: FC = () => {
         >
           <PinturaEditor
             {...getEditorDefaults()}
-            imageCropAspectRatio={16 / 9}
+            enableButtonExport={false}
             src={blob}
+            ref={ref}
+            enableDropImage={false}
+            imageCropAspectRatio={selectedConfig.aspect}
             onProcess={(res) => {
               const FilterAndCrop = URL.createObjectURL(res.dest);
-              setCroppedImage(FilterAndCrop);
+              cropAndFilter(
+                FilterAndCrop,
+                setCropImages,
+                selectedConfig.x,
+                selectedConfig.y,
+                setIsLoading,
+                setColors,
+                selectedConfig.isPortrait
+              );
+              setQuantity(selectedConfig.x * selectedConfig.y);
             }}
           />
 
@@ -158,286 +162,150 @@ const OrganismsConvertImage: FC = () => {
           /> */}
           <AtomWrapper
             customCSS={css`
-              align-items: center;
-              justify-content: space-between;
-              padding: 5px 20px 0px 20px;
-              flex-direction: row;
               background-color: #202024;
-              bottom: 40px;
-              left: 50%;
-              width: 100%;
-              border-radius: 0px;
-              height: 40px;
-              z-index: 1;
-              box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-              input {
-                margin: 0px 0px 0px 10px;
-                width: 65%;
-              }
-              input[type='range'] {
-                -webkit-appearance: none;
-                background: #313139;
-                border-radius: 10px;
-              }
-              input[type='range']::-webkit-slider-thumb {
-                -webkit-appearance: none;
-              }
-
-              input[type='range']:focus {
-                outline: none;
-              }
-
-              input[type='range']::-ms-track {
-                cursor: pointer;
-
-                background: transparent;
-                border-color: transparent;
-                color: transparent;
-              }
-
-              input[type='range']::-webkit-slider-thumb {
-                -webkit-appearance: none;
-                height: 12px;
-                width: 12px;
-                border-radius: 50%;
-                background: #ffffff;
-                cursor: pointer;
-              }
-
-              input[type='range']::-moz-range-thumb {
-                height: 36px;
-                width: 16px;
-                border-radius: 3px;
-                background: #ffffff;
-                cursor: pointer;
-              }
-
-              input[type='range']::-ms-thumb {
-                height: 36px;
-                width: 16px;
-                border-radius: 3px;
-                background: #ffffff;
-                cursor: pointer;
-              }
+              padding: 0px 10px;
             `}
           >
-            <AtomText
-              color="white"
-              fontSize="12px"
-              fontWeight={600}
-            >{`Zoom: ${Number(
-              mapRange(zoom, 1, 3, 0, 100).toFixed(0)
-            )}%`}</AtomText>
-            <input
-              type="range"
-              min="1"
-              max="3"
-              step="0.05"
-              value={zoom}
-              onChange={(e) => setZoom(Number(e.target.value))}
-            />
-          </AtomWrapper>
-          <AtomTabs
-            componentsProps={{
-              tabsProps: {
-                buttonActiveProps: {
-                  customCSS: css`
+            <AtomWrapper
+              customCSS={css`
+                justify-content: space-between;
+                align-items: center;
+                flex-wrap: wrap;
+                margin: 5px 0px;
+                border-radius: 5px;
+                overflow: hidden;
+                gap: 10px;
+                flex-direction: row;
+              `}
+            >
+              {CONFIG.map((size) => (
+                <AtomButton
+                  disabled={loading || isLoading}
+                  key={size.id}
+                  onClick={() => {
+                    setSelected(size.key as CONFIGKEYS);
+                    setSelectedSize(size.sizes[0].key as CONFIGKEYSSIZE);
+                    setCropImages([]);
+                    setQuantity(0);
+                  }}
+                  customCSS={css`
+                    padding: 12px 0px;
+                    cursor: pointer;
                     flex-grow: 1;
-                    background-color: #4a4a54;
-                    padding: 8px 40px;
-                    span {
-                      font-size: 12px;
-                    }
-                  `
-                },
-                buttonDisabledProps: {
-                  customCSS: css`
-                    flex-grow: 1;
-                    background-color: #313139;
-                    padding: 8px 40px;
-                    span {
-                      font-size: 12px;
-                    }
-                  `
-                },
-                wrapperProps: {
-                  customCSS: css`
-                    padding: 5px 10px;
-                    background-color: #202024;
+                    border-radius: 0px;
                     justify-content: center;
                     align-items: center;
-                  `
-                }
-              },
-              contentProps: {
-                wrapperProps: {
-                  customCSS: css`
-                    border: none;
-                    background-color: #202024;
-                  `
-                }
-              }
-            }}
-            tabs={[
-              {
-                id: 'size',
-                title: 'Size',
-                content: (
+                    background-color: ${size.key === selected
+                      ? '#4a4a54'
+                      : '#313139'};
+                  `}
+                >
                   <AtomWrapper
                     customCSS={css`
-                      padding: 0px 10px;
+                      cursor: pointer;
+                      border-radius: 1px;
+                      padding: 8px 30px;
+                      justify-content: center;
+                      align-items: center;
+                    `}
+                  >
+                    <AtomText
+                      color="white"
+                      fontWeight={600}
+                      fontSize="12px"
+                      customCSS={css`
+                        cursor: pointer;
+                      `}
+                    >
+                      {size.key}
+                    </AtomText>
+                  </AtomWrapper>
+                </AtomButton>
+              ))}
+            </AtomWrapper>
+            <AtomWrapper
+              customCSS={css`
+                border-radius: 2px;
+                margin: 5px 0px;
+                border-radius: 5px;
+                overflow: hidden;
+                justify-content: space-between;
+                align-items: center;
+                flex-wrap: wrap;
+                flex-direction: row;
+                gap: 10px;
+              `}
+            >
+              {CONFIG.find((size) => size.key === selected)?.sizes.map(
+                (size) => (
+                  <AtomButton
+                    disabled={loading || isLoading}
+                    key={size.id}
+                    onClick={() => {
+                      setSelectedSize(size.key as CONFIGKEYSSIZE);
+                      setCropImages([]);
+                      setQuantity(0);
+                    }}
+                    customCSS={css`
+                      padding: 5px 0px;
+                      cursor: pointer;
+                      flex-grow: 1;
+                      border-radius: 0px;
+                      justify-content: center;
+                      align-items: center;
+                      background-color: ${size.key === selectedSize
+                        ? '#4a4a54'
+                        : '#313139'};
                     `}
                   >
                     <AtomWrapper
                       customCSS={css`
-                        justify-content: space-between;
+                        cursor: pointer;
+                        border-radius: 1px;
+                        padding: 8px 30px;
+                        justify-content: center;
                         align-items: center;
-                        flex-wrap: wrap;
-                        margin: 5px 0px;
-                        border-radius: 5px;
-                        overflow: hidden;
-                        flex-direction: row;
                       `}
                     >
-                      {CONFIG.map((size) => (
-                        <AtomButton
-                          disabled={loading || isLoading}
-                          key={size.id}
-                          onClick={() => {
-                            setSelected(size.key as CONFIGKEYS);
-                            setSelectedSize(
-                              size.sizes[0].key as CONFIGKEYSSIZE
-                            );
-                            setCropImages([]);
-                            setQuantity(0);
-                          }}
-                          customCSS={css`
-                            padding: 3px;
-                            cursor: pointer;
-                            flex-grow: 1;
-                            border-radius: 0px;
-                            justify-content: center;
-                            align-items: center;
-                            background-color: ${size.key === selected
-                              ? '#4a4a54'
-                              : '#313139'};
-                          `}
-                        >
-                          <AtomWrapper
-                            customCSS={css`
-                              cursor: pointer;
-                              border-radius: 1px;
-                              padding: 8px 30px;
-                              justify-content: center;
-                              align-items: center;
-                            `}
-                          >
-                            <AtomText
-                              color="white"
-                              fontWeight={600}
-                              fontSize="12px"
-                              customCSS={css`
-                                cursor: pointer;
-                              `}
-                            >
-                              {size.key}
-                            </AtomText>
-                          </AtomWrapper>
-                        </AtomButton>
-                      ))}
-                    </AtomWrapper>
-                    <AtomWrapper
-                      customCSS={css`
-                        border-radius: 2px;
-                        margin: 5px 0px;
-                        border-radius: 5px;
-                        overflow: hidden;
-                        justify-content: space-between;
-                        align-items: center;
-                        flex-wrap: wrap;
-                        flex-direction: row;
-                      `}
-                    >
-                      {CONFIG.find((size) => size.key === selected)?.sizes.map(
-                        (size) => (
-                          <AtomButton
-                            disabled={loading || isLoading}
-                            key={size.id}
-                            onClick={() => {
-                              setSelectedSize(size.key as CONFIGKEYSSIZE);
-                              setCropImages([]);
-                              setQuantity(0);
-                            }}
-                            customCSS={css`
-                              padding: 3px;
-                              cursor: pointer;
-                              flex-grow: 1;
-                              border-radius: 0px;
-                              justify-content: center;
-                              align-items: center;
-                              background-color: ${size.key === selectedSize
-                                ? '#4a4a54'
-                                : '#313139'};
-                            `}
-                          >
-                            <AtomWrapper
-                              customCSS={css`
-                                cursor: pointer;
-                                border-radius: 1px;
-                                padding: 8px 30px;
-                                justify-content: center;
-                                align-items: center;
-                              `}
-                            >
-                              <AtomText
-                                color="white"
-                                fontWeight={600}
-                                fontSize="12px"
-                                customCSS={css`
-                                  cursor: pointer;
-                                `}
-                              >
-                                {size.key.slice(0, 1).toUpperCase()}
-                              </AtomText>
-                            </AtomWrapper>
-                          </AtomButton>
-                        )
-                      )}
-                    </AtomWrapper>
-                    <AtomWrapper
-                      customCSS={css`
-                        margin: 5px 0px;
-                        justify-content: space-between;
-                        align-items: center;
-                        flex-wrap: wrap;
-                        flex-direction: row;
-                      `}
-                    >
-                      <AtomButton
-                        disabled={loading || isLoading}
-                        width="100%"
-                        backgroundColor="#e95c10"
-                        onClick={() => {
-                          cropAndFilter(
-                            croppedImage,
-                            setCropImages,
-                            selectedConfig.x,
-                            selectedConfig.y,
-                            setIsLoading,
-                            setColors,
-                            selectedConfig.isPortrait
-                          );
-                          setQuantity(selectedConfig.x * selectedConfig.y);
-                        }}
+                      <AtomText
+                        color="white"
+                        fontWeight={600}
+                        fontSize="12px"
+                        customCSS={css`
+                          cursor: pointer;
+                        `}
                       >
-                        PIXELIT
-                      </AtomButton>
+                        {size.key.slice(0, 1).toUpperCase()}
+                      </AtomText>
                     </AtomWrapper>
-                  </AtomWrapper>
+                  </AtomButton>
                 )
-              }
-            ]}
-          />
+              )}
+            </AtomWrapper>
+            <AtomWrapper
+              customCSS={css`
+                margin: 5px 0px;
+                justify-content: space-between;
+                align-items: center;
+                flex-wrap: wrap;
+                flex-direction: row;
+              `}
+            >
+              <AtomButton
+                disabled={loading || isLoading}
+                width="100%"
+                height="50px"
+                backgroundColor="#e95c10"
+                onClick={() => {
+                  const REF = ref.current;
+                  const editor = REF.editor as EditorMethods;
+                  editor.processImage();
+                }}
+              >
+                LET’S PIXEIT!
+              </AtomButton>
+            </AtomWrapper>
+          </AtomWrapper>
         </AtomWrapper>
       </AtomWrapper>
       <AtomWrapper
@@ -513,8 +381,8 @@ const OrganismsConvertImage: FC = () => {
                               padding: 0px;
                             `}
                             onClick={() => {
-                              // setModalImage(true);
-                              // setSelectedImage(i);
+                              setModalImage(true);
+                              setSelectedImage(i);
                             }}
                           >
                             <StyledImage
@@ -553,7 +421,7 @@ const OrganismsConvertImage: FC = () => {
                             text-align: center;
                           `}
                         >
-                          Pixelit your image
+                          Pixeit your image
                         </AtomText>
                       </AtomWrapper>
                     )}
@@ -613,8 +481,8 @@ const OrganismsConvertImage: FC = () => {
                                 padding: 0px;
                               `}
                               onClick={() => {
-                                // setModalImage(true);
-                                // setSelectedImage(i);
+                                setModalImage(true);
+                                setSelectedImage(i);
                               }}
                             >
                               <StyledImage
@@ -657,7 +525,7 @@ const OrganismsConvertImage: FC = () => {
                               text-align: center;
                             `}
                           >
-                            Pixelit your image
+                            Pixeit your image
                           </AtomText>
                         </AtomWrapper>
                       )}
@@ -760,7 +628,7 @@ const OrganismsConvertImage: FC = () => {
                 color="#4a4a54"
                 fontSize="12px"
               >
-                PIXELIT YOUR IMAGE
+                PIXEIT YOUR IMAGE
               </AtomButton>
             ) : (
               <DownloadPdf
@@ -774,6 +642,16 @@ const OrganismsConvertImage: FC = () => {
           </AtomWrapper>
         </AtomWrapper>
       </AtomWrapper>
+
+      <AtomModalImage
+        state={modalImage}
+        setState={setModalImage}
+        selected={selectedImage}
+        setSelected={setSelectedImage}
+        images={cropImages
+          .sort((a, b) => (a.id > b.id ? 1 : b.id > a.id ? -1 : 0))
+          .map((image) => image.image)}
+      />
     </AtomWrapper>
   );
 };

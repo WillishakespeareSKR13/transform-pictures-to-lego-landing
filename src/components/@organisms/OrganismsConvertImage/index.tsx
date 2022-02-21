@@ -86,7 +86,7 @@ const OrganismsConvertImage: FC = () => {
     >
       <AtomWrapper
         customCSS={css`
-          width: 600px;
+          width: 30vw;
           height: max-content;
           align-items: flex-start;
           justify-content: flex-start;
@@ -106,8 +106,8 @@ const OrganismsConvertImage: FC = () => {
             position: relative;
             background-color: black;
             .PinturaRootWrapper {
-              width: 600px;
-              height: 600px;
+              width: 30vw;
+              height: 30vw;
             }
 
             .PinturaRoot {
@@ -119,15 +119,6 @@ const OrganismsConvertImage: FC = () => {
             .PinturaStatus {
               background-color: #202024;
               color: #fff;
-            }
-            .PinturaScrollable {
-              div {
-                ul {
-                  li:last-child {
-                    display: none;
-                  }
-                }
-              }
             }
           `}
         >
@@ -312,7 +303,7 @@ const OrganismsConvertImage: FC = () => {
                   editor.processImage();
                 }}
               >
-                LET’S PIXEIT!
+                LET’S PIXIT!
               </AtomButton>
             </AtomWrapper>
           </AtomWrapper>
@@ -430,7 +421,7 @@ const OrganismsConvertImage: FC = () => {
                             text-align: center;
                           `}
                         >
-                          Pixeit your image
+                          Pixit your image
                         </AtomText>
                       </AtomWrapper>
                     )}
@@ -534,7 +525,7 @@ const OrganismsConvertImage: FC = () => {
                               text-align: center;
                             `}
                           >
-                            Pixeit your image
+                            Pixit your image
                           </AtomText>
                         </AtomWrapper>
                       )}
@@ -637,7 +628,7 @@ const OrganismsConvertImage: FC = () => {
                 color="#4a4a54"
                 fontSize="12px"
               >
-                PIXEIT YOUR IMAGE
+                PIXIT YOUR IMAGE
               </AtomButton>
             ) : (
               <DownloadPdf

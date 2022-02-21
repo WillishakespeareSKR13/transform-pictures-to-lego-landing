@@ -27,7 +27,7 @@ const DefaultLayout: FC<Props> = ({ children }) => (
         maxWidth="1440px"
         minHeight="calc(100vh - 90px)"
         height="max-content"
-        padding="20px 0px"
+        padding="20px 90px"
         alignItems="center"
         justifyContent="flex-start"
         customCSS={css`

@@ -16,7 +16,7 @@ import { AtomButton } from '@sweetsyui/ui';
 const styles = StyleSheet.create({
   page: {
     flexDirection: 'row',
-    backgroundColor: '#E4E4E4'
+    backgroundColor: '#202024'
   },
   section: {
     margin: 10,
@@ -43,7 +43,9 @@ const styles = StyleSheet.create({
   text: {
     marginLeft: 5,
     fontSize: 12,
-    textAlign: 'center'
+    textAlign: 'center',
+    color: '#ffffff',
+    fontWeight: 'bold'
   }
 });
 
@@ -65,7 +67,7 @@ export const AtomPdf: FC<AtomPdfProps> = (props) => {
   });
   return (
     <Document>
-      <Page>
+      <Page style={styles.page}>
         <View style={styles.section}>
           <View style={styles.main}>
             {colors
@@ -92,7 +94,8 @@ export const AtomPdf: FC<AtomPdfProps> = (props) => {
                     style={{
                       width: '20px',
                       height: '20px',
-                      backgroundColor: color.value
+                      backgroundColor: color.value,
+                      border: '1px solid #ffffff'
                     }}
                   ></View>
                   <Text style={styles.text}>{color.count}</Text>
@@ -118,7 +121,7 @@ export const AtomPdf: FC<AtomPdfProps> = (props) => {
                 key={index}
                 style={{
                   position: 'relative',
-                  border: '2px solid white'
+                  border: '2px solid #202024'
                 }}
               >
                 <Image style={stylesImg.image} src={image} />
@@ -192,7 +195,8 @@ export const AtomPdf: FC<AtomPdfProps> = (props) => {
                   <Text
                     style={{
                       fontSize: `${isPortrait ? 6 : 9}px`,
-                      fontWeight: 600
+                      fontWeight: 600,
+                      color: '#ffffff'
                     }}
                   >
                     {idx + 1}
@@ -219,7 +223,8 @@ export const AtomPdf: FC<AtomPdfProps> = (props) => {
                     <Text
                       style={{
                         fontSize: `${isPortrait ? 6 : 9}px`,
-                        fontWeight: 600
+                        fontWeight: 600,
+                        color: '#ffffff'
                       }}
                     >
                       {idx + 1}
@@ -284,9 +289,18 @@ const DownloadPdf: FC<DocumentProps> = (props) => {
       >
         {({ loading }) =>
           loading ? (
-            <AtomButton backgroundColor="#ed7001">LOAD DOCUMENT</AtomButton>
+            <AtomButton
+              width="200px"
+              backgroundColor="#d6d6d7"
+              color="#4a4a54"
+              fontSize="12px"
+            >
+              LOAD DOCUMENT
+            </AtomButton>
           ) : (
-            <AtomButton backgroundColor="#ed7001">DOWNLOAD</AtomButton>
+            <AtomButton width="200px" backgroundColor="#e95c10" fontSize="12px">
+              DOWNLOAD
+            </AtomButton>
           )
         }
       </PDFDownloadLink>

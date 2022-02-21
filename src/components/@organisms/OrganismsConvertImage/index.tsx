@@ -127,6 +127,14 @@ const OrganismsConvertImage: FC = () => {
             enableButtonExport={false}
             src={blob}
             ref={ref}
+            utils={[
+              'crop',
+              'filter',
+              'finetune',
+              'annotate',
+              // 'decorate',
+              'frame'
+            ]}
             enableDropImage={false}
             imageCropAspectRatio={selectedConfig.aspect}
             // eslint-disable-next-line @typescript-eslint/no-explicit-any

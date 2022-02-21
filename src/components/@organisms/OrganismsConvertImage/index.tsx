@@ -1,7 +1,7 @@
 import { css } from '@emotion/react';
 import { AtomInput, AtomLoader, AtomText, AtomWrapper } from '@sweetsyui/ui';
-import { PinturaEditor } from 'react-pintura';
-import { EditorMethods, getEditorDefaults } from 'pintura';
+import PinturaEditor from '@Utils/react-pintura/PinturaEditor';
+import { EditorMethods, getEditorDefaults } from '@Utils/pintura';
 import { createRef, FC, useContext, useMemo, useState } from 'react';
 import { ContextFile } from '@Src/pages';
 import CONFIG, {
@@ -138,7 +138,8 @@ const OrganismsConvertImage: FC = () => {
             ref={ref}
             enableDropImage={false}
             imageCropAspectRatio={selectedConfig.aspect}
-            onProcess={(res) => {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            onProcess={(res: any) => {
               const FilterAndCrop = URL.createObjectURL(res.dest);
               cropAndFilter(
                 FilterAndCrop,

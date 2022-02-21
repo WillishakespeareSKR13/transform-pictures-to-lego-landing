@@ -6,6 +6,8 @@ import {
   AtomText,
   AtomWrapper
 } from '@sweetsyui/ui';
+import { PinturaEditor } from 'react-pintura';
+import { getEditorDefaults } from 'pintura';
 import { FC, useCallback, useContext, useMemo, useState } from 'react';
 import { ContextFile } from '@Src/pages';
 import getCroppedImg from '@Src/utils/getCropImage';
@@ -40,6 +42,7 @@ const OrganismsConvertImage: FC = () => {
   const [colors, setColors] = useState<COLORTYPE[]>([]);
   const [quantity, setQuantity] = useState<number>(0);
   const [isLoading, setIsLoading] = useState(false);
+  const [inlineResult, setInlineResult] = useState();
 
   console.warn(setSelectedRoom, colors, ROOMS);
 
@@ -103,7 +106,7 @@ const OrganismsConvertImage: FC = () => {
     >
       <AtomWrapper
         customCSS={css`
-          width: 350px;
+          width: 600px;
           height: max-content;
           align-items: flex-start;
           justify-content: flex-start;
@@ -115,26 +118,43 @@ const OrganismsConvertImage: FC = () => {
         `}
       >
         <AtomWrapper
-          width="320px"
+          width="600px"
           height="max-content"
           customCSS={css`
             border-radius: 10px;
             overflow: hidden;
             position: relative;
             background-color: black;
-            .reactEasyCrop_Container {
-              position: relative;
-              width: 320px;
-              height: 350px;
+            .PinturaRootWrapper {
+              width: 600px;
+              height: 600px;
             }
-            .reactEasyCrop_CropArea .reactEasyCrop_CropAreaGrid {
-              width: 100%;
+            .PinturaButton {
+              display: none;
             }
-            .reactEasyCrop_CropArea {
+            .PinturaRoot {
+              background-color: #202024;
+              * {
+                color: #fff;
+              }
+            }
+            .PinturaStatus {
+              background-color: #202024;
+              color: #fff;
             }
           `}
         >
-          <Cropper
+          <PinturaEditor
+            {...getEditorDefaults()}
+            imageCropAspectRatio={16 / 9}
+            src={blob}
+            onProcess={(res) => {
+              const FilterAndCrop = URL.createObjectURL(res.dest);
+              setCroppedImage(FilterAndCrop);
+            }}
+          />
+
+          {/* <Cropper
             image={blob}
             crop={crop}
             zoom={zoom}
@@ -149,7 +169,7 @@ const OrganismsConvertImage: FC = () => {
             onCropComplete={onCropComplete}
             onZoomChange={(e) => setZoom(Number(e.toFixed(2)))}
             objectFit="vertical-cover"
-          />
+          /> */}
           <AtomWrapper
             customCSS={css`
               align-items: center;
@@ -429,11 +449,6 @@ const OrganismsConvertImage: FC = () => {
                     </AtomWrapper>
                   </AtomWrapper>
                 )
-              },
-              {
-                id: 'shape',
-                title: 'Shape',
-                content: <></>
               }
             ]}
           />

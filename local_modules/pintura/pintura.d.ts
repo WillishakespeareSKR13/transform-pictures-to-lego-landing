@@ -3,6 +3,10 @@ type ProgressCallback = (event: ProgressEvent) => void;
 
 type Percentage = string;
 
+interface PinturaMetadata {
+    [key: string]: any;
+}
+
 // prettier-ignore
 /**
  * A matrix of 20 digits based on the SVG <feColorMatrix> filter
@@ -166,13 +170,7 @@ interface Shape {
         | 'circle'
         | 'circle-solid';
     isSelected?: boolean;
-    readonly context?: Rect | Size;
-    readonly isDraft?: boolean;
-    readonly isComplete?: boolean;
-    readonly isError?: boolean;
-    readonly isLoading?: boolean;
-    readonly isEditing?: boolean;
-    readonly isFormatted?: boolean;
+    isEditing?: boolean;
     disableStyle?: boolean | string[];
     disableErase?: boolean;
     disableSelect?: boolean;
@@ -186,6 +184,14 @@ interface Shape {
     disableResize?: boolean;
     disableRotate?: boolean;
     disableTextLayout?: boolean | TextLayout[];
+
+    // private
+    readonly _context?: Rect | Size;
+    readonly _isDraft?: boolean;
+    readonly _isComplete?: boolean;
+    readonly _isError?: boolean;
+    readonly _isLoading?: boolean;
+    readonly _isFormatted?: boolean;
 }
 
 type SvelteComponent = any;
@@ -285,11 +291,11 @@ interface EditorHistory {
     get: () => any[];
     set: (imageStates: any[]) => void;
     readonly length: number;
+    readonly index: number;
 }
 
 interface EditorMethods {
     on: (event: string, cb: (detail?: any) => void) => void;
-    destroy: () => void;
     loadImage: (
         src: ImageSource,
         options: ImageOptions
@@ -299,15 +305,13 @@ interface EditorMethods {
         options: ImageOptions
     ) => Promise<PinturaDefaultImageWriterResult>;
     processImage: () => Promise<PinturaDefaultImageWriterResult>;
+    abortLoadImage: () => void;
     abortProcessImage: () => void;
-    close: () => void;
+    updateImage: (src: ImageSource) => Promise<PinturaDefaultImageReaderResult>;
+    updateImagePreview: (src: ImageSource) => void;
     readonly history: EditorHistory;
-    /** @deprecated use history.undo() instead */
-    undo: () => void;
-    /** @deprecated use history.redo() instead */
-    redo: () => void;
-    /** @deprecated use history.revert() instead */
-    revert: () => void;
+    close: () => void;
+    destroy: () => void;
 }
 
 type CropOption = [number | undefined, string];
@@ -340,9 +344,11 @@ interface CropPluginOptions {
     cropEnableZoomInput?: boolean;
     cropEnableZoomMatchImageAspectRatio?: boolean;
     cropEnableZoomTowardsWheelPosition?: boolean;
+    cropEnableZoomAutoHide?: boolean;
     cropImageSelectionCornerStyle?: undefined | 'hook' | 'round' | 'invisible';
     cropSelectPresetOptions?: OptionGroup[] | CropPresetOption[];
     cropEnableRotateMatchImageAspectRatio?: 'never' | 'custom' | 'always';
+    cropWillRenderTools?: (nodes: PinturaNode[], env: any, redraw: () => void) => PinturaNode[];
 }
 
 interface ShapeToolButtonOptions {
@@ -377,12 +383,29 @@ interface FilterPluginOptions {
 
 interface FinetunePluginOptions {
     finetuneControlConfiguration?: { [key: string]: Effect };
-    finetuneOptions?: any;
+    finetuneOptions?: [string | undefined, LocaleString];
 }
 
 interface ResizePluginOptions {
     resizeMaxSize?: Size;
     resizeMinSize?: Size;
+    resizeSizePresetOptions?: OptionGroup[] | SizeOption[];
+    resizeWidthPresetOptions?: OptionGroup[] | SizeOption[];
+    resizeHeightPresetOptions?: OptionGroup[] | SizeOption[];
+    resizeWillRenderFooter?: (nodes: PinturaNode[], env: any, redraw: () => void) => PinturaNode[];
+}
+
+interface FramePluginOptions {
+    frameStyles?: {
+        [key: string]: {
+            shape: {
+                frameStyle: string;
+                [key: string]: any;
+            };
+            thumb: string;
+        };
+    };
+    frameOptions?: [string | undefined, LocaleString];
 }
 
 interface StickerPluginOptions {
@@ -417,6 +440,7 @@ interface ImageOptions {
     rotation?: number;
     vignette?: number;
     targetSize?: Size;
+    metadata?: PinturaMetadata;
     state?: any;
 }
 
@@ -449,6 +473,13 @@ interface EditorImageOptions {
     imageRotation?: number;
     imageVignette?: number;
     imageTargetSize?: Size;
+    imageFrame?:
+        | string
+        | {
+              [key: string]: any;
+              frameStyle: string;
+          };
+    imageMetadata?: PinturaMetadata;
     imageState?: any;
 }
 
@@ -474,6 +505,8 @@ type PinturaNode =
     | [PinturaNodeType, string, PinturaNode[]]
     | [PinturaNodeType, string, PinturaNodeOptions, PinturaNode[]];
 
+type PinturaEditorStatus = string | [string] | [string, number] | [string, false] | undefined;
+
 interface EditorOptions {
     id?: string;
     class?: string;
@@ -481,11 +514,14 @@ interface EditorOptions {
     src?: ImageSource;
     util?: string;
     utils?: string[];
+    disabled?: boolean;
+    status?: PinturaEditorStatus;
     elasticityMultiplier?: number;
     layoutDirectionPreference?: 'auto' | 'horizontal' | 'vertical';
     imageSourceToImageData?: (src: any) => Promise<ImageData>;
     previewImageDataMaxSize?: Size;
     previewUpscale?: boolean;
+    shapePreprocessor?: any;
     enableButtonClose?: boolean;
     enableButtonExport?: boolean;
     enableButtonResetHistory?: boolean;
@@ -494,8 +530,12 @@ interface EditorOptions {
     enableToolbar?: boolean;
     enableUtils?: boolean;
     enableDropImage?: boolean;
+    enablePasteImage?: boolean;
+    enableMarkupEditorToolSelectToAddShape?: boolean;
     handleEvent?: (type: string, detail: any) => void;
+    willClose?: () => Promise<boolean>;
     willRevert?: () => Promise<boolean>;
+    willProcessImage?: () => Promise<boolean>;
     willRenderCanvas?: (
         shapes: {
             decorationShapes: Shape[];
@@ -508,6 +548,7 @@ interface EditorOptions {
         annotationShapes: Shape[];
         interfaceShapes: Shape[];
     };
+    willSetHistoryInitialState?: (initialState: any) => any;
     willRenderToolbar?: (nodes: PinturaNode[], env: any) => PinturaNode[];
     beforeSelectShape?: (current: Shape | undefined, target: Shape) => boolean;
     beforeDeselectShape?: (current: Shape, target: Shape | undefined) => boolean;
@@ -515,9 +556,9 @@ interface EditorOptions {
     beforeRemoveShape?: (shape: Shape) => boolean;
     beforeUpdateShape?: (shape: Shape, props: any, context: Rect) => Shape;
     willRenderShapeControls?: (nodes: PinturaNode[], shapeId: string) => PinturaNode[];
-    willRenderPresetToolbar?: (
+    willRenderShapePresetToolbar?: (
         nodes: PinturaNode[],
-        addPreset: Function,
+        addPreset: (sticker: Sticker) => void,
         env: any
     ) => PinturaNode[];
 }
@@ -616,6 +657,11 @@ interface PinturaDefaultImageWriterOptions {
         | { url: string; dataset?: (imageState: any) => PinturaStoreField[] }
         | ((imageState: any, options: any, onprogress: ProgressCallback) => Promise<any>);
     outputProps?: string[];
+    preprocessImageSource?: (
+        imageSource: Blob | File,
+        options: any,
+        onprogress: ProgressCallback
+    ) => Promise<Blob | File>;
     preprocessImageState?: (
         imageState: any,
         options: any,
@@ -623,6 +669,16 @@ interface PinturaDefaultImageWriterOptions {
     ) => Promise<any>;
     postprocessImageData?: (
         imageData: any,
+        options: any,
+        onprogress: ProgressCallback
+    ) => Promise<ImageData>;
+
+    postprocessImageBlob?: (
+        output: {
+            blob: Blob;
+            imageData: ImageData;
+            src: File;
+        },
         options: any,
         onprogress: ProgressCallback
     ) => Promise<ImageData>;
@@ -685,11 +741,18 @@ export const processImage: (
     options: PinturaEditorHeadlessOptions
 ) => Promise<PinturaDefaultImageWriterResult>;
 
+export const processDefaultImage: (
+    src: ImageSource,
+    options: PinturaEditorHeadlessOptions
+) => Promise<PinturaDefaultImageWriterResult>;
+
 export const createDefaultImageReader: (options?: PinturaDefaultImageReaderOptions) => any[];
 
 export const createDefaultImageWriter: (options?: PinturaDefaultImageWriterOptions) => any[];
 
 export const createDefaultImageOrienter: () => PinturaImageOrienter;
+
+export const createDefaultShapePreprocessor: () => any;
 
 // node tree helpers
 export function createNode(

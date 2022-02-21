@@ -19,6 +19,7 @@ declare module 'react-pintura' {
         onProcesserror?: (detail: any) => void;
         onProcessprogress?: (detail: any) => void;
         onProcess?: (detail: any) => void;
+        onUpdate?: (detail: any) => void;
         onUndo?: (detail: any) => void;
         onRedo?: (detail: any) => void;
         onRevert?: (detail: any) => void;

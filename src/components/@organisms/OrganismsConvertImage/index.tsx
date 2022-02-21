@@ -8,10 +8,8 @@ import {
 } from '@sweetsyui/ui';
 import { PinturaEditor } from 'react-pintura';
 import { getEditorDefaults } from 'pintura';
-import { FC, useCallback, useContext, useMemo, useState } from 'react';
+import { FC, useContext, useMemo, useState } from 'react';
 import { ContextFile } from '@Src/pages';
-import getCroppedImg from '@Src/utils/getCropImage';
-import Cropper from 'react-easy-crop';
 import mapRange from '@Src/utils/mapRange';
 import CONFIG, {
   COLORTYPE,
@@ -33,7 +31,6 @@ const OrganismsConvertImage: FC = () => {
   const { file } = useContext(ContextFile);
   const [selected, setSelected] = useState<CONFIGKEYS>('SQUARE');
   const [selectedSize, setSelectedSize] = useState<CONFIGKEYSSIZE>('SMALL');
-  const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
   const [croppedImage, setCroppedImage] = useState('');
   const [showBorder, setShowBorder] = useState(false);
@@ -42,7 +39,6 @@ const OrganismsConvertImage: FC = () => {
   const [colors, setColors] = useState<COLORTYPE[]>([]);
   const [quantity, setQuantity] = useState<number>(0);
   const [isLoading, setIsLoading] = useState(false);
-  const [inlineResult, setInlineResult] = useState();
 
   console.warn(setSelectedRoom, colors, ROOMS);
 
@@ -75,16 +71,6 @@ const OrganismsConvertImage: FC = () => {
   const blob = useMemo(
     () =>
       file ? URL.createObjectURL(new Blob([file], { type: 'image/png' })) : '',
-    [file]
-  );
-
-  const onCropComplete = useCallback(
-    async (_, croppedAreaPixels) =>
-      setCroppedImage(
-        file
-          ? await getCroppedImg(file, croppedAreaPixels, 0).catch(() => ``)
-          : ``
-      ),
     [file]
   );
 

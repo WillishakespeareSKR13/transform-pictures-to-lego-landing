@@ -330,13 +330,12 @@ const OrganismsConvertImage: FC = () => {
       >
         <AtomWrapper
           customCSS={css`
-          padding: 0px 20px;
+            padding: 0px 20px;
             width: max-content;
             align-items: center;
             justify-content: center;
             background-color: #202024;
             box-shadow: 0px 0px 10px rgba(16, 16, 16, 0.563);
-            }
           `}
         >
           <AtomText

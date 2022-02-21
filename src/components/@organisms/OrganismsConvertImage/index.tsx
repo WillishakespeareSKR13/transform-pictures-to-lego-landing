@@ -73,7 +73,6 @@ const OrganismsConvertImage: FC = () => {
       customCSS={css`
         border-radius: 10px;
         width: 100%;
-        gap: 30px;
         flex-direction: row;
         min-height: calc(100vh - 90px);
         box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
@@ -86,7 +85,7 @@ const OrganismsConvertImage: FC = () => {
     >
       <AtomWrapper
         customCSS={css`
-          width: 30vw;
+          width: 600px;
           height: max-content;
           align-items: flex-start;
           justify-content: flex-start;
@@ -106,8 +105,8 @@ const OrganismsConvertImage: FC = () => {
             position: relative;
             background-color: black;
             .PinturaRootWrapper {
-              width: 30vw;
-              height: 30vw;
+              width: 600px;
+              height: 600px;
             }
 
             .PinturaRoot {
@@ -127,16 +126,10 @@ const OrganismsConvertImage: FC = () => {
             enableButtonExport={false}
             src={blob}
             ref={ref}
-            utils={[
-              'crop',
-              'filter',
-              'finetune',
-              'annotate',
-              // 'decorate',
-              'frame'
-            ]}
+            utils={['crop', 'filter', 'finetune', 'annotate', 'frame']}
             enableDropImage={false}
             imageCropAspectRatio={selectedConfig.aspect}
+            cropEnableCenterImageSelection
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             onProcess={(res: any) => {
               const FilterAndCrop = URL.createObjectURL(res.dest);

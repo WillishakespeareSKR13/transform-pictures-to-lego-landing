@@ -11,7 +11,6 @@ import {
   PDFDownloadLink
 } from '@react-pdf/renderer';
 import { AtomButton } from '@sweetsyui/ui';
-import { css } from '@emotion/react';
 
 // Create styles
 const styles = StyleSheet.create({
@@ -291,22 +290,15 @@ const DownloadPdf: FC<DocumentProps> = (props) => {
         {({ loading }) =>
           loading ? (
             <AtomButton
-              backgroundColor="#4a4a54"
-              customCSS={css`
-                margin-left: 20px;
-                font-size: 12px;
-              `}
+              width="200px"
+              backgroundColor="#d6d6d7"
+              color="#4a4a54"
+              fontSize="12px"
             >
               LOAD DOCUMENT
             </AtomButton>
           ) : (
-            <AtomButton
-              backgroundColor="#e95c10"
-              customCSS={css`
-                margin-left: 20px;
-                font-size: 12px;
-              `}
-            >
+            <AtomButton width="200px" backgroundColor="#e95c10" fontSize="12px">
               DOWNLOAD
             </AtomButton>
           )

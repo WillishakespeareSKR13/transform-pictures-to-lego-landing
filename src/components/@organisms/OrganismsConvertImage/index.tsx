@@ -17,6 +17,8 @@ import CONFIG, {
   CONFIGKEYSSIZE,
   CROPPEDIMAGE,
   ROOMS,
+  ROOMSSIZES,
+  ROOMSSIZESTYPE,
   ROOMSTYPES,
   SELECTEDCONFIG
 } from '@Src/config';
@@ -58,6 +60,14 @@ const OrganismsConvertImage: FC = () => {
     () => ROOMS.find(({ key }) => key === selectedRoom),
     [selectedRoom]
   ) as ROOMSTYPES;
+
+  const selectedRoomSizeConfig = useMemo(
+    () =>
+      ROOMSSIZES.find(({ key }) => key === selected)?.sizes.find(
+        ({ key }) => key === selectedSize
+      ),
+    [selected, selectedSize]
+  ) as ROOMSSIZESTYPE;
 
   const blob = useMemo(
     () =>
@@ -473,7 +483,7 @@ const OrganismsConvertImage: FC = () => {
                 {loading || isLoading ? (
                   <AtomLoader
                     isLoading
-                    colorLoading="#e95c10"
+                    colorLoading="#dadadb"
                     type="small"
                     customCSS={css`
                       width: ${selectedConfig.size.width};
@@ -535,7 +545,7 @@ const OrganismsConvertImage: FC = () => {
                         width="max-content"
                       >
                         <AtomText
-                          color="#4a4a54"
+                          color="#dadadb"
                           fontSize="28px"
                           fontWeight={600}
                           customCSS={css`
@@ -566,20 +576,19 @@ const OrganismsConvertImage: FC = () => {
                     top: ${selectedRoomConfig.top[selected]};
                     right: 50%;
                     transform: translate(50%, 0);
+                    background-color: #313139;
+                    box-shadow: 0px 3px 5px 2px rgba(0, 0, 0, 0.522);
+                    outline: 1px solid #6a6a6a5c;
                   `}
                 >
                   {loading || isLoading ? (
                     <AtomLoader
                       isLoading
-                      colorLoading="#e95c10"
+                      colorLoading="#4a4a54"
                       type="small"
                       customCSS={css`
-                        width: ${Number(
-                          selectedConfig.size.width.replace('px', '')
-                        ) / 3}px;
-                        height: ${Number(
-                          selectedConfig.size.height.replace('px', '')
-                        ) / 3}px;
+                        width: ${selectedRoomSizeConfig.size.width};
+                        height: ${selectedRoomSizeConfig.size.height};
                       `}
                     />
                   ) : (
@@ -587,16 +596,10 @@ const OrganismsConvertImage: FC = () => {
                       customCSS={css`
                         flex-direction: row;
                         flex-wrap: wrap;
-                        width: ${Number(
-                          selectedConfig.size.width.replace('px', '')
-                        ) / 3}px;
-                        height: ${Number(
-                          selectedConfig.size.height.replace('px', '')
-                        ) / 3}px;
+                        width: ${selectedRoomSizeConfig.size.width};
+                        height: ${selectedRoomSizeConfig.size.height};
                         align-items: center;
                         justify-content: center;
-                        background-color: #313139;
-                        box-shadow: 0px 2px 5px 2px rgba(0, 0, 0, 0.522);
                       `}
                     >
                       {cropImages.length > 0 ? (
@@ -623,16 +626,16 @@ const OrganismsConvertImage: FC = () => {
                                   `}
                                   ${selectedConfig.y > selectedConfig.x
                                     ? css`
-                                        width: ${selectedRoomConfig.size /
-                                        selectedConfig.y}px;
-                                        height: ${selectedRoomConfig.size /
-                                        selectedConfig.y}px;
+                                        width: ${selectedRoomSizeConfig.size
+                                          .max / selectedConfig.y}px;
+                                        height: ${selectedRoomSizeConfig.size
+                                          .max / selectedConfig.y}px;
                                       `
                                     : css`
-                                        width: ${selectedRoomConfig.size /
-                                        selectedConfig.x}px;
-                                        height: ${selectedRoomConfig.size /
-                                        selectedConfig.x}px;
+                                        width: ${selectedRoomSizeConfig.size
+                                          .max / selectedConfig.x}px;
+                                        height: ${selectedRoomSizeConfig.size
+                                          .max / selectedConfig.x}px;
                                       `}
                                 `}
                               />
@@ -691,28 +694,29 @@ const OrganismsConvertImage: FC = () => {
             flexDirection="row"
             justifyContent="flex-end"
             alignItems="center"
-            padding="0px 20px 20px 20px"
+            padding="10px 20px 30px 20px"
           >
             <AtomInput
               type="checkbox"
               checked={showBorder}
               onChange={() => setShowBorder(!showBorder)}
               customCSS={css`
+                margin-right: 30px;
                 span {
                   display: none;
                 }
                 div {
                   font-size: 12px;
                   font-weight: 700;
-                  color: #ebebeb;
+                  color: #9f9faa;
                 }
                 input[type='checkbox'] {
                   position: relative;
                   width: 16px;
                   height: 16px;
-                  color: #6b6b6b;
+                  color: #9f9faa;
                   background-color: #313139;
-                  border: 1px solid #6b6b6b;
+                  border: 1px solid #9f9faa;
                   border-radius: 4px;
                   appearance: none;
                   outline: 0;
@@ -750,11 +754,10 @@ const OrganismsConvertImage: FC = () => {
             </AtomInput>
             {cropImages.length === 0 || loading || isLoading ? (
               <AtomButton
-                backgroundColor="#4a4a54"
-                customCSS={css`
-                  margin-left: 20px;
-                  font-size: 12px;
-                `}
+                width="200px"
+                backgroundColor="#d6d6d7"
+                color="#4a4a54"
+                fontSize="12px"
               >
                 PIXELIT YOUR IMAGE
               </AtomButton>

@@ -320,6 +320,187 @@ export type ROOMSTYPES = {
   size: number;
 };
 
+export type ROOMSSIZESTYPE = {
+  id: string;
+  key: string;
+  size: {
+    width: string;
+    height: string;
+    max: number;
+  };
+};
+
+export const ROOMSSIZES = [
+  {
+    id: v4(),
+    key: 'VERTICAL',
+    sizes: [
+      {
+        id: v4(),
+        key: 'SMALL',
+        size: {
+          width: '140px',
+          height: '200px',
+          max: 210
+        }
+      },
+      {
+        id: v4(),
+        key: 'MEDIUM',
+        size: {
+          width: '150px',
+          height: '200px',
+          max: 200
+        }
+      },
+      {
+        id: v4(),
+        key: 'LARGE',
+        size: {
+          width: '120px',
+          height: '200',
+          max: 200
+        }
+      },
+      {
+        id: v4(),
+        key: 'XLARGE',
+        size: {
+          width: '160px',
+          height: '200px',
+          max: 200
+        }
+      },
+      {
+        id: v4(),
+        key: 'JUMBO',
+        size: {
+          width: '140px',
+          height: '200px',
+          max: 210
+        }
+      }
+    ]
+  },
+  {
+    id: v4(),
+    key: 'HORIZONTAL',
+    sizes: [
+      {
+        id: v4(),
+        key: 'SMALL',
+        size: {
+          width: '200px',
+          height: '133px',
+          max: 200
+        }
+      },
+      {
+        id: v4(),
+        key: 'MEDIUM',
+        size: {
+          width: '200px',
+          height: '150px',
+          max: 200
+        }
+      },
+      {
+        id: v4(),
+        key: 'LARGE',
+        size: {
+          width: '200px',
+          height: '120px',
+          max: 200
+        }
+      },
+      {
+        id: v4(),
+        key: 'XLARGE',
+        size: {
+          width: '200px',
+          height: '160px',
+          max: 200
+        }
+      },
+      {
+        id: v4(),
+        key: 'JUMBO',
+        size: {
+          width: '200px',
+          height: '130px',
+          max: 200
+        }
+      }
+    ]
+  },
+  {
+    id: v4(),
+    key: 'SQUARE',
+    sizes: [
+      {
+        id: v4(),
+        key: 'SMALL',
+        size: {
+          width: '180px',
+          height: '180px',
+          max: 180
+        }
+      },
+      {
+        id: v4(),
+        key: 'MEDIUM',
+        size: {
+          width: '180px',
+          height: '180px',
+          max: 180
+        }
+      },
+      {
+        id: v4(),
+        key: 'LARGE',
+        size: {
+          width: '180px',
+          height: '180px',
+          max: 180
+        }
+      },
+      {
+        id: v4(),
+        key: 'XLARGE',
+        size: {
+          width: '180px',
+          height: '180px',
+          max: 180
+        }
+      },
+      {
+        id: v4(),
+        key: 'JUMBO',
+        size: {
+          width: '180px',
+          height: '180px',
+          max: 180
+        }
+      }
+    ]
+  },
+  {
+    id: v4(),
+    key: 'PORTRAIT',
+    sizes: [
+      {
+        id: v4(),
+        key: 'PORTRAIT',
+        size: {
+          width: '180px',
+          height: '180px',
+          max: 180
+        }
+      }
+    ]
+  }
+];
+
 export const ROOMS: ROOMSTYPES[] = [
   {
     id: v4(),
@@ -327,12 +508,12 @@ export const ROOMS: ROOMSTYPES[] = [
     name: 'Room 1',
     path: '/rooms/1.jpg',
     top: {
-      VERTICAL: '100px',
+      VERTICAL: '130px',
       HORIZONTAL: '140px',
       SQUARE: '100px',
       PORTRAIT: '100px'
     },
-    size: 160
+    size: 150
   },
   {
     id: v4(),
@@ -340,12 +521,12 @@ export const ROOMS: ROOMSTYPES[] = [
     name: 'Room 2',
     path: '/rooms/2.jpg',
     top: {
-      VERTICAL: '60px',
+      VERTICAL: '80px',
       HORIZONTAL: '100px',
       SQUARE: '60px',
       PORTRAIT: '60px'
     },
-    size: 160
+    size: 150
   },
   {
     id: v4(),
@@ -353,12 +534,12 @@ export const ROOMS: ROOMSTYPES[] = [
     name: 'Room 3',
     path: '/rooms/3.jpg',
     top: {
-      VERTICAL: '70px',
+      VERTICAL: '90px',
       HORIZONTAL: '110px',
       SQUARE: '60px',
       PORTRAIT: '60px'
     },
-    size: 160
+    size: 150
   },
   {
     id: v4(),
@@ -366,12 +547,12 @@ export const ROOMS: ROOMSTYPES[] = [
     name: 'Room 4',
     path: '/rooms/4.jpg',
     top: {
-      VERTICAL: '110px',
+      VERTICAL: '130px',
       HORIZONTAL: '150px',
       SQUARE: '120px',
       PORTRAIT: '120px'
     },
-    size: 160
+    size: 150
   }
 ];
 

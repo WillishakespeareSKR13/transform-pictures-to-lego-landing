@@ -504,6 +504,19 @@ export const ROOMSSIZES = [
 export const ROOMS: ROOMSTYPES[] = [
   {
     id: v4(),
+    key: 'DEFAULT',
+    name: 'Full Screen',
+    path: '',
+    top: {
+      VERTICAL: '',
+      HORIZONTAL: '',
+      SQUARE: '',
+      PORTRAIT: ''
+    },
+    size: 0
+  },
+  {
+    id: v4(),
     key: 'LIVING_ROOM_1',
     name: 'Room 1',
     path: '/rooms/1.jpg',

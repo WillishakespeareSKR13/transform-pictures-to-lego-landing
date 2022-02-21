@@ -120,6 +120,15 @@ const OrganismsConvertImage: FC = () => {
               background-color: #202024;
               color: #fff;
             }
+            .PinturaScrollable {
+              div {
+                ul {
+                  li:last-child {
+                    display: none;
+                  }
+                }
+              }
+            }
           `}
         >
           <PinturaEditor

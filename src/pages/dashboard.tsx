@@ -12,7 +12,6 @@ type getSaleOrdersType = {
 
 const DashboardPage: NextPageFC = () => {
   const { data } = useQuery<getSaleOrdersType>(GETSALEORDES);
-  console.log(data);
 
   return (
     <AtomWrapper>

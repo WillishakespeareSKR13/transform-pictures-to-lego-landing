@@ -20,6 +20,7 @@ import { StyledImage } from './styles';
 import { cropAndFilter } from '@Src/utils/pixelit';
 import DownloadPdf from '@Src/components/@atoms/AtomPdf';
 import AtomModalImage from '@Src/components/@atoms/AtomModalImage';
+import PaymentModal from '@Src/components/@molecules/PaymentModal';
 
 const OrganismsConvertImage: FC = () => {
   const { file } = useContext(ContextFile);
@@ -624,10 +625,12 @@ const OrganismsConvertImage: FC = () => {
             </AtomInput>
             {cropImages.length === 0 || loading || isLoading ? (
               <AtomButton
+                disabled
                 width="200px"
                 backgroundColor="#d6d6d7"
                 color="#4a4a54"
                 fontSize="12px"
+                padding="10px 30px"
               >
                 PIXIT YOUR IMAGE
               </AtomButton>
@@ -640,6 +643,11 @@ const OrganismsConvertImage: FC = () => {
                 isPortrait={selectedConfig.isPortrait}
               />
             )}
+            <PaymentModal
+              isReady={!(cropImages.length === 0 || loading || isLoading)}
+              product={selected}
+              size={selectedSize}
+            />
           </AtomWrapper>
         </AtomWrapper>
       </AtomWrapper>

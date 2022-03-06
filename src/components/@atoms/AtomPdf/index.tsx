@@ -294,11 +294,17 @@ const DownloadPdf: FC<DocumentProps> = (props) => {
               backgroundColor="#d6d6d7"
               color="#4a4a54"
               fontSize="12px"
+              padding="10px 30px"
             >
               LOAD DOCUMENT
             </AtomButton>
           ) : (
-            <AtomButton width="200px" backgroundColor="#e95c10" fontSize="12px">
+            <AtomButton
+              width="200px"
+              backgroundColor="#e95c10"
+              fontSize="12px"
+              padding="10px 30px"
+            >
               DOWNLOAD
             </AtomButton>
           )

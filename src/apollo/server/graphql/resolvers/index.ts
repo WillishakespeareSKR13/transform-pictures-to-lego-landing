@@ -1,15 +1,18 @@
 import { Resolvers } from '@apollo/client';
-import User from './User';
-import Role from './Role';
+import User from './_User';
+import Role from './_Role';
+import SaleOrder from './_SaleOrder';
 
 const resolvers: Resolvers = {
   Query: {
     ...User.Query,
-    ...Role.Query
+    ...Role.Query,
+    ...SaleOrder.Query
   },
   Mutation: {
     ...User.Mutation,
-    ...Role.Mutation
+    ...Role.Mutation,
+    ...SaleOrder.Mutation
   }
 };
 

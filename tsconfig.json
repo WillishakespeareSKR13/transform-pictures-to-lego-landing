@@ -18,6 +18,8 @@
       "@Assets/*": ["src/assets/*"],
       "@Styles/*": ["src/styles/*"],
       "@Apollo/*": ["src/apollo/*"],
+      "@ApolloServer/*": ["src/apollo/server/*"],
+      "@ApolloClient/*": ["src/apollo/client/*"],
       "@Redux/*": ["src/redux/*"],
       "@ApolloQuery/*": ["src/apollo/query/*"],
       "@ApolloMutation/*": ["src/apollo/mutation/*"]

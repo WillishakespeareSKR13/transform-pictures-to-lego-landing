@@ -9,7 +9,7 @@ type Props = {
 };
 
 const DefaultLayout: FC<Props> = ({ children }) => (
-  <AuthContext type="DEFAULT">
+  <AuthContext type="LOGIN">
     <LayoutAnimation
       minHeight="100vh"
       height="max-content"
@@ -24,9 +24,9 @@ const DefaultLayout: FC<Props> = ({ children }) => (
       <AtomWrapper
         maxWidth="1440px"
         minHeight="100vh"
-        height="100%"
+        height="max-content"
         alignItems="center"
-        justifyContent="center"
+        justifyContent="flex-start"
         customCSS={css`
           @media only screen and (max-width: 980px) {
             padding: 0px 30px;

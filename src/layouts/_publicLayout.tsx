@@ -1,5 +1,6 @@
 import { FC } from 'react';
 import LayoutAnimation from '@sweetsyui/ui/build/@layouts/LayoutAnimation';
+import { OrganismsHeader } from '@Src/components/@organisms';
 import { css } from '@emotion/react';
 import { AtomWrapper } from '@sweetsyui/ui';
 import AuthContext from '@Src/hooks/authContext';
@@ -9,9 +10,11 @@ type Props = {
 };
 
 const DefaultLayout: FC<Props> = ({ children }) => (
-  <AuthContext type="DEFAULT">
+  <AuthContext type="PUBLIC">
+    <OrganismsHeader />
     <LayoutAnimation
-      minHeight="100vh"
+      padding="90px 0 0 0"
+      minHeight="calc(100% - 90px)"
       height="max-content"
       backgroundColor="transparent"
       customCSS={css`
@@ -23,10 +26,11 @@ const DefaultLayout: FC<Props> = ({ children }) => (
     >
       <AtomWrapper
         maxWidth="1440px"
-        minHeight="100vh"
-        height="100%"
+        minHeight="calc(100vh - 90px)"
+        height="max-content"
+        padding="20px 90px"
         alignItems="center"
-        justifyContent="center"
+        justifyContent="flex-start"
         customCSS={css`
           @media only screen and (max-width: 980px) {
             padding: 0px 30px;

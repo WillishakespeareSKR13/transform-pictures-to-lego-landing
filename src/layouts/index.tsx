@@ -1,8 +1,14 @@
 import { FC } from 'react';
 import DefaultLayout from './_defaultLayout';
+import PublicLayout from './_publicLayout';
+import LoginLayout from './_loginLayout';
+import DashboardLayout from './_dashboardLayout';
 
 export const AllLayouts = {
-  default: DefaultLayout
+  default: DefaultLayout,
+  public: PublicLayout,
+  login: LoginLayout,
+  dashboard: DashboardLayout
 };
 
 export type LayoutType = {

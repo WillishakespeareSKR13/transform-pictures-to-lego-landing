@@ -76,7 +76,7 @@ const OrganismsConvertImage: FC = () => {
         flex-direction: row;
         min-height: calc(100vh - 90px);
         box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-        align-items: flex-start;
+        align-items: center;
         justify-content: space-between;
         @media (max-width: 820px) {
           flex-direction: column-reverse;

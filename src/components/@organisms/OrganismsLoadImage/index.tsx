@@ -110,14 +110,13 @@ const OrganismsLoadImage: FC = () => {
           display: flex;
           background-color: #202024;
           width: 100%;
-          height: 
           align-items: center;
           justify-content: center;
           cursor: pointer;
-          *{
+          * {
             cursor: pointer;
           }
-          span{
+          span {
             display: none;
           }
           div {
@@ -125,7 +124,7 @@ const OrganismsLoadImage: FC = () => {
             font-weight: 600;
             align-items: center;
             justify-content: center;
-            span{
+            span {
               display: flex;
             }
             img {

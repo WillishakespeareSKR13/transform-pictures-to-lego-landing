@@ -3,6 +3,8 @@ import { NextPage } from 'next';
 import { LayoutType } from '@Layouts/index';
 import type { AppInitialProps } from 'next/app';
 import { NextComponentType, NextPageContext } from 'next';
+import { IQueryFilter } from 'graphql';
+
 declare module 'next/app' {
   export declare type AppPropsWithLayout<P = any> = AppInitialProps & {
     Component: NextComponentType<NextPageContext, any, P> & LayoutType;
@@ -20,7 +22,14 @@ declare module 'next' {
   export declare type NextPageFC<P = any, IP = P> = NextPage<P, IP> &
     LayoutType;
   export declare type QueryTypeChildren = { children: ReactNode };
-  export declare type QueryType = QueryResult<any, OperationVariables>;
+  export declare type QueryType = {
+    data: IQueryFilter<'me'>;
+    error?: any;
+    loading: boolean;
+    refetch: (
+      variables?: OperationVariables
+    ) => Promise<QueryResult<IQueryFilter<'me'>>>;
+  };
   export declare type QueryTypeNode = {
     query: QueryType;
     role?: string | string[];
@@ -31,11 +40,6 @@ declare module 'redux-persist/es/persistStore' {
   import { Store, Action, AnyAction } from 'redux';
   import { PersistorOptions, Persistor } from 'redux-persist/es/types';
 
-  export default function persistStore(
-    store: Store,
-    persistorOptions?: PersistorOptions | null,
-    callback?: () => any
-  ): Persistor;
   export default function persistStore<
     S = any,
     A extends Action<any> = AnyAction

@@ -12,6 +12,7 @@ type getSaleOrdersType = {
 
 const DashboardPage: NextPageFC = () => {
   const { data } = useQuery<getSaleOrdersType>(GETSALEORDES);
+  console.log(data);
 
   return (
     <AtomWrapper>
@@ -52,7 +53,7 @@ const DashboardPage: NextPageFC = () => {
             }
           }
         `}
-        data={data?.getSaleOrders}
+        data={data?.getSaleOrders?.slice()?.sort(() => -1)}
         columns={[
           {
             title: 'ID',

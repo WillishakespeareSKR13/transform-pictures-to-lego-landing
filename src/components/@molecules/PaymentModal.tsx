@@ -36,7 +36,7 @@ const PaymentModal: FC<Props> = (props) => {
   useEffect(() => {
     const secret = data?.newSaleOrder;
     setSaleOrder(secret);
-  }, [data]);
+  }, [data?.newSaleOrder]);
 
   return (
     <AtomWrapper
@@ -68,7 +68,7 @@ const PaymentModal: FC<Props> = (props) => {
               type="small"
               isLoading
               width="400px"
-              colorLoading="#ffffff"
+              colorLoading="#313139"
             />
           )}
           {saleOrder && (
@@ -196,7 +196,7 @@ const CheckoutForm: FC<CheckoutFormProps> = (props) => {
     >
       <form onSubmit={handleSubmit}>
         {loading && (
-          <AtomLoader type="small" isLoading colorLoading="#ffffff" />
+          <AtomLoader type="small" isLoading colorLoading="#313139" />
         )}
 
         <PaymentElement onReady={() => setLoading(false)} id="paymentElement" />

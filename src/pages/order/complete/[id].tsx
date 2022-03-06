@@ -96,6 +96,9 @@ const CompleteOrderPay = () => {
             margin="40px 0"
           />
           <AtomButton
+            onClick={() => {
+              router.push('/');
+            }}
             customCSS={css`
               background-color: #48d496;
               span {

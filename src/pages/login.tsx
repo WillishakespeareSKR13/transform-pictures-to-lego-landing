@@ -14,7 +14,7 @@ import { useMutation } from '@apollo/client';
 import { useAlert } from '@Src/hooks/alertContext';
 import { v4 as uuidv4 } from 'uuid';
 import cookie from 'js-cookie';
-import { LOGIN } from '@Src/apollo/client/mutation/uset';
+import { LOGIN } from '@Src/apollo/client/mutation/user';
 
 const initialValues = {
   email: '',

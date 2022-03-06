@@ -1,6 +1,6 @@
 import { combineReducers } from 'redux';
 // import ModalReducer, { ModalReduceType } from './modal';
-// import SideBarReducer, { SidebarReducerType } from './sidebar';
+import SideBarReducer, { SidebarReducerType } from './sidebar';
 import UserReducer, { UserReducerType } from './user';
 // import UserQuotation, { QuotationReduceType } from './quotation';
 // import memberID, { MemberIDReduceType } from './memberId';
@@ -8,8 +8,8 @@ import UserReducer, { UserReducerType } from './user';
 // import surveyDetail, { SurveyDetailReducer } from './blog';
 
 const RootReducer = combineReducers({
-  user: UserReducer
-  // sideBar: SideBarReducer,
+  user: UserReducer,
+  sideBar: SideBarReducer
   // modal: ModalReducer,
   // quotation: UserQuotation,
   // memberID: memberID,
@@ -19,7 +19,7 @@ const RootReducer = combineReducers({
 
 export type RootStateType = {
   user: UserReducerType;
-  // sideBar: SidebarReducerType;
+  sideBar: SidebarReducerType;
   // modal: ModalReduceType;
   // quotation: QuotationReduceType;
   // memberID: MemberIDReduceType;

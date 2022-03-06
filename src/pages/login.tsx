@@ -185,6 +185,7 @@ const PageLogin: NextPageFC = () => {
                 placeholder="Contraseña"
                 customCSS={css`
                   input {
+                    color: #dfdfdf;
                     background-color: #202024;
                     border: 1px solid #202024;
                     :focus {

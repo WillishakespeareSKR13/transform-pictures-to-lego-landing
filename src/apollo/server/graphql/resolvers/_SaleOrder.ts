@@ -106,6 +106,19 @@ const resolvers: Resolvers = {
       const saleOrder = await SaleOrder.findById(id);
       if (!saleOrder) throw new Error('No sale order found');
       return saleOrder;
+    },
+    paySaleOrder: async (_, { id }) => {
+      const saleOrder = await SaleOrder.findById(id);
+      if (!saleOrder) throw new Error('No sale order found');
+      const paymentRetrieve = await stripe.paymentIntents.retrieve(
+        saleOrder.stripeId
+      );
+      if (!paymentRetrieve) throw new Error('Payment intent not found');
+      if (paymentRetrieve.status !== 'succeeded')
+        throw new Error('Payment intent not succeeded');
+      saleOrder.status = 'PAID';
+      saleOrder.save();
+      return saleOrder;
     }
   },
   Mutation: {

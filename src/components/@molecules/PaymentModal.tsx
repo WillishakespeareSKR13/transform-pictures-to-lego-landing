@@ -1,6 +1,6 @@
 import { Elements } from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
-import { AtomLoader, AtomText, AtomWrapper, AtomButton } from '@sweetsyui/ui';
+import { AtomLoader, AtomWrapper, AtomButton } from '@sweetsyui/ui';
 import { FC, useEffect, useRef, useState } from 'react';
 
 const stripePromise = loadStripe('pk_test_8rT8GD6ByXYXhSxzRhhwcwBD00wfxfcg7a');
@@ -60,10 +60,17 @@ const PaymentModal: FC<Props> = (props) => {
             display: flex;
             justify-content: center;
             align-items: center;
+            padding: 30px 0px;
           `}
         >
-          <AtomText color="white">PaymentModal</AtomText>
-          {!saleOrder && <AtomLoader type="small" isLoading width="400px" />}
+          {!saleOrder && (
+            <AtomLoader
+              type="small"
+              isLoading
+              width="400px"
+              colorLoading="#ffffff"
+            />
+          )}
           {saleOrder && (
             <Elements
               stripe={stripePromise}
@@ -167,7 +174,7 @@ const CheckoutForm: FC<CheckoutFormProps> = (props) => {
   return (
     <AtomWrapper
       customCSS={css`
-        padding: 30px 0px;
+        padding: 20px 0px 0px 0px;
         width: 400px;
         display: flex;
         flex-direction: column;
@@ -188,7 +195,9 @@ const CheckoutForm: FC<CheckoutFormProps> = (props) => {
       `}
     >
       <form onSubmit={handleSubmit}>
-        {loading && <AtomLoader type="small" isLoading />}
+        {loading && (
+          <AtomLoader type="small" isLoading colorLoading="#ffffff" />
+        )}
 
         <PaymentElement onReady={() => setLoading(false)} id="paymentElement" />
 

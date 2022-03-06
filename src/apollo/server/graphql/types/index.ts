@@ -19,6 +19,7 @@ const typeDefs = gql`
 
     getSaleOrders: [SaleOrder]
     getSaleOrderById(id: ID!): SaleOrder
+    paySaleOrder(id: ID!): SaleOrder
   }
   #####################MUTACION######################
   type Mutation {

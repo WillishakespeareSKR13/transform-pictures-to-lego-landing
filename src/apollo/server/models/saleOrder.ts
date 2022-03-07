@@ -10,35 +10,40 @@ export interface ISaleOrder extends Document {
   status: string;
 }
 
-const SaleOrderSchema: Schema = new Schema({
-  stripeId: { type: String, required: true },
-  secret: { type: String, required: true },
-  product: {
-    type: String,
-    required: true,
-    trim: true
+const SaleOrderSchema: Schema = new Schema(
+  {
+    stripeId: { type: String, required: true },
+    secret: { type: String, required: true },
+    product: {
+      type: String,
+      required: true,
+      trim: true
+    },
+    size: {
+      type: String,
+      required: true,
+      trim: true
+    },
+    quantity: {
+      type: Number,
+      required: true,
+      trim: true
+    },
+    price: {
+      type: Number,
+      required: true,
+      trim: true
+    },
+    status: {
+      type: String,
+      default: 'PENDING',
+      trim: true
+    }
   },
-  size: {
-    type: String,
-    required: true,
-    trim: true
-  },
-  quantity: {
-    type: Number,
-    required: true,
-    trim: true
-  },
-  price: {
-    type: Number,
-    required: true,
-    trim: true
-  },
-  status: {
-    type: String,
-    default: 'PENDING',
-    trim: true
+  {
+    timestamps: true
   }
-});
+);
 
 SaleOrderSchema.set('toJSON', {
   virtuals: true

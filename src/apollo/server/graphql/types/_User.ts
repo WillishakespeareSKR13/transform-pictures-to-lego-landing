@@ -10,10 +10,12 @@ const typeDefs = gql`
     nickname: String
     email: String
     password: String
-    role: Role
     photo: String
     emailVerified: Boolean
+    disabled: Boolean
     birthdate: String
+    role: Role
+    store: Store
   }
 
   type TokenUser {
@@ -25,13 +27,33 @@ const typeDefs = gql`
   input InputUser {
     name: String!
     lastname: String!
+    nickname: String
     email: String!
     password: String!
+    photo: String
+    emailVerified: Boolean
+    disabled: Boolean
+    birthdate: String
+    role: ID
+    store: ID
   }
 
   input InputLogin {
     email: String!
     password: String!
+  }
+
+  #######################QUERY#######################
+  extend type Query {
+    me: User
+    getUsers: [User]
+    getUserById(id: ID!): User
+  }
+  #####################MUTACION######################
+  extend type Mutation {
+    newUser(input: InputUser): User
+    updateUser(id: ID!, input: InputUser): User
+    login(input: InputLogin): TokenUser
   }
 `;
 

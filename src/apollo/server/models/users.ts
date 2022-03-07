@@ -9,56 +9,72 @@ export interface IUser extends Document {
   role: ObjectId;
   photo: string;
   emailVerified: boolean;
+  disabled: boolean;
   birthdate: Date;
+  store: ObjectId;
 }
 
-const UserSchema: Schema = new Schema({
-  name: {
-    type: String,
-    required: true,
-    trim: true
+const UserSchema: Schema = new Schema(
+  {
+    name: {
+      type: String,
+      required: true,
+      trim: true
+    },
+    lastname: {
+      type: String,
+      required: true,
+      trim: true
+    },
+    nickname: {
+      type: String,
+      trim: true
+    },
+    email: {
+      type: String,
+      required: true,
+      trim: true,
+      unique: true
+    },
+    password: {
+      type: String,
+      required: true,
+      trim: true
+    },
+    role: {
+      type: Schema.Types.ObjectId,
+      ref: 'Role'
+    },
+    photo: {
+      type: String,
+      trim: true,
+      default:
+        'https://farmersca.com/wp-content/webp-express/webp-images/uploads/2016/07/default-profile-300x300.png.webp'
+    },
+    emailVerified: {
+      type: Boolean,
+      default: false
+    },
+    disabled: {
+      type: Boolean,
+      default: false
+    },
+    birthdate: {
+      type: Date
+    },
+    store: {
+      type: Schema.Types.ObjectId,
+      ref: 'Store'
+    }
   },
-  lastname: {
-    type: String,
-    required: true,
-    trim: true
-  },
-  nickname: {
-    type: String,
-    trim: true
-  },
-  email: {
-    type: String,
-    required: true,
-    trim: true,
-    unique: true
-  },
-  password: {
-    type: String,
-    required: true,
-    trim: true
-  },
-  role: {
-    type: Schema.Types.ObjectId,
-    ref: 'role',
-    default: '6224166036d952dc97a07c20'
-  },
-  photo: {
-    type: String,
-    trim: true
-  },
-  emailVerified: {
-    type: Boolean,
-    default: false
-  },
-  birthdate: {
-    type: Date
+  {
+    timestamps: true
   }
-});
+);
 
 UserSchema.set('toJSON', {
   virtuals: true
 });
 
-export default mongoose.models.user ||
-  mongoose.model<IUser>('user', UserSchema);
+export default mongoose.models.User ||
+  mongoose.model<IUser>('User', UserSchema);

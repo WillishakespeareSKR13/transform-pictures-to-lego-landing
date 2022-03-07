@@ -21,6 +21,18 @@ const typeDefs = gql`
     size: String!
     quantity: Int
   }
+  #######################QUERY#######################
+
+  extend type Query {
+    getSaleOrders: [SaleOrder]
+    getSaleOrderById(id: ID!): SaleOrder
+    paySaleOrder(id: ID!): SaleOrder
+  }
+  #####################MUTACION######################
+  extend type Mutation {
+    newSaleOrder(input: InputSaleOrder): SaleOrder
+    updateSaleOrder(id: ID!, input: InputSaleOrder): SaleOrder
+  }
 `;
 
 export default typeDefs;

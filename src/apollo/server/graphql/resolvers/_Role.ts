@@ -20,6 +20,13 @@ const resolvers: Resolvers = {
         ...input
       });
       return role;
+    },
+    updateRole: async (_, { id, input }) => {
+      const roleExist = await Role.findById(id);
+      if (!roleExist) throw new Error('Role does not exist');
+
+      const role = await Role.findByIdAndUpdate(id, input, { new: true });
+      return role;
     }
   }
 };

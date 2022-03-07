@@ -3,27 +3,27 @@ import { gql } from 'apollo-server-micro';
 const typeDefs = gql`
   #######################TYPES#######################
 
-  type Role {
+  type StoreType {
     id: ID
     name: String
   }
 
   #######################INPUT#######################
 
-  input InputRole {
+  input InputStoreType {
     name: String!
   }
 
   #######################QUERY#######################
   extend type Query {
-    getRoles: [Role]
-    getRoleById(id: ID!): Role
+    getStoreTypes: [StoreType]
+    getStoreTypeById(id: ID!): StoreType
   }
 
   #######################MUTACION######################
   extend type Mutation {
-    newRole(input: InputRole): Role
-    updateRole(id: ID!, input: InputRole): Role
+    newStoreType(input: InputStoreType): StoreType
+    updateStoreType(id: ID!, input: InputStoreType): StoreType
   }
 `;
 

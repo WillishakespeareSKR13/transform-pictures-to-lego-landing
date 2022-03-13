@@ -2,6 +2,7 @@ import { Reducer } from 'redux';
 import cookies from 'js-cookie';
 
 export type UserReducerType = {
+  id: string;
   name: string;
   lastname: string;
   nickname: string;
@@ -13,7 +14,27 @@ export type UserReducerType = {
   };
   photo: string;
   emailVerified: boolean;
-  birthdate: string;
+  disabled: boolean;
+  birthdate: Date;
+  store: {
+    id: string;
+    name: string;
+    description: string;
+    phone: string;
+    email: string;
+    website: string;
+    photo: string;
+    street: string;
+    cash: number;
+    currency: string;
+    city: string;
+    state: string;
+    zip: string;
+    storeType: {
+      id: string;
+      name: string;
+    };
+  }[];
 };
 
 const TypesReducers = {

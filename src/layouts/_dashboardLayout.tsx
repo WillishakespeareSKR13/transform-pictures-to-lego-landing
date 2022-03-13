@@ -66,6 +66,7 @@ const DefaultLayout: FC<Props> = ({ children }) => {
           borderRadius="2px"
           onClick={() => {
             dispatch(Logout());
+            location.reload();
           }}
         >
           Sign Out

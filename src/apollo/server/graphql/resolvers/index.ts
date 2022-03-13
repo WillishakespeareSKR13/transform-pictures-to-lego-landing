@@ -5,6 +5,10 @@ import SaleOrder from './_SaleOrder';
 import StoreType from './_StoreType';
 import Store from './_Store';
 import Product from './_Products';
+import BoardType from './_BoardType';
+import BoardSizeType from './_BoardSizeType';
+import BoardSize from './_BoardSize';
+import Board from './_Board';
 
 const resolvers: Resolvers = {
   Query: {
@@ -13,7 +17,11 @@ const resolvers: Resolvers = {
     ...SaleOrder.Query,
     ...StoreType.Query,
     ...Store.Query,
-    ...Product.Query
+    ...Product.Query,
+    ...BoardType.Query,
+    ...BoardSizeType.Query,
+    ...BoardSize.Query,
+    ...Board.Query
   },
   Mutation: {
     ...User.Mutation,
@@ -21,7 +29,11 @@ const resolvers: Resolvers = {
     ...SaleOrder.Mutation,
     ...StoreType.Mutation,
     ...Store.Mutation,
-    ...Product.Mutation
+    ...Product.Mutation,
+    ...BoardType.Mutation,
+    ...BoardSizeType.Mutation,
+    ...BoardSize.Mutation,
+    ...Board.Mutation
   }
 };
 

@@ -3,6 +3,7 @@ import mongoose, { Schema, Document, ObjectId } from 'mongoose';
 export interface IProducts extends Document {
   name: string;
   price: number;
+  currency: string;
   description: string;
   sku: string;
   stock: number;
@@ -19,6 +20,10 @@ const ProductsSchema: Schema = new Schema(
     price: {
       type: Number,
       required: true
+    },
+    currency: {
+      type: String,
+      default: 'USD'
     },
     description: {
       type: String,

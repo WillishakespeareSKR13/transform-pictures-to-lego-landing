@@ -5,6 +5,10 @@ import SaleOrder from './_SaleOrder';
 import StoreTypes from './_StoreTypes';
 import Store from './_Store';
 import Product from './_Products';
+import BoardType from './_BoardType';
+import BoardSizeType from './_BoardSizeType';
+import BoardSize from './_BoardSize';
+import Board from './_Board';
 
 const typeDefs = gql`
   ${User}
@@ -13,6 +17,10 @@ const typeDefs = gql`
   ${StoreTypes}
   ${Store}
   ${Product}
+  ${BoardType}
+  ${BoardSizeType}
+  ${BoardSize}
+  ${Board}
 
   type Query {
     ping: String

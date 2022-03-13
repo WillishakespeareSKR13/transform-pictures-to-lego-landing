@@ -1,12 +1,13 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema, Document, ObjectId } from 'mongoose';
 
 export interface ISaleOrder extends Document {
   stripeId: string;
   secret: string;
-  product: string;
-  size: string;
+  product: ObjectId;
+  board: ObjectId;
   quantity: number;
-  price: number;
+  total: number;
+  currency: string;
   status: string;
 }
 
@@ -14,25 +15,21 @@ const SaleOrderSchema: Schema = new Schema(
   {
     stripeId: { type: String, required: true },
     secret: { type: String, required: true },
-    product: {
-      type: String,
-      required: true,
-      trim: true
-    },
-    size: {
-      type: String,
-      required: true,
-      trim: true
-    },
+    product: { type: Schema.Types.ObjectId, ref: 'Product' },
+    board: { type: Schema.Types.ObjectId, ref: 'Board' },
     quantity: {
       type: Number,
       required: true,
       trim: true
     },
-    price: {
+    total: {
       type: Number,
       required: true,
       trim: true
+    },
+    currency: {
+      type: String,
+      default: 'USD'
     },
     status: {
       type: String,

@@ -9,6 +9,8 @@ import BoardType from './_BoardType';
 import BoardSizeType from './_BoardSizeType';
 import BoardSize from './_BoardSize';
 import Board from './_Board';
+import Room from './_Room';
+import RoomSizes from './_RoomSizes';
 
 const resolvers: Resolvers = {
   Query: {
@@ -21,7 +23,9 @@ const resolvers: Resolvers = {
     ...BoardType.Query,
     ...BoardSizeType.Query,
     ...BoardSize.Query,
-    ...Board.Query
+    ...Board.Query,
+    ...Room.Query,
+    ...RoomSizes.Query
   },
   Mutation: {
     ...User.Mutation,
@@ -33,7 +37,9 @@ const resolvers: Resolvers = {
     ...BoardType.Mutation,
     ...BoardSizeType.Mutation,
     ...BoardSize.Mutation,
-    ...Board.Mutation
+    ...Board.Mutation,
+    ...Room.Mutation,
+    ...RoomSizes.Mutation
   }
 };
 

@@ -1,99 +1,12 @@
 import { Resolvers } from '@apollo/client';
 import SaleOrder from '../../models/saleOrder';
+import Product from '../../models/products';
+import Board from '../../models/board';
 import Stripe from 'stripe';
 
 const stripe = new Stripe('sk_test_yzlw6HqnbaXA119soMjDkxVz00QguDKKBV', {
   apiVersion: '2020-08-27'
 });
-
-const PRODUCTS = [
-  {
-    product: 'VERTICAL',
-    sizes: [
-      {
-        price: 420,
-        product: 'SMALL'
-      },
-      {
-        price: 840,
-        product: 'MEDIUM'
-      },
-      {
-        price: 1050,
-        product: 'LARGE'
-      },
-      {
-        price: 1400,
-        product: 'XLARGE'
-      },
-      {
-        price: 1750,
-        product: 'JUMBO'
-      }
-    ]
-  },
-  {
-    product: 'HORIZONTAL',
-    sizes: [
-      {
-        price: 420,
-        product: 'SMALL'
-      },
-      {
-        price: 840,
-        product: 'MEDIUM'
-      },
-      {
-        price: 1050,
-        product: 'LARGE'
-      },
-      {
-        price: 1400,
-        product: 'XLARGE'
-      },
-      {
-        price: 1750,
-        product: 'JUMBO'
-      }
-    ]
-  },
-  {
-    product: 'SQUARE',
-
-    sizes: [
-      {
-        price: 280,
-        product: 'SMALL'
-      },
-      {
-        price: 420,
-        product: 'MEDIUM'
-      },
-      {
-        price: 1120,
-        product: 'LARGE'
-      },
-      {
-        price: 1750,
-        product: 'XLARGE'
-      },
-      {
-        price: 2520,
-        product: 'JUMBO'
-      }
-    ]
-  },
-  {
-    product: 'PORTRAIT',
-
-    sizes: [
-      {
-        price: 139,
-        product: 'PORTRAIT'
-      }
-    ]
-  }
-];
 
 const resolvers: Resolvers = {
   Query: {
@@ -123,28 +36,37 @@ const resolvers: Resolvers = {
   },
   Mutation: {
     newSaleOrder: async (_, { input }) => {
-      if (!input) throw new Error('No input');
-      const isProduct = PRODUCTS.find(
-        (product) => product.product === input.product
-      );
-      if (!isProduct) throw new Error('Product not found');
-      const isSize = isProduct.sizes.find(
-        (size) => size.product === input.size
-      );
-      if (!isSize) throw new Error('Size not found');
+      const { product, board, quantity } = input;
+
+      if (!product && !board) {
+        throw new Error('Product or board is required');
+      }
+
+      const isId = product
+        ? await Product.findById(product)
+        : await Board.findById(board);
+      if (!isId) throw new Error(`${product ? 'Product' : 'Board'} not found`);
 
       const paymentIntent = await stripe.paymentIntents.create({
-        amount: isSize.price,
-        currency: 'usd',
+        amount: isId.price * quantity,
+        currency: isId.currency.toLowerCase(),
         payment_method_types: ['card']
       });
 
       if (!paymentIntent) throw new Error('Payment intent not found');
 
+      const id = product
+        ? {
+            product: isId._id
+          }
+        : {
+            board: isId._id
+          };
       const saleOrder = await SaleOrder.create({
-        ...input,
-        price: isSize.price,
-        quantity: 1,
+        ...id,
+        total: isId.price * quantity,
+        quantity: quantity,
+        currency: isId.currency,
         stripeId: paymentIntent.id,
         secret: paymentIntent.client_secret
       });

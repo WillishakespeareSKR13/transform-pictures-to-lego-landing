@@ -11,7 +11,7 @@ export interface IUser extends Document {
   emailVerified: boolean;
   disabled: boolean;
   birthdate: Date;
-  store: ObjectId;
+  store: [ObjectId];
 }
 
 const UserSchema: Schema = new Schema(
@@ -63,7 +63,7 @@ const UserSchema: Schema = new Schema(
       type: Date
     },
     store: {
-      type: Schema.Types.ObjectId,
+      type: [Schema.Types.ObjectId],
       ref: 'Store'
     }
   },

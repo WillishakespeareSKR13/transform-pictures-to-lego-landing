@@ -15,7 +15,7 @@ const typeDefs = gql`
     disabled: Boolean
     birthdate: String
     role: Role
-    store: Store
+    store: [Store]
   }
 
   type TokenUser {
@@ -25,17 +25,17 @@ const typeDefs = gql`
   #######################INPUT#######################
 
   input InputUser {
-    name: String!
-    lastname: String!
+    name: String
+    lastname: String
     nickname: String
-    email: String!
-    password: String!
+    email: String
+    password: String
     photo: String
     emailVerified: Boolean
     disabled: Boolean
     birthdate: String
     role: ID
-    store: ID
+    store: [ID]
   }
 
   input InputLogin {

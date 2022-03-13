@@ -5,10 +5,10 @@ import StoreType from '../../models/storeTypes';
 const resolvers: Resolvers = {
   Query: {
     getStores: async (_, __) => {
-      return await Store.find({});
+      return await Store.find({}).populate('storeType');
     },
     getStoreById: async (_, { id }) => {
-      return await Store.findById(id);
+      return await Store.findById(id).populate('storeType');
     }
   },
   Mutation: {
@@ -35,10 +35,8 @@ const resolvers: Resolvers = {
         ...input,
         storeType: storeTypeExist.id
       });
-      return {
-        ...store.toJSON(),
-        storeType: storeTypeExist
-      };
+      const getStore = await Store.findById(store.id).populate('storeType');
+      return getStore;
     },
     updateStore: async (_, { id, input }) => {
       const storeExist = await Store.findById(id);
@@ -47,7 +45,8 @@ const resolvers: Resolvers = {
       const store = await Store.findByIdAndUpdate(id, input, {
         new: true
       });
-      return store;
+      const getStore = await Store.findById(store.id).populate('storeType');
+      return getStore;
     }
   }
 };

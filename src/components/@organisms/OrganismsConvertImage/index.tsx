@@ -21,6 +21,9 @@ import { cropAndFilter } from '@Src/utils/pixelit';
 import DownloadPdf from '@Src/components/@atoms/AtomPdf';
 import AtomModalImage from '@Src/components/@atoms/AtomModalImage';
 import PaymentModal from '@Src/components/@molecules/PaymentModal';
+import { useQuery } from '@apollo/client';
+import { IQueryFilter } from 'graphql';
+import { GET_BOARDS } from '@Src/services/boards';
 
 const OrganismsConvertImage: FC = () => {
   const { file } = useContext(ContextFile);
@@ -36,6 +39,8 @@ const OrganismsConvertImage: FC = () => {
   const [selectedImage, setSelectedImage] = useState(0);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const ref = createRef<any>();
+
+  const { data } = useQuery<IQueryFilter<'getBoards'>>(GET_BOARDS);
 
   const loading = useMemo(
     () => cropImages.length !== quantity,
@@ -68,7 +73,8 @@ const OrganismsConvertImage: FC = () => {
       file ? URL.createObjectURL(new Blob([file], { type: 'image/png' })) : '',
     [file]
   );
-
+  console.log(data?.getBoards);
+  console.log(`selected`, selected);
   return (
     <AtomWrapper
       customCSS={css`
@@ -146,23 +152,6 @@ const OrganismsConvertImage: FC = () => {
               setQuantity(selectedConfig.x * selectedConfig.y);
             }}
           />
-
-          {/* <Cropper
-            image={blob}
-            crop={crop}
-            zoom={zoom}
-            aspect={selectedConfig.aspect}
-            zoomSpeed={0.1}
-            cropSize={
-              ['PORTRAIT', 'SQUARE'].includes(selected)
-                ? { width: 220, height: 220 }
-                : undefined
-            }
-            onCropChange={setCrop}
-            onCropComplete={onCropComplete}
-            onZoomChange={(e) => setZoom(Number(e.toFixed(2)))}
-            objectFit="vertical-cover"
-          /> */}
           <AtomWrapper
             customCSS={css`
               background-color: #202024;
@@ -181,13 +170,16 @@ const OrganismsConvertImage: FC = () => {
                 flex-direction: row;
               `}
             >
-              {CONFIG.map((size) => (
+              {data?.getBoards?.map((size) => (
                 <AtomButton
                   disabled={loading || isLoading}
-                  key={size.id}
+                  key={size?.id}
                   onClick={() => {
-                    setSelected(size.key as CONFIGKEYS);
-                    setSelectedSize(size.sizes[0].key as CONFIGKEYSSIZE);
+                    setSelected(size?.type?.name as CONFIGKEYS);
+                    setSelectedSize(
+                      (size?.sizes?.find((_, index) => index === 0)?.type
+                        ?.name ?? 'SMALL') as CONFIGKEYSSIZE
+                    );
                     setCropImages([]);
                     setQuantity(0);
                   }}
@@ -198,7 +190,7 @@ const OrganismsConvertImage: FC = () => {
                     border-radius: 0px;
                     justify-content: center;
                     align-items: center;
-                    background-color: ${size.key === selected
+                    background-color: ${size?.type?.name === selected
                       ? '#4a4a54'
                       : '#313139'};
                   `}
@@ -220,7 +212,7 @@ const OrganismsConvertImage: FC = () => {
                         cursor: pointer;
                       `}
                     >
-                      {size.key}
+                      {size?.type?.name}
                     </AtomText>
                   </AtomWrapper>
                 </AtomButton>

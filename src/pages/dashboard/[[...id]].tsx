@@ -1,8 +1,9 @@
 import { RootStateType } from '@Src/redux/reducer';
 import { NextPageFC } from 'next';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import ADMIN from '@Templates/ADMIN';
+import { BrowserRouter } from 'react-router-dom';
 
 const DASHBOARDS: { [key: string]: () => JSX.Element } = {
   ADMIN: ADMIN,
@@ -11,7 +12,17 @@ const DASHBOARDS: { [key: string]: () => JSX.Element } = {
 
 const DashboardPage: NextPageFC = () => {
   const role = useSelector((state: RootStateType) => state?.user?.role?.name);
-  return <>{DASHBOARDS[role ?? 'DEFAULT']()}</>;
+  const Dashboard = DASHBOARDS[role ?? 'DEFAULT'];
+  const Routes = useMemo(
+    () => (
+      <BrowserRouter basename={'/dashboard'}>
+        <Dashboard />
+      </BrowserRouter>
+    ),
+    [window.location.pathname]
+  );
+
+  return <>{Routes}</>;
 };
 
 export default DashboardPage;

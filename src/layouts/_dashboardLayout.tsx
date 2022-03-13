@@ -32,7 +32,7 @@ const DefaultLayout: FC<Props> = ({ children }) => {
       >
         <AtomWrapper
           maxWidth="1440px"
-          minHeight="100vh"
+          minHeight="calc(100vh - 60px)"
           height="max-content"
           alignItems="center"
           justifyContent="flex-start"

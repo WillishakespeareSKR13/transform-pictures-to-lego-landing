@@ -5,6 +5,7 @@ export interface ISaleOrder extends Document {
   secret: string;
   product: ObjectId;
   board: ObjectId;
+  customer: ObjectId;
   quantity: number;
   total: number;
   currency: string;
@@ -17,6 +18,7 @@ const SaleOrderSchema: Schema = new Schema(
     secret: { type: String, required: true },
     product: { type: Schema.Types.ObjectId, ref: 'Product' },
     board: { type: Schema.Types.ObjectId, ref: 'Board' },
+    customer: { type: Schema.Types.ObjectId, ref: 'User' },
     quantity: {
       type: Number,
       required: true,

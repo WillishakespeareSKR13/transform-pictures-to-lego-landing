@@ -17,6 +17,7 @@ const typeDefs = gql`
     secret: String
     product: String
     board: String
+    customer: User
     quantity: Int
     total: Int
     currency: String
@@ -29,6 +30,7 @@ const typeDefs = gql`
     product: String
     board: String
     quantity: Int
+    customer: String
   }
   #######################QUERY#######################
 

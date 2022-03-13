@@ -2,6 +2,7 @@ import { Resolvers } from '@apollo/client';
 import SaleOrder from '../../models/saleOrder';
 import Product from '../../models/products';
 import Board from '../../models/board';
+import User from '../../models/users';
 import Stripe from 'stripe';
 
 const stripe = new Stripe('sk_test_yzlw6HqnbaXA119soMjDkxVz00QguDKKBV', {
@@ -36,7 +37,7 @@ const resolvers: Resolvers = {
   },
   Mutation: {
     newSaleOrder: async (_, { input }) => {
-      const { product, board, quantity } = input;
+      const { product, board, quantity, customer } = input;
 
       if (!product && !board) {
         throw new Error('Product or board is required');
@@ -62,16 +63,31 @@ const resolvers: Resolvers = {
         : {
             board: isId._id
           };
+      const customerExist = async () => {
+        if (!customer) {
+          return {};
+        }
+        const customerExist = await User.findById(customer).populate('role');
+        if (!customerExist) throw new Error('Customer does not exist');
+        if (!['AGENT', 'OWNER', 'ADMIN'].includes(customerExist.role.name))
+          throw new Error('Customer is not an agent');
+        return { customer: customerExist._id };
+      };
+      const customerGet = await customerExist();
       const saleOrder = await SaleOrder.create({
         ...id,
         total: isId.price * quantity,
         quantity: quantity,
         currency: isId.currency,
         stripeId: paymentIntent.id,
-        secret: paymentIntent.client_secret
+        secret: paymentIntent.client_secret,
+        ...customerGet
       });
       if (!saleOrder) throw new Error('Error creating sale order');
-      return saleOrder;
+      const getSaleOrder = await SaleOrder.findById(saleOrder._id).populate(
+        'customer'
+      );
+      return getSaleOrder;
     }
   }
 };

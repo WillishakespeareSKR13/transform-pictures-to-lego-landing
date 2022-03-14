@@ -14,11 +14,7 @@ const LOGIN: FC<QueryTypeNode> = ({ children, query }) => {
   return (
     <>
       {loading || data ? (
-        <AtomLoader
-          isLoading={loading || data}
-          colorLoading="white"
-          backgroundColor="#202024"
-        />
+        <AtomLoader isLoading colorLoading="white" backgroundColor="#202024" />
       ) : (
         children
       )}

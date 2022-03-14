@@ -9,7 +9,7 @@ const STORES = () => {
   const router = useRouter();
   const { data } = useQuery<IQueryFilter<'getStores'>>(GETSTORES);
   return (
-    <AtomWrapper customCSS={css``}>
+    <AtomWrapper>
       <AtomWrapper
         customCSS={css`
           background-color: #202026;
@@ -158,6 +158,42 @@ const STORES = () => {
             </AtomWrapper>
           </AtomWrapper>
         ))}
+        <AtomWrapper
+          customCSS={css`
+            width: 300px;
+            height: 300px;
+            background-color: #202026;
+            justify-content: space-between;
+            border-radius: 8px;
+            padding: 15px 20px;
+          `}
+        >
+          <AtomButton
+            customCSS={css`
+              width: 100%;
+              height: 100%;
+              margin-top: 10px;
+              background-color: #2e2e35;
+              :hover {
+                background-color: #1a1a1f;
+              }
+              transition: background-color 0.3s ease;
+            `}
+            onClick={() => {
+              router.push(`./store/add`);
+            }}
+          >
+            <AtomText
+              customCSS={css`
+                color: #dfdfdf;
+                font-weight: 600;
+                font-size: 18px;
+              `}
+            >
+              Add Store
+            </AtomText>
+          </AtomButton>
+        </AtomWrapper>
       </AtomWrapper>
     </AtomWrapper>
   );

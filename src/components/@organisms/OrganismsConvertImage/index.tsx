@@ -73,8 +73,6 @@ const OrganismsConvertImage: FC = () => {
       file ? URL.createObjectURL(new Blob([file], { type: 'image/png' })) : '',
     [file]
   );
-  console.log(data?.getBoards);
-  console.log(`selected`, selected);
   return (
     <AtomWrapper
       customCSS={css`

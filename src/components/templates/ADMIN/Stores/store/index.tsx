@@ -2,14 +2,9 @@ import { useQuery } from '@apollo/client';
 import { css } from '@emotion/react';
 import { GETSALEORDES } from '@Src/apollo/client/query/saleOrder';
 import { GETSTOREBYID } from '@Src/apollo/client/query/stores';
+import DashWithTitle from '@Src/components/layouts/DashWithTitle';
 import { TableStyles } from '@Src/styles';
-import {
-  AtomButton,
-  AtomLoader,
-  AtomTable,
-  AtomText,
-  AtomWrapper
-} from '@sweetsyui/ui';
+import { AtomLoader, AtomTable, AtomText, AtomWrapper } from '@sweetsyui/ui';
 import { IQueryFilter, ISaleOrder } from 'graphql';
 import { useRouter } from 'next/router';
 
@@ -41,52 +36,7 @@ const VIEW = () => {
       <AtomLoader isLoading backgroundColor="#2e2e35" colorLoading="white" />
     );
   return (
-    <AtomWrapper>
-      <AtomWrapper
-        customCSS={css`
-          flex-direction: row;
-          justify-content: flex-start;
-          align-items: center;
-          background-color: #1a1a1f;
-          margin-bottom: 15px;
-          border-radius: 5px;
-          padding: 10px 30px;
-        `}
-      >
-        <AtomButton
-          customCSS={css`
-            margin-right: 20px;
-            padding: 8px 20px;
-            background-color: #2e2e35;
-            :hover {
-              background-color: #1a1a1f;
-            }
-            transition: background-color 0.3s ease;
-          `}
-          onClick={() => {
-            router.push('/dashboard');
-          }}
-        >
-          <AtomText
-            customCSS={css`
-              color: #dfdfdf;
-              font-weight: 600;
-              font-size: 12px;
-            `}
-          >
-            Return to Stores
-          </AtomText>
-        </AtomButton>
-        <AtomText
-          customCSS={css`
-            font-size: 20px;
-            font-weight: bold;
-            color: #dfdfdf;
-          `}
-        >
-          Store: {data?.getStoreById?.name}
-        </AtomText>
-      </AtomWrapper>
+    <DashWithTitle title={`Store: ${data?.getStoreById?.name}`}>
       <AtomWrapper>
         <AtomWrapper
           customCSS={css`
@@ -131,7 +81,7 @@ const VIEW = () => {
           />
         </AtomWrapper>
       </AtomWrapper>
-    </AtomWrapper>
+    </DashWithTitle>
   );
 };
 

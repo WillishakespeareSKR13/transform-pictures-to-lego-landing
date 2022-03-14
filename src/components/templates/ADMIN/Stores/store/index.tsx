@@ -47,7 +47,7 @@ const VIEW = () => {
           flex-direction: row;
           justify-content: flex-start;
           align-items: center;
-          background-color: #202026;
+          background-color: #1a1a1f;
           margin-bottom: 15px;
           border-radius: 5px;
           padding: 10px 30px;

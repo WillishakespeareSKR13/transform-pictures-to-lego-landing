@@ -38,7 +38,7 @@ const VIEW = () => {
 
   if (loading)
     return (
-      <AtomLoader isLoading backgroundColor="#2e2e35" colorLoading="#1a1a1f" />
+      <AtomLoader isLoading backgroundColor="#2e2e35" colorLoading="white" />
     );
   return (
     <AtomWrapper>

@@ -4,17 +4,7 @@ import PinturaEditor from '@Utils/react-pintura/PinturaEditor';
 import { EditorMethods, getEditorDefaults } from '@Utils/pintura';
 import { createRef, FC, useContext, useMemo, useState } from 'react';
 import { ContextFile } from '@Src/pages';
-import CONFIG, {
-  COLORTYPE,
-  CONFIGKEYS,
-  CONFIGKEYSSIZE,
-  CROPPEDIMAGE,
-  ROOMS,
-  ROOMSSIZES,
-  ROOMSSIZESTYPE,
-  ROOMSTYPES,
-  SELECTEDCONFIG
-} from '@Src/config';
+import { COLORTYPE, CROPPEDIMAGE } from '@Src/config';
 import AtomButton from '@Src/components/@atoms/AtomButton';
 import { StyledImage } from './styles';
 import { cropAndFilter } from '@Src/utils/pixelit';
@@ -22,13 +12,13 @@ import DownloadPdf from '@Src/components/@atoms/AtomPdf';
 import AtomModalImage from '@Src/components/@atoms/AtomModalImage';
 import PaymentModal from '@Src/components/@molecules/PaymentModal';
 import { useQuery } from '@apollo/client';
-import { IQueryFilter } from 'graphql';
+import { IBoardSize, IQueryFilter, IRoom, IRoomSizesSizes } from 'graphql';
 import { GET_BOARDS } from '@Src/apollo/client/query/boards';
 import { GET_ROOM_SIZES, GET_ROOM_TYPES } from '@Src/apollo/client/query/rooms';
 
 const OrganismsConvertImage: FC = () => {
   const { file } = useContext(ContextFile);
-  const [selected, setSelected] = useState('SQUARE');
+  const [selected, setSelected] = useState('VERTICAL');
   const [selectedSize, setSelectedSize] = useState('SMALL');
   const [showBorder, setShowBorder] = useState(false);
   const [selectedRoom, setSelectedRoom] = useState('DEFAULT');
@@ -54,34 +44,35 @@ const OrganismsConvertImage: FC = () => {
 
   const selectedConfig = useMemo(
     () =>
-      CONFIG.find(({ key }) => key === selected)?.sizes.find(
-        ({ key }) => key === selectedSize
-      ),
-    [selected, selectedSize]
-  ) as SELECTEDCONFIG;
+      boards?.getBoards
+        ?.find((board) => board?.type?.name === selected)
+        ?.sizes?.find((size) => size?.type?.name === selectedSize),
+    [selected, selectedSize, boards]
+  ) as IBoardSize;
 
   const selectedRoomConfig = useMemo(
-    () => ROOMS.find(({ key }) => key === selectedRoom),
-    [selectedRoom]
-  ) as ROOMSTYPES;
+    () => rooms?.getRooms?.find((room) => room?.key === selectedRoom),
+    // () => ROOMS.find(({ key }) => key === selectedRoom),
+    [selectedRoom, rooms]
+  ) as IRoom;
 
   const selectedRoomSizeConfig = useMemo(
     () =>
-      // roomSizes?.getRoomSizes?.find(({}) => ())
-      ROOMSSIZES.find(({ key }) => key === selected)?.sizes.find(
-        ({ key }) => key === selectedSize
-      ),
-    [selected, selectedSize]
-  ) as ROOMSSIZESTYPE;
+      roomSizes?.getRoomSizes
+        ?.find((roomSize) => roomSize?.key?.name === selected)
+        ?.sizes?.find((size) => size?.key?.name === selectedSize),
+    // ROOMSSIZES.find(({ key }) => key === selected)?.sizes.find(
+    //   ({ key }) => key === selectedSize
+    // ),
+    [selected, selectedSize, roomSizes]
+  ) as IRoomSizesSizes;
 
   const blob = useMemo(
     () =>
       file ? URL.createObjectURL(new Blob([file], { type: 'image/png' })) : '',
     [file]
   );
-  console.log(boards);
-  console.log(`rooms`, rooms);
-  console.log(`roomSize`, roomSizes);
+
   return (
     <AtomWrapper
       customCSS={css`
@@ -142,7 +133,7 @@ const OrganismsConvertImage: FC = () => {
             ref={ref}
             utils={['crop', 'filter', 'finetune', 'annotate', 'frame']}
             enableDropImage={false}
-            imageCropAspectRatio={selectedConfig.aspect}
+            imageCropAspectRatio={selectedConfig?.aspect}
             cropEnableCenterImageSelection
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             onProcess={(res: any) => {
@@ -150,13 +141,13 @@ const OrganismsConvertImage: FC = () => {
               cropAndFilter(
                 FilterAndCrop,
                 setCropImages,
-                selectedConfig.x,
-                selectedConfig.y,
+                selectedConfig?.x ?? 0,
+                selectedConfig?.y ?? 0,
                 setIsLoading,
                 setColors,
-                selectedConfig.isPortrait
+                selectedConfig?.isPortrait ?? false
               );
-              setQuantity(selectedConfig.x * selectedConfig.y);
+              setQuantity((selectedConfig?.x ?? 0) * (selectedConfig?.y ?? 0));
             }}
           />
           <AtomWrapper
@@ -238,13 +229,14 @@ const OrganismsConvertImage: FC = () => {
                 gap: 10px;
               `}
             >
-              {CONFIG.find((size) => size.key === selected)?.sizes.map(
-                (size) => (
+              {boards?.getBoards
+                ?.find((board) => board?.type?.name === selected)
+                ?.sizes?.map((size) => (
                   <AtomButton
                     disabled={loading || isLoading}
-                    key={size.id}
+                    key={size?.id}
                     onClick={() => {
-                      setSelectedSize(size.key as CONFIGKEYSSIZE);
+                      setSelectedSize(size?.type?.name ?? 'SMALL');
                       setCropImages([]);
                       setQuantity(0);
                     }}
@@ -255,7 +247,7 @@ const OrganismsConvertImage: FC = () => {
                       border-radius: 0px;
                       justify-content: center;
                       align-items: center;
-                      background-color: ${size.key === selectedSize
+                      background-color: ${size?.type?.name === selectedSize
                         ? '#4a4a54'
                         : '#313139'};
                     `}
@@ -277,12 +269,11 @@ const OrganismsConvertImage: FC = () => {
                           cursor: pointer;
                         `}
                       >
-                        {size.key.slice(0, 1).toUpperCase()}
+                        {size?.type?.name?.slice(0, 1).toUpperCase()}
                       </AtomText>
                     </AtomWrapper>
                   </AtomButton>
-                )
-              )}
+                ))}
             </AtomWrapper>
             <AtomWrapper
               customCSS={css`
@@ -338,13 +329,14 @@ const OrganismsConvertImage: FC = () => {
               font-size: 12px;
               font-weight: 600;
               margin: 15px 0px;
-              max-width: ${selectedConfig.size.width};
+              max-width: ${selectedConfig?.size?.width}px;
             `}
           >
             {
-              CONFIG.find((size) => size.key === selected)?.sizes.find(
-                (size) => size.key === selectedSize
-              )?.title
+              boards?.getBoards
+                ?.find((board) => board?.type?.name === selected)
+                ?.sizes?.find((size) => size?.type?.name === selectedSize)
+                ?.title
             }
           </AtomText>
           <>
@@ -356,8 +348,8 @@ const OrganismsConvertImage: FC = () => {
                     colorLoading="#dadadb"
                     type="small"
                     customCSS={css`
-                      width: ${selectedConfig.size.width};
-                      height: ${selectedConfig.size.height};
+                      width: ${selectedConfig?.size?.width};
+                      height: ${selectedConfig?.size?.height};
                     `}
                   />
                 ) : (
@@ -365,8 +357,8 @@ const OrganismsConvertImage: FC = () => {
                     customCSS={css`
                       flex-direction: row;
                       flex-wrap: wrap;
-                      width: ${selectedConfig.size.width};
-                      height: ${selectedConfig.size.height};
+                      width: ${selectedConfig?.size?.width};
+                      height: ${selectedConfig?.size?.height};
                       align-items: center;
                       justify-content: center;
                       background-color: #313139;
@@ -394,14 +386,19 @@ const OrganismsConvertImage: FC = () => {
                                 css`
                                   border: 2px solid #202024;
                                 `}
-                                ${selectedConfig.y > selectedConfig.x
+                                ${(selectedConfig?.y ?? 0) >
+                                (selectedConfig?.x ?? 0)
                                   ? css`
-                                      width: ${600 / selectedConfig.y}px;
-                                      height: ${600 / selectedConfig.y}px;
+                                      width: ${600 /
+                                      (selectedConfig?.y ?? 0)}px;
+                                      height: ${600 /
+                                      (selectedConfig?.y ?? 0)}px;
                                     `
                                   : css`
-                                      width: ${600 / selectedConfig.x}px;
-                                      height: ${600 / selectedConfig.x}px;
+                                      width: ${600 /
+                                      (selectedConfig?.x ?? 0)}px;
+                                      height: ${600 /
+                                      (selectedConfig?.x ?? 0)}px;
                                     `}
                               `}
                             />
@@ -434,7 +431,7 @@ const OrganismsConvertImage: FC = () => {
                 customCSS={css`
                   width: 600px;
                   height: 600px;
-                  background-image: url(${selectedRoomConfig.path});
+                  background-image: url(${selectedRoomConfig.image});
                   position: relative;
                 `}
               >
@@ -443,7 +440,9 @@ const OrganismsConvertImage: FC = () => {
                     width: max-content;
                     height: max-content;
                     position: absolute;
-                    /* top: ${selectedRoomConfig.top[selected]}; */
+                    top: ${selectedRoomConfig.offset?.find(
+                      (off) => off?.key?.name === selected
+                    )?.top}px;
                     right: 50%;
                     transform: translate(50%, -50%);
                     background-color: #313139;
@@ -457,8 +456,8 @@ const OrganismsConvertImage: FC = () => {
                       colorLoading="#4a4a54"
                       type="small"
                       customCSS={css`
-                        width: ${selectedRoomSizeConfig.size.width};
-                        height: ${selectedRoomSizeConfig.size.height};
+                        width: ${selectedRoomSizeConfig?.width}px;
+                        height: ${selectedRoomSizeConfig?.height}px;
                       `}
                     />
                   ) : (
@@ -466,8 +465,8 @@ const OrganismsConvertImage: FC = () => {
                       customCSS={css`
                         flex-direction: row;
                         flex-wrap: wrap;
-                        width: ${selectedRoomSizeConfig.size.width};
-                        height: ${selectedRoomSizeConfig.size.height};
+                        width: ${selectedRoomSizeConfig?.width}px;
+                        height: ${selectedRoomSizeConfig?.height}px;
                         align-items: center;
                         justify-content: center;
                       `}
@@ -494,18 +493,19 @@ const OrganismsConvertImage: FC = () => {
                                   css`
                                     border: 2px solid #202024;
                                   `}
-                                  ${selectedConfig.y > selectedConfig.x
+                                  ${(selectedConfig?.y ?? 0) >
+                                  (selectedConfig?.x ?? 0)
                                     ? css`
-                                        width: ${selectedRoomSizeConfig.size
-                                          .max / selectedConfig.y}px;
-                                        height: ${selectedRoomSizeConfig.size
-                                          .max / selectedConfig.y}px;
+                                        width: ${(selectedRoomSizeConfig?.max ??
+                                          0) / (selectedConfig?.y ?? 0)}px;
+                                        height: ${(selectedRoomSizeConfig?.max ??
+                                          0) / (selectedConfig?.y ?? 0)}px;
                                       `
                                     : css`
-                                        width: ${selectedRoomSizeConfig.size
-                                          .max / selectedConfig.x}px;
-                                        height: ${selectedRoomSizeConfig.size
-                                          .max / selectedConfig.x}px;
+                                        width: ${(selectedRoomSizeConfig?.max ??
+                                          0) / (selectedConfig?.x ?? 0)}px;
+                                        height: ${(selectedRoomSizeConfig?.max ??
+                                          0) / (selectedConfig?.x ?? 0)}px;
                                       `}
                                 `}
                               />
@@ -541,10 +541,10 @@ const OrganismsConvertImage: FC = () => {
             type="select"
             errorHeight="0px"
             value={selectedRoom}
-            options={ROOMS.map((room) => ({
-              id: room.id,
-              value: room.key,
-              label: room.name
+            options={rooms?.getRooms?.map((room) => ({
+              id: `${room?.id}`,
+              value: `${room?.key}`,
+              label: `${room?.title}`
             }))}
             onChange={(e) => setSelectedRoom(e.target.value)}
             labelWidth="250px"

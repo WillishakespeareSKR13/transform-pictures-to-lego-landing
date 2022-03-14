@@ -17,3 +17,28 @@ const GlobalStyles: FC = () => (
 );
 
 export default GlobalStyles;
+
+export const TableStyles = css`
+  width: 100%;
+  color: #dfdfdf;
+  font-weight: bold;
+  thead {
+    background-color: #1a1a1f !important;
+    tr th {
+      color: #dfdfdf;
+    }
+  }
+  tbody {
+    background-color: #202026;
+    tr {
+      :hover {
+        background-color: #1a1a1f;
+        color: #dfdfdf;
+      }
+      td {
+        color: #dfdfdf;
+        border-bottom: 1px solid #2e2e35;
+      }
+    }
+  }
+`;

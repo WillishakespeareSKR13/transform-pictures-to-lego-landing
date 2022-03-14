@@ -38,6 +38,23 @@ const typeDefs = gql`
     storeType: ID
   }
 
+  input FilterStore {
+    id: ID
+    name: String
+    description: String
+    phone: String
+    email: String
+    website: String
+    photo: String
+    cash: Float
+    currency: String
+    street: String
+    city: String
+    state: String
+    zip: String
+    storeType: FilterStoreType
+  }
+
   #######################QUERY#######################
   extend type Query {
     getStores: [Store]

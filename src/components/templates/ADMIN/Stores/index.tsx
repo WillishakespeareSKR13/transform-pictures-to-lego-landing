@@ -10,16 +10,24 @@ const STORES = () => {
   const { data } = useQuery<IQueryFilter<'getStores'>>(GETSTORES);
   return (
     <AtomWrapper customCSS={css``}>
-      <AtomText
+      <AtomWrapper
         customCSS={css`
-          font-size: 26px;
-          font-weight: bold;
-          color: #dfdfdf;
-          margin-bottom: 20px;
+          background-color: #202026;
+          margin-bottom: 15px;
+          border-radius: 5px;
+          padding: 10px 30px;
         `}
       >
-        All Stores
-      </AtomText>
+        <AtomText
+          customCSS={css`
+            font-size: 22px;
+            font-weight: bold;
+            color: #dfdfdf;
+          `}
+        >
+          All Stores
+        </AtomText>
+      </AtomWrapper>
       <AtomWrapper
         customCSS={css`
           flex-direction: row;
@@ -67,6 +75,9 @@ const STORES = () => {
                   color: #dfdfdf;
                   font-weight: 600;
                   font-size: 12px;
+                  text-overflow: ellipsis;
+                  overflow: hidden;
+                  white-space: nowrap;
                 `}
               >
                 Description: {store?.description}
@@ -76,6 +87,9 @@ const STORES = () => {
                   color: #dfdfdf;
                   font-weight: 600;
                   font-size: 12px;
+                  text-overflow: ellipsis;
+                  overflow: hidden;
+                  white-space: nowrap;
                 `}
               >
                 Phone: {store?.phone}
@@ -85,6 +99,9 @@ const STORES = () => {
                   color: #dfdfdf;
                   font-weight: 600;
                   font-size: 12px;
+                  text-overflow: ellipsis;
+                  overflow: hidden;
+                  white-space: nowrap;
                 `}
               >
                 Email: {store?.email}
@@ -94,6 +111,9 @@ const STORES = () => {
                   color: #dfdfdf;
                   font-weight: 600;
                   font-size: 12px;
+                  text-overflow: ellipsis;
+                  overflow: hidden;
+                  white-space: nowrap;
                 `}
               >
                 Website: {store?.website}
@@ -103,6 +123,9 @@ const STORES = () => {
                   color: #dfdfdf;
                   font-weight: 600;
                   font-size: 12px;
+                  text-overflow: ellipsis;
+                  overflow: hidden;
+                  white-space: nowrap;
                 `}
               >
                 Address: {store?.city}, {store?.state}, {store?.zip},

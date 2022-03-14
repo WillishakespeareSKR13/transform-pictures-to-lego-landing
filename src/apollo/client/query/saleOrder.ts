@@ -1,15 +1,26 @@
 import { gql } from '@apollo/client';
 
 export const GETSALEORDES = gql`
-  query getSaleOrders {
-    getSaleOrders {
+  query getSaleOrder($filter: FilterSaleOrder) {
+    getSaleOrders(filter: $filter) {
       id
       stripeId
       secret
-      product
-      size
+      product {
+        id
+      }
+      board {
+        id
+      }
+      customer {
+        id
+      }
+      store {
+        id
+      }
       quantity
-      price
+      total
+      currency
       status
     }
   }

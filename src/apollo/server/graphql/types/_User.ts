@@ -38,6 +38,21 @@ const typeDefs = gql`
     store: [ID]
   }
 
+  input FilterUser {
+    id: ID
+    name: String
+    lastname: String
+    nickname: String
+    email: String
+    password: String
+    photo: String
+    emailVerified: Boolean
+    disabled: Boolean
+    birthdate: String
+    role: FilterRole
+    store: [FilterStore]
+  }
+
   input InputLogin {
     email: String!
     password: String!

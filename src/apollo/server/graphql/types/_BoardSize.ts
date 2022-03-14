@@ -37,6 +37,23 @@ const typeDefs = gql`
     size: InputSizeBoard
   }
 
+  input FilterSizeBoard {
+    width: String
+    height: String
+  }
+
+  input FilterBoardSize {
+    id: ID
+    aspect: Float
+    title: String
+    board: FilterBoard
+    type: FilterBoardSizeType
+    x: Int
+    y: Int
+    isPortrait: Boolean
+    size: FilterSizeBoard
+  }
+
   #######################QUERY#######################
   extend type Query {
     getBoardSizes: [BoardSize]

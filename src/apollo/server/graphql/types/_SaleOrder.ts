@@ -1,13 +1,5 @@
 import { gql } from 'apollo-server-micro';
 
-// stripeId: string;
-// secret: string;
-// product: ObjectId;
-// board: ObjectId;
-// quantity: number;
-// total: number;
-// status: string;
-
 const typeDefs = gql`
   #######################TYPES#######################
 
@@ -15,9 +7,10 @@ const typeDefs = gql`
     id: ID
     stripeId: String
     secret: String
-    product: String
-    board: String
+    product: Products
+    board: Board
     customer: User
+    store: Store
     quantity: Int
     total: Int
     currency: String
@@ -30,12 +23,27 @@ const typeDefs = gql`
     product: String
     board: String
     quantity: Int
+    store: String
     customer: String
+  }
+
+  input FilterSaleOrder {
+    id: ID
+    stripeId: String
+    secret: String
+    product: String
+    board: String
+    customer: String
+    store: String
+    quantity: Int
+    total: Int
+    currency: String
+    status: String
   }
   #######################QUERY#######################
 
   extend type Query {
-    getSaleOrders: [SaleOrder]
+    getSaleOrders(filter: FilterSaleOrder): [SaleOrder]
     getSaleOrderById(id: ID!): SaleOrder
     paySaleOrder(id: ID!): SaleOrder
   }

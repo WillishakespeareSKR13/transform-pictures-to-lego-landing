@@ -25,6 +25,17 @@ const typeDefs = gql`
     image: String
   }
 
+  input FilterBoard {
+    id: ID
+    type: FilterBoardType
+    price: Float
+    currency: String
+    title: String
+    description: String
+    image: String
+    sizes: [FilterBoardSize]
+  }
+
   #######################QUERY#######################
   extend type Query {
     getBoards: [Board]

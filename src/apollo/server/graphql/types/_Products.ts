@@ -26,6 +26,17 @@ const typeDefs = gql`
     store: ID
   }
 
+  input FilterProduct {
+    id: ID
+    name: String
+    price: Float
+    description: String
+    sku: String
+    stock: Int
+    image: String
+    store: FilterStore
+  }
+
   #######################QUERY#######################
 
   extend type Query {

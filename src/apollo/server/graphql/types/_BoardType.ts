@@ -14,6 +14,11 @@ const typeDefs = gql`
     name: String!
   }
 
+  input FilterBoardType {
+    id: ID
+    name: String
+  }
+
   #######################QUERY#######################
   extend type Query {
     getBoardTypes: [BoardType]

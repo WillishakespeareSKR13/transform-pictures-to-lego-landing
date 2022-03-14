@@ -14,6 +14,11 @@ const typeDefs = gql`
     name: String!
   }
 
+  input FilterRole {
+    id: ID
+    name: String
+  }
+
   #######################QUERY#######################
   extend type Query {
     getRoles: [Role]

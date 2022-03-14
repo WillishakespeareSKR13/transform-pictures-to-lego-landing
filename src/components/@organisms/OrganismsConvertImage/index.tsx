@@ -23,12 +23,13 @@ import AtomModalImage from '@Src/components/@atoms/AtomModalImage';
 import PaymentModal from '@Src/components/@molecules/PaymentModal';
 import { useQuery } from '@apollo/client';
 import { IQueryFilter } from 'graphql';
-import { GET_BOARDS } from '@Src/services/boards';
+import { GET_BOARDS } from '@Src/apollo/client/query/boards';
+import { GET_ROOM_SIZES, GET_ROOM_TYPES } from '@Src/apollo/client/query/rooms';
 
 const OrganismsConvertImage: FC = () => {
   const { file } = useContext(ContextFile);
-  const [selected, setSelected] = useState<CONFIGKEYS>('SQUARE');
-  const [selectedSize, setSelectedSize] = useState<CONFIGKEYSSIZE>('SMALL');
+  const [selected, setSelected] = useState('SQUARE');
+  const [selectedSize, setSelectedSize] = useState('SMALL');
   const [showBorder, setShowBorder] = useState(false);
   const [selectedRoom, setSelectedRoom] = useState('DEFAULT');
   const [cropImages, setCropImages] = useState<CROPPEDIMAGE>([]);
@@ -40,7 +41,11 @@ const OrganismsConvertImage: FC = () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const ref = createRef<any>();
 
-  const { data } = useQuery<IQueryFilter<'getBoards'>>(GET_BOARDS);
+  const { data: boards } = useQuery<IQueryFilter<'getBoards'>>(GET_BOARDS);
+  const { data: rooms } = useQuery<IQueryFilter<'getRooms'>>(GET_ROOM_TYPES);
+  const { data: roomSizes } =
+    useQuery<IQueryFilter<'getRoomSizes'>>(GET_ROOM_SIZES);
+  // const { data: boards } = useQuery<IQueryFilter<'getBoards'>>(GET_BOARDS);
 
   const loading = useMemo(
     () => cropImages.length !== quantity,
@@ -62,6 +67,7 @@ const OrganismsConvertImage: FC = () => {
 
   const selectedRoomSizeConfig = useMemo(
     () =>
+      // roomSizes?.getRoomSizes?.find(({}) => ())
       ROOMSSIZES.find(({ key }) => key === selected)?.sizes.find(
         ({ key }) => key === selectedSize
       ),
@@ -73,6 +79,9 @@ const OrganismsConvertImage: FC = () => {
       file ? URL.createObjectURL(new Blob([file], { type: 'image/png' })) : '',
     [file]
   );
+  console.log(boards);
+  console.log(`rooms`, rooms);
+  console.log(`roomSize`, roomSizes);
   return (
     <AtomWrapper
       customCSS={css`
@@ -168,15 +177,15 @@ const OrganismsConvertImage: FC = () => {
                 flex-direction: row;
               `}
             >
-              {data?.getBoards?.map((size) => (
+              {boards?.getBoards?.map((board) => (
                 <AtomButton
                   disabled={loading || isLoading}
-                  key={size?.id}
+                  key={board?.id}
                   onClick={() => {
-                    setSelected(size?.type?.name as CONFIGKEYS);
+                    setSelected(board?.type?.name as string);
                     setSelectedSize(
-                      (size?.sizes?.find((_, index) => index === 0)?.type
-                        ?.name ?? 'SMALL') as CONFIGKEYSSIZE
+                      board?.sizes?.find((_, index) => index === 0)?.type
+                        ?.name ?? 'SMALL'
                     );
                     setCropImages([]);
                     setQuantity(0);
@@ -188,7 +197,7 @@ const OrganismsConvertImage: FC = () => {
                     border-radius: 0px;
                     justify-content: center;
                     align-items: center;
-                    background-color: ${size?.type?.name === selected
+                    background-color: ${board?.type?.name === selected
                       ? '#4a4a54'
                       : '#313139'};
                   `}
@@ -210,7 +219,7 @@ const OrganismsConvertImage: FC = () => {
                         cursor: pointer;
                       `}
                     >
-                      {size?.type?.name}
+                      {board?.type?.name}
                     </AtomText>
                   </AtomWrapper>
                 </AtomButton>
@@ -434,7 +443,7 @@ const OrganismsConvertImage: FC = () => {
                     width: max-content;
                     height: max-content;
                     position: absolute;
-                    top: ${selectedRoomConfig.top[selected]};
+                    /* top: ${selectedRoomConfig.top[selected]}; */
                     right: 50%;
                     transform: translate(50%, -50%);
                     background-color: #313139;

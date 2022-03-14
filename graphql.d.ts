@@ -47,6 +47,10 @@ declare module 'graphql' {
     getBoardSizeById?: IBoardSize;
     getBoards?: Array<IBoard | null>;
     getBoardById?: IBoard;
+    getRooms?: Array<IRoom | null>;
+    getRoomById?: IRoom;
+    getRoomSizes?: Array<IRoomSizes | null>;
+    getRoomSizesById?: IRoomSizes;
   }
 
   export interface IUser {
@@ -61,7 +65,7 @@ declare module 'graphql' {
     disabled?: boolean;
     birthdate?: string;
     role?: IRole;
-    store?: IStore;
+    store?: Array<IStore | null>;
   }
 
   export interface IRole {
@@ -91,14 +95,31 @@ declare module 'graphql' {
     name?: string;
   }
 
-  export interface ISaleOrder {
+  export interface IFilterSaleOrder {
     id?: string;
     stripeId?: string;
     secret?: string;
     product?: string;
-    size?: string;
+    board?: string;
+    customer?: string;
+    store?: string;
     quantity?: number;
-    price?: number;
+    total?: number;
+    currency?: string;
+    status?: string;
+  }
+
+  export interface ISaleOrder {
+    id?: string;
+    stripeId?: string;
+    secret?: string;
+    product?: IProducts;
+    board?: IBoard;
+    customer?: IUser;
+    store?: IStore;
+    quantity?: number;
+    total?: number;
+    currency?: string;
     status?: string;
   }
 
@@ -113,12 +134,18 @@ declare module 'graphql' {
     store?: IStore;
   }
 
-  export interface IBoardType {
+  export interface IBoard {
     id?: string;
-    name?: string;
+    type?: IBoardType;
+    price?: number;
+    currency?: string;
+    title?: string;
+    description?: string;
+    image?: string;
+    sizes?: Array<IBoardSize | null>;
   }
 
-  export interface IBoardSizeType {
+  export interface IBoardType {
     id?: string;
     name?: string;
   }
@@ -135,20 +162,39 @@ declare module 'graphql' {
     size?: IsizeBoard;
   }
 
-  export interface IBoard {
+  export interface IBoardSizeType {
     id?: string;
-    type?: IBoardType;
-    price?: number;
-    currency?: string;
-    title?: string;
-    description?: string;
-    image?: string;
-    sizes?: Array<IBoardSize | null>;
+    name?: string;
   }
 
   export interface IsizeBoard {
     width?: string;
     height?: string;
+  }
+
+  export interface IRoom {
+    id?: string;
+    key?: string;
+    title?: string;
+    image?: string;
+    offset?: Array<IRoomOffSets | null>;
+  }
+
+  export interface IRoomOffSets {
+    key?: IBoardType;
+    top?: number;
+  }
+
+  export interface IRoomSizes {
+    key?: IBoardType;
+    sizes?: Array<IRoomSizesSizes | null>;
+  }
+
+  export interface IRoomSizesSizes {
+    key?: IBoardSizeType;
+    width?: number;
+    height?: number;
+    max?: number;
   }
 
   export interface IMutation {
@@ -174,20 +220,24 @@ declare module 'graphql' {
     updateBoardSize?: IBoardSize;
     newBoard?: IBoard;
     updateBoard?: IBoard;
+    newRoom?: IRoom;
+    updateRoom?: IRoom;
+    newRoomSizes?: IRoomSizes;
+    updateRoomSizes?: IRoomSizes;
   }
 
   export interface IInputUser {
-    name: string;
-    lastname: string;
+    name?: string;
+    lastname?: string;
     nickname?: string;
-    email: string;
-    password: string;
+    email?: string;
+    password?: string;
     photo?: string;
     emailVerified?: boolean;
     disabled?: boolean;
     birthdate?: string;
     role?: string;
-    store?: string;
+    store?: Array<string | null>;
   }
 
   export interface IInputLogin {
@@ -204,9 +254,11 @@ declare module 'graphql' {
   }
 
   export interface IInputSaleOrder {
-    product: string;
-    size: string;
+    product?: string;
+    board?: string;
     quantity?: number;
+    store?: string;
+    customer?: string;
   }
 
   export interface IInputStoreType {
@@ -272,6 +324,121 @@ declare module 'graphql' {
     image?: string;
   }
 
+  export interface IInputRoom {
+    key?: string;
+    title?: string;
+    image?: string;
+    offset?: Array<IInputRoomOffSets | null>;
+  }
+
+  export interface IInputRoomOffSets {
+    key?: string;
+    top?: number;
+  }
+
+  export interface IInputRoomSizes {
+    key?: string;
+    sizes?: Array<IInputRoomSizesSizes | null>;
+  }
+
+  export interface IInputRoomSizesSizes {
+    key?: string;
+    width?: number;
+    height?: number;
+    max?: number;
+  }
+
+  export interface IFilterUser {
+    id?: string;
+    name?: string;
+    lastname?: string;
+    nickname?: string;
+    email?: string;
+    password?: string;
+    photo?: string;
+    emailVerified?: boolean;
+    disabled?: boolean;
+    birthdate?: string;
+    role?: IFilterRole;
+    store?: Array<IFilterStore | null>;
+  }
+
+  export interface IFilterRole {
+    id?: string;
+    name?: string;
+  }
+
+  export interface IFilterStore {
+    id?: string;
+    name?: string;
+    description?: string;
+    phone?: string;
+    email?: string;
+    website?: string;
+    photo?: string;
+    cash?: number;
+    currency?: string;
+    street?: string;
+    city?: string;
+    state?: string;
+    zip?: string;
+    storeType?: IFilterStoreType;
+  }
+
+  export interface IFilterStoreType {
+    id?: string;
+    name?: string;
+  }
+
+  export interface IFilterProduct {
+    id?: string;
+    name?: string;
+    price?: number;
+    description?: string;
+    sku?: string;
+    stock?: number;
+    image?: string;
+    store?: IFilterStore;
+  }
+
+  export interface IFilterBoardType {
+    id?: string;
+    name?: string;
+  }
+
+  export interface IFilterBoardSizeType {
+    id?: string;
+    name?: string;
+  }
+
+  export interface IFilterSizeBoard {
+    width?: string;
+    height?: string;
+  }
+
+  export interface IFilterBoardSize {
+    id?: string;
+    aspect?: number;
+    title?: string;
+    board?: IFilterBoard;
+    type?: IFilterBoardSizeType;
+    x?: number;
+    y?: number;
+    isPortrait?: boolean;
+    size?: IFilterSizeBoard;
+  }
+
+  export interface IFilterBoard {
+    id?: string;
+    type?: IFilterBoardType;
+    price?: number;
+    currency?: string;
+    title?: string;
+    description?: string;
+    image?: string;
+    sizes?: Array<IFilterBoardSize | null>;
+  }
+
   /*********************************
    *                               *
    *         TYPE RESOLVERS        *
@@ -290,11 +457,15 @@ declare module 'graphql' {
     StoreType?: IStoreTypeTypeResolver;
     SaleOrder?: ISaleOrderTypeResolver;
     Products?: IProductsTypeResolver;
-    BoardType?: IBoardTypeTypeResolver;
-    BoardSizeType?: IBoardSizeTypeTypeResolver;
-    BoardSize?: IBoardSizeTypeResolver;
     Board?: IBoardTypeResolver;
+    BoardType?: IBoardTypeTypeResolver;
+    BoardSize?: IBoardSizeTypeResolver;
+    BoardSizeType?: IBoardSizeTypeTypeResolver;
     sizeBoard?: IsizeBoardTypeResolver;
+    Room?: IRoomTypeResolver;
+    RoomOffSets?: IRoomOffSetsTypeResolver;
+    RoomSizes?: IRoomSizesTypeResolver;
+    RoomSizesSizes?: IRoomSizesSizesTypeResolver;
     Mutation?: IMutationTypeResolver;
     TokenUser?: ITokenUserTypeResolver;
   }
@@ -322,6 +493,10 @@ declare module 'graphql' {
     getBoardSizeById?: QueryToGetBoardSizeByIdResolver<TParent>;
     getBoards?: QueryToGetBoardsResolver<TParent>;
     getBoardById?: QueryToGetBoardByIdResolver<TParent>;
+    getRooms?: QueryToGetRoomsResolver<TParent>;
+    getRoomById?: QueryToGetRoomByIdResolver<TParent>;
+    getRoomSizes?: QueryToGetRoomSizesResolver<TParent>;
+    getRoomSizesById?: QueryToGetRoomSizesByIdResolver<TParent>;
   }
 
   export interface QueryToPingResolver<TParent = any, TResult = any> {
@@ -384,10 +559,13 @@ declare module 'graphql' {
     ): TResult;
   }
 
+  export interface QueryToGetSaleOrdersArgs {
+    filter?: IFilterSaleOrder;
+  }
   export interface QueryToGetSaleOrdersResolver<TParent = any, TResult = any> {
     (
       parent: TParent,
-      args: {},
+      args: QueryToGetSaleOrdersArgs,
       context: any,
       info: GraphQLResolveInfo
     ): TResult;
@@ -577,6 +755,51 @@ declare module 'graphql' {
     (
       parent: TParent,
       args: QueryToGetBoardByIdArgs,
+      context: any,
+      info: GraphQLResolveInfo
+    ): TResult;
+  }
+
+  export interface QueryToGetRoomsResolver<TParent = any, TResult = any> {
+    (
+      parent: TParent,
+      args: {},
+      context: any,
+      info: GraphQLResolveInfo
+    ): TResult;
+  }
+
+  export interface QueryToGetRoomByIdArgs {
+    id: string;
+  }
+  export interface QueryToGetRoomByIdResolver<TParent = any, TResult = any> {
+    (
+      parent: TParent,
+      args: QueryToGetRoomByIdArgs,
+      context: any,
+      info: GraphQLResolveInfo
+    ): TResult;
+  }
+
+  export interface QueryToGetRoomSizesResolver<TParent = any, TResult = any> {
+    (
+      parent: TParent,
+      args: {},
+      context: any,
+      info: GraphQLResolveInfo
+    ): TResult;
+  }
+
+  export interface QueryToGetRoomSizesByIdArgs {
+    id: string;
+  }
+  export interface QueryToGetRoomSizesByIdResolver<
+    TParent = any,
+    TResult = any
+  > {
+    (
+      parent: TParent,
+      args: QueryToGetRoomSizesByIdArgs,
       context: any,
       info: GraphQLResolveInfo
     ): TResult;
@@ -899,9 +1122,12 @@ declare module 'graphql' {
     stripeId?: SaleOrderToStripeIdResolver<TParent>;
     secret?: SaleOrderToSecretResolver<TParent>;
     product?: SaleOrderToProductResolver<TParent>;
-    size?: SaleOrderToSizeResolver<TParent>;
+    board?: SaleOrderToBoardResolver<TParent>;
+    customer?: SaleOrderToCustomerResolver<TParent>;
+    store?: SaleOrderToStoreResolver<TParent>;
     quantity?: SaleOrderToQuantityResolver<TParent>;
-    price?: SaleOrderToPriceResolver<TParent>;
+    total?: SaleOrderToTotalResolver<TParent>;
+    currency?: SaleOrderToCurrencyResolver<TParent>;
     status?: SaleOrderToStatusResolver<TParent>;
   }
 
@@ -941,7 +1167,25 @@ declare module 'graphql' {
     ): TResult;
   }
 
-  export interface SaleOrderToSizeResolver<TParent = any, TResult = any> {
+  export interface SaleOrderToBoardResolver<TParent = any, TResult = any> {
+    (
+      parent: TParent,
+      args: {},
+      context: any,
+      info: GraphQLResolveInfo
+    ): TResult;
+  }
+
+  export interface SaleOrderToCustomerResolver<TParent = any, TResult = any> {
+    (
+      parent: TParent,
+      args: {},
+      context: any,
+      info: GraphQLResolveInfo
+    ): TResult;
+  }
+
+  export interface SaleOrderToStoreResolver<TParent = any, TResult = any> {
     (
       parent: TParent,
       args: {},
@@ -959,7 +1203,16 @@ declare module 'graphql' {
     ): TResult;
   }
 
-  export interface SaleOrderToPriceResolver<TParent = any, TResult = any> {
+  export interface SaleOrderToTotalResolver<TParent = any, TResult = any> {
+    (
+      parent: TParent,
+      args: {},
+      context: any,
+      info: GraphQLResolveInfo
+    ): TResult;
+  }
+
+  export interface SaleOrderToCurrencyResolver<TParent = any, TResult = any> {
     (
       parent: TParent,
       args: {},
@@ -1060,6 +1313,89 @@ declare module 'graphql' {
     ): TResult;
   }
 
+  export interface IBoardTypeResolver<TParent = any> {
+    id?: BoardToIdResolver<TParent>;
+    type?: BoardToTypeResolver<TParent>;
+    price?: BoardToPriceResolver<TParent>;
+    currency?: BoardToCurrencyResolver<TParent>;
+    title?: BoardToTitleResolver<TParent>;
+    description?: BoardToDescriptionResolver<TParent>;
+    image?: BoardToImageResolver<TParent>;
+    sizes?: BoardToSizesResolver<TParent>;
+  }
+
+  export interface BoardToIdResolver<TParent = any, TResult = any> {
+    (
+      parent: TParent,
+      args: {},
+      context: any,
+      info: GraphQLResolveInfo
+    ): TResult;
+  }
+
+  export interface BoardToTypeResolver<TParent = any, TResult = any> {
+    (
+      parent: TParent,
+      args: {},
+      context: any,
+      info: GraphQLResolveInfo
+    ): TResult;
+  }
+
+  export interface BoardToPriceResolver<TParent = any, TResult = any> {
+    (
+      parent: TParent,
+      args: {},
+      context: any,
+      info: GraphQLResolveInfo
+    ): TResult;
+  }
+
+  export interface BoardToCurrencyResolver<TParent = any, TResult = any> {
+    (
+      parent: TParent,
+      args: {},
+      context: any,
+      info: GraphQLResolveInfo
+    ): TResult;
+  }
+
+  export interface BoardToTitleResolver<TParent = any, TResult = any> {
+    (
+      parent: TParent,
+      args: {},
+      context: any,
+      info: GraphQLResolveInfo
+    ): TResult;
+  }
+
+  export interface BoardToDescriptionResolver<TParent = any, TResult = any> {
+    (
+      parent: TParent,
+      args: {},
+      context: any,
+      info: GraphQLResolveInfo
+    ): TResult;
+  }
+
+  export interface BoardToImageResolver<TParent = any, TResult = any> {
+    (
+      parent: TParent,
+      args: {},
+      context: any,
+      info: GraphQLResolveInfo
+    ): TResult;
+  }
+
+  export interface BoardToSizesResolver<TParent = any, TResult = any> {
+    (
+      parent: TParent,
+      args: {},
+      context: any,
+      info: GraphQLResolveInfo
+    ): TResult;
+  }
+
   export interface IBoardTypeTypeResolver<TParent = any> {
     id?: BoardTypeToIdResolver<TParent>;
     name?: BoardTypeToNameResolver<TParent>;
@@ -1075,29 +1411,6 @@ declare module 'graphql' {
   }
 
   export interface BoardTypeToNameResolver<TParent = any, TResult = any> {
-    (
-      parent: TParent,
-      args: {},
-      context: any,
-      info: GraphQLResolveInfo
-    ): TResult;
-  }
-
-  export interface IBoardSizeTypeTypeResolver<TParent = any> {
-    id?: BoardSizeTypeToIdResolver<TParent>;
-    name?: BoardSizeTypeToNameResolver<TParent>;
-  }
-
-  export interface BoardSizeTypeToIdResolver<TParent = any, TResult = any> {
-    (
-      parent: TParent,
-      args: {},
-      context: any,
-      info: GraphQLResolveInfo
-    ): TResult;
-  }
-
-  export interface BoardSizeTypeToNameResolver<TParent = any, TResult = any> {
     (
       parent: TParent,
       args: {},
@@ -1199,18 +1512,12 @@ declare module 'graphql' {
     ): TResult;
   }
 
-  export interface IBoardTypeResolver<TParent = any> {
-    id?: BoardToIdResolver<TParent>;
-    type?: BoardToTypeResolver<TParent>;
-    price?: BoardToPriceResolver<TParent>;
-    currency?: BoardToCurrencyResolver<TParent>;
-    title?: BoardToTitleResolver<TParent>;
-    description?: BoardToDescriptionResolver<TParent>;
-    image?: BoardToImageResolver<TParent>;
-    sizes?: BoardToSizesResolver<TParent>;
+  export interface IBoardSizeTypeTypeResolver<TParent = any> {
+    id?: BoardSizeTypeToIdResolver<TParent>;
+    name?: BoardSizeTypeToNameResolver<TParent>;
   }
 
-  export interface BoardToIdResolver<TParent = any, TResult = any> {
+  export interface BoardSizeTypeToIdResolver<TParent = any, TResult = any> {
     (
       parent: TParent,
       args: {},
@@ -1219,61 +1526,7 @@ declare module 'graphql' {
     ): TResult;
   }
 
-  export interface BoardToTypeResolver<TParent = any, TResult = any> {
-    (
-      parent: TParent,
-      args: {},
-      context: any,
-      info: GraphQLResolveInfo
-    ): TResult;
-  }
-
-  export interface BoardToPriceResolver<TParent = any, TResult = any> {
-    (
-      parent: TParent,
-      args: {},
-      context: any,
-      info: GraphQLResolveInfo
-    ): TResult;
-  }
-
-  export interface BoardToCurrencyResolver<TParent = any, TResult = any> {
-    (
-      parent: TParent,
-      args: {},
-      context: any,
-      info: GraphQLResolveInfo
-    ): TResult;
-  }
-
-  export interface BoardToTitleResolver<TParent = any, TResult = any> {
-    (
-      parent: TParent,
-      args: {},
-      context: any,
-      info: GraphQLResolveInfo
-    ): TResult;
-  }
-
-  export interface BoardToDescriptionResolver<TParent = any, TResult = any> {
-    (
-      parent: TParent,
-      args: {},
-      context: any,
-      info: GraphQLResolveInfo
-    ): TResult;
-  }
-
-  export interface BoardToImageResolver<TParent = any, TResult = any> {
-    (
-      parent: TParent,
-      args: {},
-      context: any,
-      info: GraphQLResolveInfo
-    ): TResult;
-  }
-
-  export interface BoardToSizesResolver<TParent = any, TResult = any> {
+  export interface BoardSizeTypeToNameResolver<TParent = any, TResult = any> {
     (
       parent: TParent,
       args: {},
@@ -1305,6 +1558,151 @@ declare module 'graphql' {
     ): TResult;
   }
 
+  export interface IRoomTypeResolver<TParent = any> {
+    id?: RoomToIdResolver<TParent>;
+    key?: RoomToKeyResolver<TParent>;
+    title?: RoomToTitleResolver<TParent>;
+    image?: RoomToImageResolver<TParent>;
+    offset?: RoomToOffsetResolver<TParent>;
+  }
+
+  export interface RoomToIdResolver<TParent = any, TResult = any> {
+    (
+      parent: TParent,
+      args: {},
+      context: any,
+      info: GraphQLResolveInfo
+    ): TResult;
+  }
+
+  export interface RoomToKeyResolver<TParent = any, TResult = any> {
+    (
+      parent: TParent,
+      args: {},
+      context: any,
+      info: GraphQLResolveInfo
+    ): TResult;
+  }
+
+  export interface RoomToTitleResolver<TParent = any, TResult = any> {
+    (
+      parent: TParent,
+      args: {},
+      context: any,
+      info: GraphQLResolveInfo
+    ): TResult;
+  }
+
+  export interface RoomToImageResolver<TParent = any, TResult = any> {
+    (
+      parent: TParent,
+      args: {},
+      context: any,
+      info: GraphQLResolveInfo
+    ): TResult;
+  }
+
+  export interface RoomToOffsetResolver<TParent = any, TResult = any> {
+    (
+      parent: TParent,
+      args: {},
+      context: any,
+      info: GraphQLResolveInfo
+    ): TResult;
+  }
+
+  export interface IRoomOffSetsTypeResolver<TParent = any> {
+    key?: RoomOffSetsToKeyResolver<TParent>;
+    top?: RoomOffSetsToTopResolver<TParent>;
+  }
+
+  export interface RoomOffSetsToKeyResolver<TParent = any, TResult = any> {
+    (
+      parent: TParent,
+      args: {},
+      context: any,
+      info: GraphQLResolveInfo
+    ): TResult;
+  }
+
+  export interface RoomOffSetsToTopResolver<TParent = any, TResult = any> {
+    (
+      parent: TParent,
+      args: {},
+      context: any,
+      info: GraphQLResolveInfo
+    ): TResult;
+  }
+
+  export interface IRoomSizesTypeResolver<TParent = any> {
+    key?: RoomSizesToKeyResolver<TParent>;
+    sizes?: RoomSizesToSizesResolver<TParent>;
+  }
+
+  export interface RoomSizesToKeyResolver<TParent = any, TResult = any> {
+    (
+      parent: TParent,
+      args: {},
+      context: any,
+      info: GraphQLResolveInfo
+    ): TResult;
+  }
+
+  export interface RoomSizesToSizesResolver<TParent = any, TResult = any> {
+    (
+      parent: TParent,
+      args: {},
+      context: any,
+      info: GraphQLResolveInfo
+    ): TResult;
+  }
+
+  export interface IRoomSizesSizesTypeResolver<TParent = any> {
+    key?: RoomSizesSizesToKeyResolver<TParent>;
+    width?: RoomSizesSizesToWidthResolver<TParent>;
+    height?: RoomSizesSizesToHeightResolver<TParent>;
+    max?: RoomSizesSizesToMaxResolver<TParent>;
+  }
+
+  export interface RoomSizesSizesToKeyResolver<TParent = any, TResult = any> {
+    (
+      parent: TParent,
+      args: {},
+      context: any,
+      info: GraphQLResolveInfo
+    ): TResult;
+  }
+
+  export interface RoomSizesSizesToWidthResolver<TParent = any, TResult = any> {
+    (
+      parent: TParent,
+      args: {},
+      context: any,
+      info: GraphQLResolveInfo
+    ): TResult;
+  }
+
+  export interface RoomSizesSizesToHeightResolver<
+    TParent = any,
+    TResult = any
+  > {
+    (
+      parent: TParent,
+      args: {},
+      context: any,
+      info: GraphQLResolveInfo
+    ): TResult;
+  }
+
+  export interface RoomSizesSizesToMaxResolver<TParent = any, TResult = any> {
+    (
+      parent: TParent,
+      args: {},
+      context: any,
+      info: GraphQLResolveInfo
+    ): TResult;
+  }
+
   export interface IMutationTypeResolver<TParent = any> {
     pong?: MutationToPongResolver<TParent>;
     newUser?: MutationToNewUserResolver<TParent>;
@@ -1328,6 +1726,10 @@ declare module 'graphql' {
     updateBoardSize?: MutationToUpdateBoardSizeResolver<TParent>;
     newBoard?: MutationToNewBoardResolver<TParent>;
     updateBoard?: MutationToUpdateBoardResolver<TParent>;
+    newRoom?: MutationToNewRoomResolver<TParent>;
+    updateRoom?: MutationToUpdateRoomResolver<TParent>;
+    newRoomSizes?: MutationToNewRoomSizesResolver<TParent>;
+    updateRoomSizes?: MutationToUpdateRoomSizesResolver<TParent>;
   }
 
   export interface MutationToPongResolver<TParent = any, TResult = any> {
@@ -1629,6 +2031,62 @@ declare module 'graphql' {
     (
       parent: TParent,
       args: MutationToUpdateBoardArgs,
+      context: any,
+      info: GraphQLResolveInfo
+    ): TResult;
+  }
+
+  export interface MutationToNewRoomArgs {
+    input?: IInputRoom;
+  }
+  export interface MutationToNewRoomResolver<TParent = any, TResult = any> {
+    (
+      parent: TParent,
+      args: MutationToNewRoomArgs,
+      context: any,
+      info: GraphQLResolveInfo
+    ): TResult;
+  }
+
+  export interface MutationToUpdateRoomArgs {
+    id: string;
+    input?: IInputRoom;
+  }
+  export interface MutationToUpdateRoomResolver<TParent = any, TResult = any> {
+    (
+      parent: TParent,
+      args: MutationToUpdateRoomArgs,
+      context: any,
+      info: GraphQLResolveInfo
+    ): TResult;
+  }
+
+  export interface MutationToNewRoomSizesArgs {
+    input?: IInputRoomSizes;
+  }
+  export interface MutationToNewRoomSizesResolver<
+    TParent = any,
+    TResult = any
+  > {
+    (
+      parent: TParent,
+      args: MutationToNewRoomSizesArgs,
+      context: any,
+      info: GraphQLResolveInfo
+    ): TResult;
+  }
+
+  export interface MutationToUpdateRoomSizesArgs {
+    id: string;
+    input?: IInputRoomSizes;
+  }
+  export interface MutationToUpdateRoomSizesResolver<
+    TParent = any,
+    TResult = any
+  > {
+    (
+      parent: TParent,
+      args: MutationToUpdateRoomSizesArgs,
       context: any,
       info: GraphQLResolveInfo
     ): TResult;

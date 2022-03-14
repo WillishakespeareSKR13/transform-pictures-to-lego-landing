@@ -4,6 +4,7 @@ import { GETSTORES } from '@Src/apollo/client/query/stores';
 import {
   AtomButton,
   AtomImage,
+  AtomLink,
   AtomLoader,
   AtomText,
   AtomWrapper
@@ -45,7 +46,7 @@ const STORES = () => {
         {loading ? (
           <AtomWrapper
             customCSS={css`
-              width: 300px;
+              width: 32.3%;
               height: 300px;
               background-color: #2e2e35;
               justify-content: space-between;
@@ -66,7 +67,7 @@ const STORES = () => {
               <AtomWrapper
                 key={store?.id}
                 customCSS={css`
-                  width: 300px;
+                  width: 32.3%;
                   height: 300px;
                   background-color: #202026;
                   justify-content: space-between;
@@ -142,7 +143,20 @@ const STORES = () => {
                       white-space: nowrap;
                     `}
                   >
-                    Website: {store?.website}
+                    Website:
+                    <AtomLink
+                      customCSS={css`
+                        color: #f1576c;
+                        font-weight: 500;
+                        margin-left: 5px;
+                        font-size: 12px;
+                      `}
+                      href={`${store?.website}`}
+                    >
+                      {store?.website
+                        ?.replace('https://', '')
+                        .replaceAll('/', '')}
+                    </AtomLink>
                   </AtomText>
                   <AtomText
                     customCSS={css`
@@ -189,7 +203,7 @@ const STORES = () => {
 
         <AtomWrapper
           customCSS={css`
-            width: 300px;
+            width: 32.3%;
             height: 300px;
             background-color: #202026;
             justify-content: space-between;

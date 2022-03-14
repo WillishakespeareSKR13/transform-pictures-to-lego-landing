@@ -20,6 +20,7 @@ export default GlobalStyles;
 
 export const TableStyles = css`
   width: 100%;
+  overflow: visible;
   color: #dfdfdf;
   font-weight: bold;
   thead {
@@ -40,5 +41,58 @@ export const TableStyles = css`
         border-bottom: 1px solid #2e2e35;
       }
     }
+  }
+`;
+
+export const InputStyles = css`
+  span {
+    margin: 0px 0px 10px 0px;
+    color: #dfdfdf;
+    font-weight: 500;
+  }
+  span:last-of-type {
+    color: #a83240;
+  }
+  input {
+    border: 1px solid #1a1a1f;
+    background-color: #202026;
+    color: #dfdfdf;
+    ::placeholder {
+      color: #dfdfdf;
+    }
+  }
+  select {
+    border: 1px solid #1a1a1f;
+    background-color: #202026;
+    color: #dfdfdf;
+    ::placeholder {
+      color: #dfdfdf;
+    }
+  }
+`;
+
+export const InputLightStyles = css`
+  span {
+    margin: 0px 0px 10px 0px;
+    color: #dfdfdf;
+    font-weight: 500;
+  }
+  span:last-of-type {
+    color: #a83240;
+  }
+  input {
+    border: 1px solid #1a1a1f;
+    background-color: #2e2e35;
+    color: #dfdfdf;
+    ::placeholder {
+      color: #dfdfdf;
+    }
+  }
+`;
+
+export const InputDragAndDropStyles = css`
+  label {
+    background-color: #202026;
+    color: #dfdfdf;
   }
 `;

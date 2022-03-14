@@ -29,6 +29,7 @@ const typeDefs = gql`
   extend type Mutation {
     newBoardType(input: InputBoardType): BoardType
     updateBoardType(id: ID!, input: InputBoardType): BoardType
+    deleteBoardType(id: ID!): BoardType
   }
 `;
 

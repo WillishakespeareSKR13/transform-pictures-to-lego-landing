@@ -29,6 +29,7 @@ const typeDefs = gql`
   extend type Mutation {
     newStoreType(input: InputStoreType): StoreType
     updateStoreType(id: ID!, input: InputStoreType): StoreType
+    deleteStoreType(id: ID!): StoreType
   }
 `;
 

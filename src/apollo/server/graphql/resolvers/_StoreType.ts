@@ -29,6 +29,13 @@ const resolvers: Resolvers = {
         new: true
       });
       return storeType;
+    },
+    deleteStoreType: async (_, { id }) => {
+      const storeTypeExist = await StoreType.findById(id);
+      if (!storeTypeExist) throw new Error('StoreType does not exist');
+
+      const storeType = await StoreType.findByIdAndDelete(id);
+      return storeType;
     }
   }
 };

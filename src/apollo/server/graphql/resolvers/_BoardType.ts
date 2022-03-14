@@ -31,6 +31,13 @@ const resolvers: Resolvers = {
         new: true
       });
       return boardType;
+    },
+    deleteBoardType: async (_, { id }) => {
+      const boardTypeExist = await BoardType.findById(id);
+      if (!boardTypeExist) throw new Error('BoardType does not exist');
+
+      const boardType = await BoardType.findByIdAndDelete(id);
+      return boardType;
     }
   }
 };

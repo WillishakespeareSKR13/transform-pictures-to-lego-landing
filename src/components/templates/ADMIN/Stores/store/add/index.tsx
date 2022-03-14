@@ -82,7 +82,7 @@ const ADD = () => {
           }
         }
       }).then(() => {
-        router.push('/dashboard');
+        location.href = '/dashboard';
       });
     }
   });

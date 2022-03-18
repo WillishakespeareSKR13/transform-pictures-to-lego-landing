@@ -49,8 +49,8 @@ const typeDefs = gql`
     emailVerified: Boolean
     disabled: Boolean
     birthdate: String
-    role: FilterRole
-    store: [FilterStore]
+    role: String
+    store: [String]
   }
 
   input InputLogin {
@@ -61,7 +61,7 @@ const typeDefs = gql`
   #######################QUERY#######################
   extend type Query {
     me: User
-    getUsers: [User]
+    getUsers(input: FilterUser): [User]
     getUserById(id: ID!): User
   }
   #####################MUTACION######################

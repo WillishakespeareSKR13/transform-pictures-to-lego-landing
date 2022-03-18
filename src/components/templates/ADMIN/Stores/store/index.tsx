@@ -2,10 +2,20 @@ import { useQuery } from '@apollo/client';
 import { css } from '@emotion/react';
 import { GETSALEORDES } from '@Src/apollo/client/query/saleOrder';
 import { GETSTOREBYID } from '@Src/apollo/client/query/stores';
+import { GETUSERS } from '@Src/apollo/client/query/user';
 import DashWithTitle from '@Src/components/layouts/DashWithTitle';
 import { TableStyles } from '@Src/styles';
-import { AtomLoader, AtomTable, AtomText, AtomWrapper } from '@sweetsyui/ui';
-import { IQueryFilter, ISaleOrder } from 'graphql';
+import {
+  AtomButton,
+  AtomImage,
+  AtomLink,
+  AtomLoader,
+  AtomSeparator,
+  AtomTable,
+  AtomText,
+  AtomWrapper
+} from '@sweetsyui/ui';
+import { IQueryFilter, ISaleOrder, IUser } from 'graphql';
 import { useRouter } from 'next/router';
 
 const VIEW = () => {
@@ -31,13 +41,22 @@ const VIEW = () => {
     }
   );
 
+  const { data: dataUsers } = useQuery<IQueryFilter<'getUsers'>>(GETUSERS);
+
   if (loading)
     return (
       <AtomLoader isLoading backgroundColor="#2e2e35" colorLoading="white" />
     );
+
   return (
     <DashWithTitle title={`Store: ${data?.getStoreById?.name}`}>
-      <AtomWrapper>
+      <AtomWrapper
+        customCSS={css`
+          flex-direction: row;
+          justify-content: flex-start;
+          gap: 20px;
+        `}
+      >
         <AtomWrapper
           customCSS={css`
             width: 60%;
@@ -59,11 +78,13 @@ const VIEW = () => {
             columns={[
               {
                 title: 'Product',
-                view: (item) => <>{`${item?.product}`}</>
+                view: (item) => <>{`${item?.board ? 'Board' : 'Product'}`}</>
               },
               {
-                title: 'Size',
-                view: (item) => <>{`${item?.size}`}</>
+                title: 'Name',
+                view: (item) => (
+                  <>{`${item?.board?.title ?? item?.product?.name}`}</>
+                )
               },
               {
                 title: 'Quantity',
@@ -75,10 +96,217 @@ const VIEW = () => {
               },
               {
                 title: 'Price',
-                view: (item) => <>{`$ ${item?.price}`}</>
+                view: (item) => <>{`$ ${item?.board?.price}`}</>
               }
             ]}
           />
+        </AtomWrapper>
+        <AtomWrapper
+          customCSS={css`
+            width: 40%;
+          `}
+        >
+          <AtomWrapper
+            key={data?.getStoreById?.id}
+            customCSS={css`
+              width: 100%;
+              height: max-content;
+              background-color: #202026;
+              justify-content: space-between;
+              border-radius: 8px;
+              padding: 15px 20px;
+            `}
+          >
+            <AtomWrapper>
+              <AtomText
+                customCSS={css`
+                  color: #dfdfdf;
+                  font-size: 16px;
+                  font-weight: 600;
+                `}
+              >
+                Store: {data?.getStoreById?.name}
+              </AtomText>
+              <AtomImage
+                src={`${data?.getStoreById?.photo}`}
+                alt={`${data?.getStoreById?.photo}`}
+                customCSS={css`
+                  width: 90px;
+                  height: 90px;
+                  margin: 10px 0px;
+                  background-color: #1a1a1f;
+                `}
+              />
+            </AtomWrapper>
+            <AtomWrapper>
+              <AtomText
+                customCSS={css`
+                  color: #dfdfdf;
+                  font-weight: 600;
+                  font-size: 12px;
+                  text-overflow: ellipsis;
+                  overflow: hidden;
+                  white-space: nowrap;
+                `}
+              >
+                Description: {data?.getStoreById?.description}
+              </AtomText>
+              <AtomText
+                customCSS={css`
+                  color: #dfdfdf;
+                  font-weight: 600;
+                  font-size: 12px;
+                  text-overflow: ellipsis;
+                  overflow: hidden;
+                  white-space: nowrap;
+                `}
+              >
+                Phone: {data?.getStoreById?.phone}
+              </AtomText>
+              <AtomText
+                customCSS={css`
+                  color: #dfdfdf;
+                  font-weight: 600;
+                  font-size: 12px;
+                  text-overflow: ellipsis;
+                  overflow: hidden;
+                  white-space: nowrap;
+                `}
+              >
+                Email: {data?.getStoreById?.email}
+              </AtomText>
+              <AtomText
+                customCSS={css`
+                  color: #dfdfdf;
+                  font-weight: 600;
+                  font-size: 12px;
+                  text-overflow: ellipsis;
+                  overflow: hidden;
+                  white-space: nowrap;
+                `}
+              >
+                Website:
+                <AtomLink
+                  customCSS={css`
+                    color: #f1576c;
+                    font-weight: 500;
+                    margin-left: 5px;
+                    font-size: 12px;
+                  `}
+                  href={`${data?.getStoreById?.website}`}
+                >
+                  {data?.getStoreById?.website
+                    ?.replace('https://', '')
+                    .replaceAll('/', '')}
+                </AtomLink>
+              </AtomText>
+              <AtomText
+                customCSS={css`
+                  color: #dfdfdf;
+                  font-weight: 600;
+                  font-size: 12px;
+                  text-overflow: ellipsis;
+                  overflow: hidden;
+                  white-space: nowrap;
+                `}
+              >
+                Address: {data?.getStoreById?.city}, {data?.getStoreById?.state}
+                , {data?.getStoreById?.zip},{data?.getStoreById?.street}
+              </AtomText>
+              <AtomSeparator color="#2e2e35" height="3px" margin="10px 0px" />
+              <AtomText
+                customCSS={css`
+                  color: #dfdfdf;
+                  font-weight: 600;
+                  font-size: 12px;
+                  text-overflow: ellipsis;
+                  overflow: hidden;
+                  white-space: nowrap;
+                `}
+              >
+                Balance: {data?.getStoreById?.cash}
+              </AtomText>
+              <AtomText
+                customCSS={css`
+                  color: #dfdfdf;
+                  font-weight: 600;
+                  font-size: 12px;
+                  text-overflow: ellipsis;
+                  overflow: hidden;
+                  white-space: nowrap;
+                `}
+              >
+                Currency {data?.getStoreById?.currency}
+              </AtomText>
+            </AtomWrapper>
+          </AtomWrapper>
+          <AtomWrapper
+            customCSS={css`
+              border-radius: 8px;
+              margin-top: 20px;
+              background-color: #202026;
+              overflow: auto;
+              max-width: 100%;
+            `}
+          >
+            <AtomWrapper
+              customCSS={css`
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+                width: 100%;
+                padding: 15px 20px;
+              `}
+            >
+              <AtomText
+                customCSS={css`
+                  font-size: 16px;
+                  font-weight: 600;
+                  color: #dfdfdf;
+                  display: flex;
+                `}
+              >
+                Users in Store
+              </AtomText>
+              <AtomButton
+                customCSS={css`
+                  padding: 8px 20px;
+                  font-size: 10px;
+                `}
+                onClick={() => {
+                  router.push(
+                    `/dashboard/store/[id]/users`,
+                    `/dashboard/store/${data?.getStoreById?.id}/users`
+                  );
+                }}
+              >
+                Add User
+              </AtomButton>
+            </AtomWrapper>
+            <AtomTable
+              customCSS={css`
+                ${TableStyles}
+                table {
+                  max-width: 100%;
+                }
+              `}
+              data={dataUsers?.getUsers as IUser[]}
+              columns={[
+                {
+                  title: 'Name',
+                  view: (item) => <>{`${item?.name}`}</>
+                },
+                {
+                  title: 'Email',
+                  view: (item) => <>{`${item?.email}`}</>
+                },
+                {
+                  title: 'Role',
+                  view: (item) => <>{`${item?.role?.name}`}</>
+                }
+              ]}
+            />
+          </AtomWrapper>
         </AtomWrapper>
       </AtomWrapper>
     </DashWithTitle>

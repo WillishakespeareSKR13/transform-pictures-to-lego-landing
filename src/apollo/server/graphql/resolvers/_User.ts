@@ -14,8 +14,10 @@ const resolvers: Resolvers = {
       }
       return ctx.user;
     },
-    getUsers: async (_, __) => {
-      return await Users.find({})
+    getUsers: async (_, { input }) => {
+      return await Users.find({
+        ...input
+      })
         .populate('role')
         .populate({
           path: 'store',

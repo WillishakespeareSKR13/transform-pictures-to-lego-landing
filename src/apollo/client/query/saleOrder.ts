@@ -11,6 +11,31 @@ export const GETSALEORDES = gql`
       }
       board {
         id
+        type {
+          id
+          name
+        }
+        price
+        currency
+        title
+        description
+        image
+        sizes {
+          id
+          aspect
+          title
+          type {
+            id
+            name
+          }
+          x
+          y
+          isPortrait
+          size {
+            width
+            height
+          }
+        }
       }
       customer {
         id

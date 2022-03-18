@@ -14,3 +14,27 @@ export const USER = gql`
     }
   }
 `;
+
+export const GETUSERS = gql`
+  query getUsers {
+    getUsers {
+      id
+      name
+      lastname
+      nickname
+      email
+      photo
+      emailVerified
+      disabled
+      birthdate
+      role {
+        id
+        name
+      }
+      store {
+        id
+        name
+      }
+    }
+  }
+`;

@@ -19,8 +19,13 @@ const resolvers: Resolvers = {
       })
         .populate('customer')
         .populate('product')
-        .populate('board')
-        .populate('store');
+        .populate('store')
+        .populate({
+          path: 'board',
+          populate: {
+            path: 'type'
+          }
+        });
       if (!saleOrders) throw new Error('No sale orders found');
 
       return saleOrders;
@@ -29,11 +34,16 @@ const resolvers: Resolvers = {
       const saleOrder = await SaleOrder.findById(id)
         .populate('customer')
         .populate('product')
-        .populate('board')
+        .populate({
+          path: 'board',
+          populate: {
+            path: 'type'
+          }
+        })
         .populate('store');
       if (!saleOrder) throw new Error('No sale order found');
 
-      return saleOrder;
+      return saleOrder.toJSON();
     },
     paySaleOrder: async (_, { id }) => {
       const saleOrder = await SaleOrder.findById(id);

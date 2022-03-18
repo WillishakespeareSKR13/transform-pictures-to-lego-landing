@@ -22,7 +22,6 @@ declare module 'graphql' {
   }
 
   ////////////////////////////////////////////////////////////////////////////////
-
   export interface IQuery {
     ping?: string;
     me?: IUser;
@@ -208,12 +207,14 @@ declare module 'graphql' {
     updateSaleOrder?: ISaleOrder;
     newStoreType?: IStoreType;
     updateStoreType?: IStoreType;
+    deleteStoreType?: IStoreType;
     newStore?: IStore;
     updateStore?: IStore;
     newProduct?: IProducts;
     updateProduct?: IProducts;
     newBoardType?: IBoardType;
     updateBoardType?: IBoardType;
+    deleteBoardType?: IBoardType;
     newBoardSizeType?: IBoardSizeType;
     updateBoardSizeType?: IBoardSizeType;
     newBoardSize?: IBoardSize;
@@ -1714,12 +1715,14 @@ declare module 'graphql' {
     updateSaleOrder?: MutationToUpdateSaleOrderResolver<TParent>;
     newStoreType?: MutationToNewStoreTypeResolver<TParent>;
     updateStoreType?: MutationToUpdateStoreTypeResolver<TParent>;
+    deleteStoreType?: MutationToDeleteStoreTypeResolver<TParent>;
     newStore?: MutationToNewStoreResolver<TParent>;
     updateStore?: MutationToUpdateStoreResolver<TParent>;
     newProduct?: MutationToNewProductResolver<TParent>;
     updateProduct?: MutationToUpdateProductResolver<TParent>;
     newBoardType?: MutationToNewBoardTypeResolver<TParent>;
     updateBoardType?: MutationToUpdateBoardTypeResolver<TParent>;
+    deleteBoardType?: MutationToDeleteBoardTypeResolver<TParent>;
     newBoardSizeType?: MutationToNewBoardSizeTypeResolver<TParent>;
     updateBoardSizeType?: MutationToUpdateBoardSizeTypeResolver<TParent>;
     newBoardSize?: MutationToNewBoardSizeResolver<TParent>;
@@ -1865,6 +1868,21 @@ declare module 'graphql' {
     ): TResult;
   }
 
+  export interface MutationToDeleteStoreTypeArgs {
+    id: string;
+  }
+  export interface MutationToDeleteStoreTypeResolver<
+    TParent = any,
+    TResult = any
+  > {
+    (
+      parent: TParent,
+      args: MutationToDeleteStoreTypeArgs,
+      context: any,
+      info: GraphQLResolveInfo
+    ): TResult;
+  }
+
   export interface MutationToNewStoreArgs {
     input?: IInputStore;
   }
@@ -1944,6 +1962,21 @@ declare module 'graphql' {
     (
       parent: TParent,
       args: MutationToUpdateBoardTypeArgs,
+      context: any,
+      info: GraphQLResolveInfo
+    ): TResult;
+  }
+
+  export interface MutationToDeleteBoardTypeArgs {
+    id: string;
+  }
+  export interface MutationToDeleteBoardTypeResolver<
+    TParent = any,
+    TResult = any
+  > {
+    (
+      parent: TParent,
+      args: MutationToDeleteBoardTypeArgs,
       context: any,
       info: GraphQLResolveInfo
     ): TResult;

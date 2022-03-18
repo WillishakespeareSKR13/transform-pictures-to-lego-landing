@@ -49,7 +49,12 @@ const VIEW = () => {
     );
 
   return (
-    <DashWithTitle title={`Store: ${data?.getStoreById?.name}`}>
+    <DashWithTitle
+      title={`Store: ${data?.getStoreById?.name}`}
+      onClick={() => {
+        location.href = `/dashboard/`;
+      }}
+    >
       <AtomWrapper
         customCSS={css`
           flex-direction: row;

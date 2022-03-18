@@ -9,10 +9,11 @@ type Props = {
   title?: string;
   url?: UrlObject | string;
   button?: ReactNode;
+  onClick?: () => void;
 };
 
 const DashWithTitle: FC<Props> = (props) => {
-  const { children, title, url, button } = props;
+  const { children, title, url, button, onClick } = props;
   const router = useRouter();
   return (
     <AtomWrapper>
@@ -42,9 +43,13 @@ const DashWithTitle: FC<Props> = (props) => {
               background-color: #2e2e35;
               transition: background-color 0.3s ease;
             `}
-            onClick={() => {
-              router.push(url ?? '/dashboard');
-            }}
+            onClick={
+              onClick
+                ? onClick
+                : () => {
+                    router.push(url ?? '/dashboard');
+                  }
+            }
           >
             <AtomIcon
               icon="https://upload.wikimedia.org/wikipedia/commons/f/f9/Antu_arrow-right.svg"

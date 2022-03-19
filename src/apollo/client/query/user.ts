@@ -38,3 +38,43 @@ export const GETUSERS = gql`
     }
   }
 `;
+
+export const CREATEUSER = gql`
+  mutation newUser($input: InputUser) {
+    newUser(input: $input) {
+      id
+      name
+      lastname
+      nickname
+      email
+      password
+      photo
+      emailVerified
+      disabled
+      birthdate
+      role {
+        id
+        name
+      }
+      store {
+        id
+        name
+        description
+        phone
+        email
+        website
+        photo
+        cash
+        currency
+        street
+        city
+        state
+        zip
+        storeType {
+          id
+          name
+        }
+      }
+    }
+  }
+`;

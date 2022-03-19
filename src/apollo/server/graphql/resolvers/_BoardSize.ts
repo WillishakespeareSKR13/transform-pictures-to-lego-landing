@@ -6,11 +6,8 @@ import Board from '../../models/board';
 const resolvers: Resolvers = {
   Query: {
     getBoardSizes: async (_, __) => {
-      const boardSizes = await BoardSize.find().populate({
-        path: 'type',
-        populate: {
-          path: 'board'
-        }
+      const boardSizes = await BoardSize.find().populate('board').populate({
+        path: 'type'
       });
       return boardSizes;
     },

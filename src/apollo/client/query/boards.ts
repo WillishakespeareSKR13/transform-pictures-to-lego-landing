@@ -10,13 +10,13 @@ export const GET_BOARDS = gql`
       }
       title
       description
-      price
       currency
       image
       sizes {
         id
         aspect
         title
+        price
         type {
           id
           name

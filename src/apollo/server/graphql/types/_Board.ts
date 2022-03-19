@@ -6,7 +6,6 @@ const typeDefs = gql`
   type Board {
     id: ID
     type: BoardType
-    price: Float
     currency: String
     title: String
     description: String
@@ -18,7 +17,6 @@ const typeDefs = gql`
 
   input InputBoard {
     type: ID
-    price: Float
     currency: String
     title: String
     description: String
@@ -28,7 +26,6 @@ const typeDefs = gql`
   input FilterBoard {
     id: ID
     type: FilterBoardType
-    price: Float
     currency: String
     title: String
     description: String

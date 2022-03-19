@@ -11,6 +11,8 @@ const typeDefs = gql`
     type: BoardSizeType
     x: Int
     y: Int
+    price: Int
+    priority: Int
     isPortrait: Boolean
     size: sizeBoard
   }
@@ -33,6 +35,8 @@ const typeDefs = gql`
     type: ID
     x: Int
     y: Int
+    price: Int
+    priority: Int
     isPortrait: Boolean
     size: InputSizeBoard
   }
@@ -50,6 +54,8 @@ const typeDefs = gql`
     type: FilterBoardSizeType
     x: Int
     y: Int
+    price: Int
+    priority: Int
     isPortrait: Boolean
     size: FilterSizeBoard
   }

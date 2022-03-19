@@ -6,7 +6,6 @@ export interface IBoard extends Document {
   currency: string;
   description: string;
   image: string;
-  price: number;
 }
 
 const BoardSchema: Schema = new Schema(
@@ -14,10 +13,6 @@ const BoardSchema: Schema = new Schema(
     type: {
       type: Schema.Types.ObjectId,
       ref: 'BoardType',
-      required: true
-    },
-    price: {
-      type: Number,
       required: true
     },
     currency: {

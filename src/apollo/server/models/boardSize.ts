@@ -8,6 +8,8 @@ export interface IBoardSize extends Document {
   x: number;
   y: number;
   isPortrait: boolean;
+  price: number;
+  priority: number;
   size: {
     width: string;
     height: string;
@@ -44,6 +46,14 @@ const BoardSizeSchema: Schema = new Schema(
     isPortrait: {
       type: Boolean,
       required: true
+    },
+    price: {
+      type: Number,
+      required: true
+    },
+    priority: {
+      type: Number,
+      default: 0
     },
     size: {
       width: {

@@ -18,7 +18,7 @@ import { GET_ROOM_SIZES, GET_ROOM_TYPES } from '@Src/apollo/client/query/rooms';
 
 const OrganismsConvertImage: FC = () => {
   const { file } = useContext(ContextFile);
-  const [selected, setSelected] = useState('VERTICAL');
+  const [selected, setSelected] = useState('SQUARE');
   const [selectedSize, setSelectedSize] = useState('SMALL');
   const [showBorder, setShowBorder] = useState(false);
   const [selectedRoom, setSelectedRoom] = useState('DEFAULT');
@@ -231,7 +231,9 @@ const OrganismsConvertImage: FC = () => {
             >
               {boards?.getBoards
                 ?.find((board) => board?.type?.name === selected)
-                ?.sizes?.map((size) => (
+                ?.sizes?.slice()
+                .sort((a, b) => (a?.priority ?? 1) - (b?.priority ?? 1))
+                ?.map((size) => (
                   <AtomButton
                     disabled={loading || isLoading}
                     key={size?.id}
@@ -357,8 +359,8 @@ const OrganismsConvertImage: FC = () => {
                     customCSS={css`
                       flex-direction: row;
                       flex-wrap: wrap;
-                      width: ${selectedConfig?.size?.width};
-                      height: ${selectedConfig?.size?.height};
+                      width: ${selectedConfig?.size?.width ?? '600px'};
+                      height: ${selectedConfig?.size?.height ?? '600px'};
                       align-items: center;
                       justify-content: center;
                       background-color: #313139;

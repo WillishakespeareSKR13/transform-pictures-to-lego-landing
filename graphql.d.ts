@@ -94,6 +94,21 @@ declare module 'graphql' {
     name?: string;
   }
 
+  export interface IFilterUser {
+    id?: string;
+    name?: string;
+    lastname?: string;
+    nickname?: string;
+    email?: string;
+    password?: string;
+    photo?: string;
+    emailVerified?: boolean;
+    disabled?: boolean;
+    birthdate?: string;
+    role?: string;
+    store?: Array<string | null>;
+  }
+
   export interface IFilterSaleOrder {
     id?: string;
     stripeId?: string;
@@ -136,7 +151,6 @@ declare module 'graphql' {
   export interface IBoard {
     id?: string;
     type?: IBoardType;
-    price?: number;
     currency?: string;
     title?: string;
     description?: string;
@@ -157,6 +171,8 @@ declare module 'graphql' {
     type?: IBoardSizeType;
     x?: number;
     y?: number;
+    price?: number;
+    priority?: number;
     isPortrait?: boolean;
     size?: IsizeBoard;
   }
@@ -307,6 +323,8 @@ declare module 'graphql' {
     type?: string;
     x?: number;
     y?: number;
+    price?: number;
+    priority?: number;
     isPortrait?: boolean;
     size?: IInputSizeBoard;
   }
@@ -318,7 +336,6 @@ declare module 'graphql' {
 
   export interface IInputBoard {
     type?: string;
-    price?: number;
     currency?: string;
     title?: string;
     description?: string;
@@ -349,22 +366,12 @@ declare module 'graphql' {
     max?: number;
   }
 
-  export interface IFilterUser {
+  export interface IFilterRole {
     id?: string;
     name?: string;
-    lastname?: string;
-    nickname?: string;
-    email?: string;
-    password?: string;
-    photo?: string;
-    emailVerified?: boolean;
-    disabled?: boolean;
-    birthdate?: string;
-    role?: IFilterRole;
-    store?: Array<IFilterStore | null>;
   }
 
-  export interface IFilterRole {
+  export interface IFilterStoreType {
     id?: string;
     name?: string;
   }
@@ -384,11 +391,6 @@ declare module 'graphql' {
     state?: string;
     zip?: string;
     storeType?: IFilterStoreType;
-  }
-
-  export interface IFilterStoreType {
-    id?: string;
-    name?: string;
   }
 
   export interface IFilterProduct {
@@ -425,6 +427,8 @@ declare module 'graphql' {
     type?: IFilterBoardSizeType;
     x?: number;
     y?: number;
+    price?: number;
+    priority?: number;
     isPortrait?: boolean;
     size?: IFilterSizeBoard;
   }
@@ -432,7 +436,6 @@ declare module 'graphql' {
   export interface IFilterBoard {
     id?: string;
     type?: IFilterBoardType;
-    price?: number;
     currency?: string;
     title?: string;
     description?: string;
@@ -518,10 +521,13 @@ declare module 'graphql' {
     ): TResult;
   }
 
+  export interface QueryToGetUsersArgs {
+    input?: IFilterUser;
+  }
   export interface QueryToGetUsersResolver<TParent = any, TResult = any> {
     (
       parent: TParent,
-      args: {},
+      args: QueryToGetUsersArgs,
       context: any,
       info: GraphQLResolveInfo
     ): TResult;
@@ -1317,7 +1323,6 @@ declare module 'graphql' {
   export interface IBoardTypeResolver<TParent = any> {
     id?: BoardToIdResolver<TParent>;
     type?: BoardToTypeResolver<TParent>;
-    price?: BoardToPriceResolver<TParent>;
     currency?: BoardToCurrencyResolver<TParent>;
     title?: BoardToTitleResolver<TParent>;
     description?: BoardToDescriptionResolver<TParent>;
@@ -1335,15 +1340,6 @@ declare module 'graphql' {
   }
 
   export interface BoardToTypeResolver<TParent = any, TResult = any> {
-    (
-      parent: TParent,
-      args: {},
-      context: any,
-      info: GraphQLResolveInfo
-    ): TResult;
-  }
-
-  export interface BoardToPriceResolver<TParent = any, TResult = any> {
     (
       parent: TParent,
       args: {},
@@ -1428,6 +1424,8 @@ declare module 'graphql' {
     type?: BoardSizeToTypeResolver<TParent>;
     x?: BoardSizeToXResolver<TParent>;
     y?: BoardSizeToYResolver<TParent>;
+    price?: BoardSizeToPriceResolver<TParent>;
+    priority?: BoardSizeToPriorityResolver<TParent>;
     isPortrait?: BoardSizeToIsPortraitResolver<TParent>;
     size?: BoardSizeToSizeResolver<TParent>;
   }
@@ -1487,6 +1485,24 @@ declare module 'graphql' {
   }
 
   export interface BoardSizeToYResolver<TParent = any, TResult = any> {
+    (
+      parent: TParent,
+      args: {},
+      context: any,
+      info: GraphQLResolveInfo
+    ): TResult;
+  }
+
+  export interface BoardSizeToPriceResolver<TParent = any, TResult = any> {
+    (
+      parent: TParent,
+      args: {},
+      context: any,
+      info: GraphQLResolveInfo
+    ): TResult;
+  }
+
+  export interface BoardSizeToPriorityResolver<TParent = any, TResult = any> {
     (
       parent: TParent,
       args: {},

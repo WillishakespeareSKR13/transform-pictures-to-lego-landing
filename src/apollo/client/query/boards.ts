@@ -17,6 +17,7 @@ export const GET_BOARDS = gql`
         aspect
         title
         price
+        priority
         type {
           id
           name

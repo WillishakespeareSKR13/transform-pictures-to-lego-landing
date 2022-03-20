@@ -101,7 +101,7 @@ const VIEW = () => {
               },
               {
                 title: 'Price',
-                view: (item) => <>{`$ ${item?.board?.price}`}</>
+                view: (item) => <>{`$ ${item?.total}`}</>
               }
             ]}
           />

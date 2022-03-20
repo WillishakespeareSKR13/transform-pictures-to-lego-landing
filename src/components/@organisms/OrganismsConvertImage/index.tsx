@@ -359,8 +359,8 @@ const OrganismsConvertImage: FC = () => {
                     customCSS={css`
                       flex-direction: row;
                       flex-wrap: wrap;
-                      width: ${selectedConfig?.size?.width};
-                      height: ${selectedConfig?.size?.height};
+                      width: ${selectedConfig?.size?.width ?? '600px'};
+                      height: ${selectedConfig?.size?.height ?? '600px'};
                       align-items: center;
                       justify-content: center;
                       background-color: #313139;

@@ -8,31 +8,25 @@ export const GETSALEORDES = gql`
       secret
       product {
         id
+        name
       }
       board {
         id
-        type {
+        board {
           id
-          name
-        }
-        currency
-        title
-        description
-        image
-        sizes {
-          id
-          aspect
           title
           type {
             id
             name
           }
-          x
-          y
-          isPortrait
-          size {
-            width
-            height
+          currency
+        }
+        size {
+          id
+          title
+          type {
+            id
+            name
           }
         }
       }

@@ -4,7 +4,7 @@ import StylesGlobal from '@sweetsyui/ui/build/@styles/stylesglobal';
 
 const GlobalStyles: FC = () => (
   <>
-    <StylesGlobal />
+    <StylesGlobal scrollbarColor="#f1576c" />
     <Global
       styles={css`
         html,

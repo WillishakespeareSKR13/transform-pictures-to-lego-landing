@@ -77,34 +77,64 @@ const VIEW = () => {
           >
             Store Orders
           </AtomText>
-          <AtomTable
-            customCSS={TableStyles}
-            data={dataOrders?.getSaleOrders as ISaleOrder[]}
-            columns={[
-              {
-                title: 'Product',
-                view: (item) => <>{`${item?.board ? 'Board' : 'Product'}`}</>
-              },
-              {
-                title: 'Name',
-                view: (item) => (
-                  <>{`${item?.board?.title ?? item?.product?.name}`}</>
-                )
-              },
-              {
-                title: 'Quantity',
-                view: (item) => <>{`${item?.quantity}`}</>
-              },
-              {
-                title: 'Status',
-                view: (item) => <>{`${item?.status}`}</>
-              },
-              {
-                title: 'Price',
-                view: (item) => <>{`$ ${item?.total}`}</>
-              }
-            ]}
-          />
+          <AtomWrapper
+            customCSS={css`
+              max-width: 100%;
+              overflow-x: scroll;
+            `}
+          >
+            <AtomTable
+              customCSS={TableStyles}
+              data={dataOrders?.getSaleOrders as ISaleOrder[]}
+              columns={[
+                {
+                  title: 'Product',
+                  view: (item) => (
+                    <>
+                      {`${item?.board?.length ?? 0 > 0 ? 'Board ' : ''}`}
+                      {`${item?.product?.length ?? 0 > 0 ? ', Product' : ''}`}
+                    </>
+                  )
+                },
+                {
+                  title: 'Name',
+                  view: (item) => (
+                    <AtomText
+                      customCSS={css`
+                        color: #dfdfdf;
+                        font-weight: 600;
+                        max-width: 10px;
+                        text-overflow: ellipsis;
+                      `}
+                    >
+                      {[
+                        item?.board?.map((board) => board?.board?.title),
+                        item?.product?.map((product) => product?.name)
+                      ]
+                        .flat()
+                        .join(', ')}
+                    </AtomText>
+                  )
+                },
+                {
+                  title: 'Quantity',
+                  view: (item) => <>{`${item?.quantity}`}</>
+                },
+                {
+                  title: 'Status',
+                  view: (item) => <>{`${item?.status}`}</>
+                },
+                {
+                  title: 'Seller',
+                  view: (item) => <>{`${item?.customer?.name ?? 'WEBSITE'}`}</>
+                },
+                {
+                  title: 'Price',
+                  view: (item) => <>{`$ ${item?.total}`}</>
+                }
+              ]}
+            />
+          </AtomWrapper>
         </AtomWrapper>
         <AtomWrapper
           customCSS={css`

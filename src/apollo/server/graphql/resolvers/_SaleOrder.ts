@@ -2,6 +2,8 @@ import { Resolvers } from '@apollo/client';
 import SaleOrder from '../../models/saleOrder';
 import Product from '../../models/products';
 import Board from '../../models/board';
+import BoardSize from '../../models/boardSize';
+import BoardSelected from '../../models/boardSelected';
 import User from '../../models/users';
 import Store from '../../models/store';
 import StoreType from '../../models/storeTypes';
@@ -19,13 +21,26 @@ const resolvers: Resolvers = {
       })
         .populate('customer')
         .populate('product')
-        .populate('store')
         .populate({
           path: 'board',
           populate: {
-            path: 'type'
+            path: 'board',
+            populate: {
+              path: 'type'
+            }
           }
-        });
+        })
+        .populate({
+          path: 'board',
+          populate: {
+            path: 'size',
+            populate: {
+              path: 'type'
+            }
+          }
+        })
+        .populate('store');
+
       if (!saleOrders) throw new Error('No sale orders found');
 
       return saleOrders;
@@ -34,12 +49,7 @@ const resolvers: Resolvers = {
       const saleOrder = await SaleOrder.findById(id)
         .populate('customer')
         .populate('product')
-        .populate({
-          path: 'board',
-          populate: {
-            path: 'type'
-          }
-        })
+        .populate('board')
         .populate('store');
       if (!saleOrder) throw new Error('No sale order found');
 
@@ -61,32 +71,108 @@ const resolvers: Resolvers = {
   },
   Mutation: {
     newSaleOrder: async (_, { input }) => {
-      const { product, board, quantity, customer, store } = input;
+      const { product, board, customer, store } = input;
 
       if (!product && !board) {
         throw new Error('Product or board is required');
       }
 
-      const isId = product
-        ? await Product.findById(product)
-        : await Board.findById(board);
-      if (!isId) throw new Error(`${product ? 'Product' : 'Board'} not found`);
+      const productExist = async () => {
+        if (!product) {
+          return null;
+        }
+        const products = product.map(async (e: string) => {
+          if (e) {
+            const findProduct = await Product.findById(e);
+            if (!findProduct) throw new Error('Product not found');
+            return findProduct;
+          }
+        });
+        return (await Promise.all(products)).filter(
+          (e) => typeof e !== 'undefined'
+        );
+      };
+
+      const boardExist = async () => {
+        if (!board) {
+          return null;
+        }
+        const boards = board.map(async (e: { board: string; size: string }) => {
+          if (e.board && e.size) {
+            const findBoard = await Board.findById(e.board);
+            const findBoardSize = await BoardSize.findById(e.size);
+            if (!findBoard) throw new Error('Board not found');
+            if (!findBoardSize) throw new Error('Board size not found');
+
+            const createBoardSelected = await BoardSelected.create({
+              board: findBoard,
+              size: findBoardSize
+            });
+
+            const getBoardSelected = await BoardSelected.findById(
+              createBoardSelected.id
+            )
+              .populate('board')
+              .populate('size');
+
+            if (!getBoardSelected) throw new Error('Board selected not found');
+
+            return getBoardSelected;
+          }
+        });
+        return (await Promise.all(boards)).filter(
+          (e) => typeof e !== 'undefined'
+        );
+      };
+
+      const quantityExist = () => {
+        const productQuantity = () => {
+          return getProduct?.length ?? 0;
+        };
+        const boardQuantity = () => {
+          return getBoard?.length ?? 0;
+        };
+        return productQuantity() + boardQuantity();
+      };
+
+      const priceExist = () => {
+        const productPrice = () => {
+          return getProduct?.reduce((a, b) => a + b.price, 0) ?? 0;
+        };
+        const boardPrice = () => {
+          return getBoard?.reduce((a, b) => a + b.size.price, 0) ?? 0;
+        };
+        return productPrice() + boardPrice();
+      };
+
+      const currencyExist = () => {
+        const productCurrency = () => {
+          return getProduct?.reduce((a, b) => [...a, b.currency], []) ?? [];
+        };
+        const boardCurrency = () => {
+          return getBoard?.reduce((a, b) => [...a, b.board.currency], []) ?? [];
+        };
+        const currency = [
+          ...new Set([...productCurrency(), ...boardCurrency()])
+        ];
+        if (currency.length > 1) throw new Error('Currency not match');
+        return currency[0] ?? 'USD';
+      };
+
+      const getProduct = await productExist();
+      const getBoard = await boardExist();
+      const getQuantity = quantityExist();
+      const getPrice = priceExist();
+      const getCurrency = currencyExist();
 
       const paymentIntent = await stripe.paymentIntents.create({
-        amount: isId.price * quantity,
-        currency: isId.currency.toLowerCase(),
+        amount: Math.round(getPrice),
+        currency: getCurrency,
         payment_method_types: ['card']
       });
 
       if (!paymentIntent) throw new Error('Payment intent not found');
 
-      const id = product
-        ? {
-            product: isId._id
-          }
-        : {
-            board: isId._id
-          };
       const customerExist = async () => {
         if (!customer) {
           return {};
@@ -117,14 +203,15 @@ const resolvers: Resolvers = {
       const storeGet = await storeTypeExist();
 
       const saleOrder = await SaleOrder.create({
-        ...id,
-        total: isId.price * quantity,
-        quantity: quantity,
-        currency: isId.currency,
         stripeId: paymentIntent.id,
         secret: paymentIntent.client_secret,
+        product: getProduct?.map((e) => e._id),
+        board: getBoard?.map((e) => e._id),
         ...customerGet,
-        store: storeGet._id
+        store: storeGet._id,
+        quantity: getQuantity,
+        total: getPrice,
+        currency: getCurrency
       });
       if (!saleOrder) throw new Error('Error creating sale order');
       const getSaleOrder = await SaleOrder.findById(saleOrder._id)

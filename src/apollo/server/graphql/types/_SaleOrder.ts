@@ -7,12 +7,12 @@ const typeDefs = gql`
     id: ID
     stripeId: String
     secret: String
-    product: Products
-    board: Board
+    product: [Products]
+    board: [BoardSelected]
     customer: User
     store: Store
     quantity: Int
-    total: Int
+    total: Float
     currency: String
     status: String
   }
@@ -20,9 +20,8 @@ const typeDefs = gql`
   #######################INPUT#######################
 
   input InputSaleOrder {
-    product: String
-    board: String
-    quantity: Int
+    product: [String]
+    board: [InputBoardSelected]
     store: String
     customer: String
   }
@@ -31,8 +30,8 @@ const typeDefs = gql`
     id: ID
     stripeId: String
     secret: String
-    product: String
-    board: String
+    product: [String]
+    board: [String]
     customer: String
     store: String
     quantity: Int

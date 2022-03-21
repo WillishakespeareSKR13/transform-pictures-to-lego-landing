@@ -57,5 +57,5 @@ ProductsSchema.set('toJSON', {
   virtuals: true
 });
 
-export default mongoose.models.Products ||
-  mongoose.model<IProducts>('Products', ProductsSchema);
+export default mongoose.models.Product ||
+  mongoose.model<IProducts>('Product', ProductsSchema);

@@ -15,7 +15,6 @@ export const GETSALEORDES = gql`
           id
           name
         }
-        price
         currency
         title
         description

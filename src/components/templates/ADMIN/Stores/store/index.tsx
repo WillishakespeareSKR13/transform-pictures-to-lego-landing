@@ -41,7 +41,14 @@ const VIEW = () => {
     }
   );
 
-  const { data: dataUsers } = useQuery<IQueryFilter<'getUsers'>>(GETUSERS);
+  const { data: dataUsers } = useQuery<IQueryFilter<'getUsers'>>(GETUSERS, {
+    skip: !data?.getStoreById?.id,
+    variables: {
+      filter: {
+        store: data?.getStoreById?.id
+      }
+    }
+  });
 
   if (loading)
     return (

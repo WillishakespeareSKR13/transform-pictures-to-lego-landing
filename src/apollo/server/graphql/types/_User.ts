@@ -61,7 +61,7 @@ const typeDefs = gql`
   #######################QUERY#######################
   extend type Query {
     me: User
-    getUsers(input: FilterUser): [User]
+    getUsers(filter: FilterUser): [User]
     getUserById(id: ID!): User
   }
   #####################MUTACION######################

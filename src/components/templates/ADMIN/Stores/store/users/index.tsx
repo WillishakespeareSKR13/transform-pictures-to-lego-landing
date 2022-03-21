@@ -33,7 +33,14 @@ const VIEW = () => {
       router.reload();
     }
   });
-  const { data: dataUsers } = useQuery<IQueryFilter<'getUsers'>>(GETUSERS);
+  const { data: dataUsers } = useQuery<IQueryFilter<'getUsers'>>(GETUSERS, {
+    variables: {
+      skip: !data?.getStoreById?.id,
+      filter: {
+        store: data?.getStoreById?.id
+      }
+    }
+  });
   const { data: dataRole } = useQuery<IQueryFilter<'getRoles'>>(GETROLES);
   const formik = useFormik({
     initialValues: {

@@ -16,8 +16,8 @@ export const USER = gql`
 `;
 
 export const GETUSERS = gql`
-  query getUsers {
-    getUsers {
+  query getUsers($filter: FilterUser) {
+    getUsers(filter: $filter) {
       id
       name
       lastname

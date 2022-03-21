@@ -32,6 +32,7 @@ export const GETSALEORDES = gql`
       }
       customer {
         id
+        name
       }
       store {
         id

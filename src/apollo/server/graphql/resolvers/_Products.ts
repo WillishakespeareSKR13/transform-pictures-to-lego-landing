@@ -4,8 +4,10 @@ import Store from '../../models/store';
 
 const resolvers: Resolvers = {
   Query: {
-    getProducts: async (_, __) => {
-      return await Products.find({}).populate({
+    getProducts: async (_, { filter }) => {
+      return await Products.find({
+        ...filter
+      }).populate({
         path: 'store',
         populate: {
           path: 'storeType'

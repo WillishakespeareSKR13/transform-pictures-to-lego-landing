@@ -40,7 +40,7 @@ const typeDefs = gql`
   #######################QUERY#######################
 
   extend type Query {
-    getProducts: [Products]
+    getProducts(filter: FilterProduct): [Products]
     getProductById(id: ID!): Products
   }
 

@@ -5,6 +5,7 @@ import StoreAddStoreType from './Stores/store/add/storeType';
 import StoreEdit from './Stores/store/edit';
 import StoreView from './Stores/store';
 import StoreAddUser from './Stores/store/users';
+import PointSale from './Stores/store/pointSale';
 
 const ADMIN = () => {
   return (
@@ -15,6 +16,7 @@ const ADMIN = () => {
       <Route path="/store/:id" element={<StoreView />} />
       <Route path="/store/add/storeType" element={<StoreAddStoreType />} />
       <Route path="/store/:id/users" element={<StoreAddUser />} />
+      <Route path="/store/:id/pointsale" element={<PointSale />} />
     </Routes>
   );
 };

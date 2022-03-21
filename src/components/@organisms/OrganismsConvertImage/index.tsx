@@ -233,7 +233,7 @@ const OrganismsConvertImage: FC = () => {
                 ?.find((board) => board?.type?.name === selected)
                 ?.sizes?.slice()
                 ?.sort((a, b) => (a?.priority ?? 0) - (b?.priority ?? 0))
-                .map((size) => (
+                ?.map((size) => (
                   <AtomButton
                     disabled={loading || isLoading}
                     key={size?.id}

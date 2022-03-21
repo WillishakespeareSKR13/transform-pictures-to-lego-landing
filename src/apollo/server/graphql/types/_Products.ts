@@ -34,7 +34,7 @@ const typeDefs = gql`
     sku: String
     stock: Int
     image: String
-    store: FilterStore
+    store: String
   }
 
   #######################QUERY#######################

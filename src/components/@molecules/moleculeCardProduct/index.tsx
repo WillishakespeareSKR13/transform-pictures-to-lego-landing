@@ -1,17 +1,29 @@
 import { IProducts } from 'graphql';
-import React, { FC } from 'react';
+import React, { Dispatch, FC, SetStateAction } from 'react';
 import { SerializedStyles } from '@emotion/utils';
 import { AtomButton, AtomImage, AtomText, AtomWrapper } from '@sweetsyui/ui';
 import { css } from '@emotion/react';
 import { useRouter } from 'next/router';
+import { ItemCardShopType } from '../MoleculeitemCartShop';
 
 interface MoleculeCardProductType extends IProducts {
+  setState: Dispatch<SetStateAction<ItemCardShopType[]>>;
   customCSS?: SerializedStyles;
 }
 
 const MoleculeCardProduct: FC<MoleculeCardProductType> = (props) => {
   const router = useRouter();
-  const { id, image, name, price, description, stock, sku, customCSS } = props;
+  const {
+    id,
+    image,
+    name,
+    price,
+    description,
+    stock,
+    sku,
+    customCSS,
+    setState
+  } = props;
   return (
     <AtomWrapper
       customCSS={css`
@@ -92,7 +104,26 @@ const MoleculeCardProduct: FC<MoleculeCardProductType> = (props) => {
             transition: background-color 0.3s ease;
           `}
           onClick={() => {
-            console.log(`añadiendo al carrito ${sku}`);
+            setState((prev) => {
+              const isExist = prev.find((item) => item.id === id);
+              return isExist
+                ? prev.map((item) =>
+                    item.id === id
+                      ? { ...item, quantity: item.quantity + 1 }
+                      : item
+                  )
+                : [
+                    ...prev,
+                    {
+                      id: `${id}`,
+                      image: `${image}`,
+                      name: `${name}`,
+                      price: price ?? 0,
+                      quantity: 1,
+                      type: 'Product'
+                    }
+                  ];
+            });
           }}
         >
           <AtomText

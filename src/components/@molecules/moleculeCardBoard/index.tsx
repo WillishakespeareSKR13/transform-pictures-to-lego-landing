@@ -2,9 +2,11 @@ import { css, SerializedStyles } from '@emotion/react';
 import { AtomButton, AtomImage, AtomText, AtomWrapper } from '@sweetsyui/ui';
 import { AnimatePresence } from 'framer-motion';
 import { IBoard } from 'graphql';
-import React, { FC, useState } from 'react';
+import React, { Dispatch, FC, SetStateAction, useState } from 'react';
+import { ItemCardShopType } from '../MoleculeitemCartShop';
 
 interface MoleculeCardBoardType extends IBoard {
+  setState: Dispatch<SetStateAction<ItemCardShopType[]>>;
   customCSS?: SerializedStyles;
 }
 
@@ -19,7 +21,16 @@ const variants = {
   })
 };
 const MoleculeCardBoard: FC<MoleculeCardBoardType> = (props) => {
-  const { id, image, title, description, customCSS, sizes, currency } = props;
+  const {
+    id,
+    image,
+    title,
+    description,
+    customCSS,
+    sizes,
+    currency,
+    setState
+  } = props;
   const [show, setshow] = useState(false);
   return (
     <AtomWrapper
@@ -118,6 +129,20 @@ const MoleculeCardBoard: FC<MoleculeCardBoardType> = (props) => {
                   animate="visible"
                   variants={variants}
                   key={size?.id}
+                  onClick={() => {
+                    setshow(false);
+                    setState((prev) => [
+                      ...prev,
+                      {
+                        id: `${id}`,
+                        image: `${image}`,
+                        name: `${title}`,
+                        price: size?.price ?? 0,
+                        quantity: 1,
+                        type: 'Product'
+                      }
+                    ]);
+                  }}
                   customCSS={css`
                     background-color: #f1576c;
                     :hover {

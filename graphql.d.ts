@@ -46,6 +46,8 @@ declare module 'graphql' {
     getBoardSizeById?: IBoardSize;
     getBoards?: Array<IBoard | null>;
     getBoardById?: IBoard;
+    getBoardSelecteds?: Array<IBoardSelected | null>;
+    getBoardSelectedById?: IBoardSelected;
     getRooms?: Array<IRoom | null>;
     getRoomById?: IRoom;
     getRoomSizes?: Array<IRoomSizes | null>;
@@ -113,8 +115,8 @@ declare module 'graphql' {
     id?: string;
     stripeId?: string;
     secret?: string;
-    product?: string;
-    board?: string;
+    product?: Array<string | null>;
+    board?: Array<string | null>;
     customer?: string;
     store?: string;
     quantity?: number;
@@ -127,8 +129,8 @@ declare module 'graphql' {
     id?: string;
     stripeId?: string;
     secret?: string;
-    product?: IProducts;
-    board?: IBoard;
+    product?: Array<IProducts | null>;
+    board?: Array<IBoardSelected | null>;
     customer?: IUser;
     store?: IStore;
     quantity?: number;
@@ -146,6 +148,12 @@ declare module 'graphql' {
     stock?: number;
     image?: string;
     store?: IStore;
+  }
+
+  export interface IBoardSelected {
+    id?: string;
+    board?: IBoard;
+    size?: IBoardSize;
   }
 
   export interface IBoard {
@@ -237,6 +245,8 @@ declare module 'graphql' {
     updateBoardSize?: IBoardSize;
     newBoard?: IBoard;
     updateBoard?: IBoard;
+    newBoardSelected?: IBoardSelected;
+    updateBoardSelected?: IBoardSelected;
     newRoom?: IRoom;
     updateRoom?: IRoom;
     newRoomSizes?: IRoomSizes;
@@ -271,11 +281,15 @@ declare module 'graphql' {
   }
 
   export interface IInputSaleOrder {
-    product?: string;
-    board?: string;
-    quantity?: number;
+    product?: Array<string | null>;
+    board?: Array<IInputBoardSelected | null>;
     store?: string;
     customer?: string;
+  }
+
+  export interface IInputBoardSelected {
+    board?: string;
+    size?: string;
   }
 
   export interface IInputStoreType {
@@ -443,6 +457,12 @@ declare module 'graphql' {
     sizes?: Array<IFilterBoardSize | null>;
   }
 
+  export interface IFilterBoardSelected {
+    id?: string;
+    board?: string;
+    size?: string;
+  }
+
   /*********************************
    *                               *
    *         TYPE RESOLVERS        *
@@ -461,6 +481,7 @@ declare module 'graphql' {
     StoreType?: IStoreTypeTypeResolver;
     SaleOrder?: ISaleOrderTypeResolver;
     Products?: IProductsTypeResolver;
+    BoardSelected?: IBoardSelectedTypeResolver;
     Board?: IBoardTypeResolver;
     BoardType?: IBoardTypeTypeResolver;
     BoardSize?: IBoardSizeTypeResolver;
@@ -497,6 +518,8 @@ declare module 'graphql' {
     getBoardSizeById?: QueryToGetBoardSizeByIdResolver<TParent>;
     getBoards?: QueryToGetBoardsResolver<TParent>;
     getBoardById?: QueryToGetBoardByIdResolver<TParent>;
+    getBoardSelecteds?: QueryToGetBoardSelectedsResolver<TParent>;
+    getBoardSelectedById?: QueryToGetBoardSelectedByIdResolver<TParent>;
     getRooms?: QueryToGetRoomsResolver<TParent>;
     getRoomById?: QueryToGetRoomByIdResolver<TParent>;
     getRoomSizes?: QueryToGetRoomSizesResolver<TParent>;
@@ -762,6 +785,33 @@ declare module 'graphql' {
     (
       parent: TParent,
       args: QueryToGetBoardByIdArgs,
+      context: any,
+      info: GraphQLResolveInfo
+    ): TResult;
+  }
+
+  export interface QueryToGetBoardSelectedsResolver<
+    TParent = any,
+    TResult = any
+  > {
+    (
+      parent: TParent,
+      args: {},
+      context: any,
+      info: GraphQLResolveInfo
+    ): TResult;
+  }
+
+  export interface QueryToGetBoardSelectedByIdArgs {
+    id: string;
+  }
+  export interface QueryToGetBoardSelectedByIdResolver<
+    TParent = any,
+    TResult = any
+  > {
+    (
+      parent: TParent,
+      args: QueryToGetBoardSelectedByIdArgs,
       context: any,
       info: GraphQLResolveInfo
     ): TResult;
@@ -1320,6 +1370,39 @@ declare module 'graphql' {
     ): TResult;
   }
 
+  export interface IBoardSelectedTypeResolver<TParent = any> {
+    id?: BoardSelectedToIdResolver<TParent>;
+    board?: BoardSelectedToBoardResolver<TParent>;
+    size?: BoardSelectedToSizeResolver<TParent>;
+  }
+
+  export interface BoardSelectedToIdResolver<TParent = any, TResult = any> {
+    (
+      parent: TParent,
+      args: {},
+      context: any,
+      info: GraphQLResolveInfo
+    ): TResult;
+  }
+
+  export interface BoardSelectedToBoardResolver<TParent = any, TResult = any> {
+    (
+      parent: TParent,
+      args: {},
+      context: any,
+      info: GraphQLResolveInfo
+    ): TResult;
+  }
+
+  export interface BoardSelectedToSizeResolver<TParent = any, TResult = any> {
+    (
+      parent: TParent,
+      args: {},
+      context: any,
+      info: GraphQLResolveInfo
+    ): TResult;
+  }
+
   export interface IBoardTypeResolver<TParent = any> {
     id?: BoardToIdResolver<TParent>;
     type?: BoardToTypeResolver<TParent>;
@@ -1745,6 +1828,8 @@ declare module 'graphql' {
     updateBoardSize?: MutationToUpdateBoardSizeResolver<TParent>;
     newBoard?: MutationToNewBoardResolver<TParent>;
     updateBoard?: MutationToUpdateBoardResolver<TParent>;
+    newBoardSelected?: MutationToNewBoardSelectedResolver<TParent>;
+    updateBoardSelected?: MutationToUpdateBoardSelectedResolver<TParent>;
     newRoom?: MutationToNewRoomResolver<TParent>;
     updateRoom?: MutationToUpdateRoomResolver<TParent>;
     newRoomSizes?: MutationToNewRoomSizesResolver<TParent>;
@@ -2080,6 +2165,37 @@ declare module 'graphql' {
     (
       parent: TParent,
       args: MutationToUpdateBoardArgs,
+      context: any,
+      info: GraphQLResolveInfo
+    ): TResult;
+  }
+
+  export interface MutationToNewBoardSelectedArgs {
+    input?: IInputBoardSelected;
+  }
+  export interface MutationToNewBoardSelectedResolver<
+    TParent = any,
+    TResult = any
+  > {
+    (
+      parent: TParent,
+      args: MutationToNewBoardSelectedArgs,
+      context: any,
+      info: GraphQLResolveInfo
+    ): TResult;
+  }
+
+  export interface MutationToUpdateBoardSelectedArgs {
+    id: string;
+    input?: IInputBoardSelected;
+  }
+  export interface MutationToUpdateBoardSelectedResolver<
+    TParent = any,
+    TResult = any
+  > {
+    (
+      parent: TParent,
+      args: MutationToUpdateBoardSelectedArgs,
       context: any,
       info: GraphQLResolveInfo
     ): TResult;

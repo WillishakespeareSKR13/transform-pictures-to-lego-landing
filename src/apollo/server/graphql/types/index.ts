@@ -12,6 +12,8 @@ import Board from './_Board';
 import BoardSelected from './_BoardSelected';
 import Room from './_Room';
 import RoomSize from './_RoomSize';
+import Colors from './_Colors';
+import ColorSaleOrders from './_ColorSaleOrders';
 
 const typeDefs = gql`
   ${User}
@@ -27,6 +29,8 @@ const typeDefs = gql`
   ${BoardSelected}
   ${Room}
   ${RoomSize}
+  ${Colors}
+  ${ColorSaleOrders}
 
   type Query {
     ping: String

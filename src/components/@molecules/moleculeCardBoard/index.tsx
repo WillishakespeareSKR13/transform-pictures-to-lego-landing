@@ -21,16 +21,8 @@ const variants = {
   })
 };
 const MoleculeCardBoard: FC<MoleculeCardBoardType> = (props) => {
-  const {
-    id,
-    image,
-    title,
-    description,
-    customCSS,
-    sizes,
-    currency,
-    setState
-  } = props;
+  const { image, title, description, customCSS, sizes, currency, setState } =
+    props;
   const [show, setshow] = useState(false);
   return (
     <AtomWrapper

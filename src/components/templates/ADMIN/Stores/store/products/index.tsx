@@ -41,7 +41,7 @@ const Products: FC = () => {
     openModal: false
   });
   const [openNewProduct, setOpenNewProduct] = useState<boolean>(false);
-  const { data, loading } = useQuery<IQueryFilter<'getProducts'>>(GETPRODUCTS, {
+  const { data } = useQuery<IQueryFilter<'getProducts'>>(GETPRODUCTS, {
     variables: {
       filter: {
         store: router?.query?.id?.[1]

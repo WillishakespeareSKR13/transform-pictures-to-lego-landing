@@ -3,7 +3,6 @@ import React, { Dispatch, FC, SetStateAction } from 'react';
 import { SerializedStyles } from '@emotion/utils';
 import { AtomButton, AtomImage, AtomText, AtomWrapper } from '@sweetsyui/ui';
 import { css } from '@emotion/react';
-import { useRouter } from 'next/router';
 import { ItemCardShopType } from '@Src/components/templates/ADMIN/Stores/store/pointSale';
 
 interface MoleculeCardProductType extends IProducts {
@@ -12,18 +11,8 @@ interface MoleculeCardProductType extends IProducts {
 }
 
 const MoleculeCardProduct: FC<MoleculeCardProductType> = (props) => {
-  const router = useRouter();
-  const {
-    id,
-    image,
-    name,
-    price,
-    description,
-    stock,
-    sku,
-    customCSS,
-    setState
-  } = props;
+  const { id, image, name, price, description, stock, customCSS, setState } =
+    props;
   return (
     <AtomWrapper
       customCSS={css`

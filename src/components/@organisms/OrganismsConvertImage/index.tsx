@@ -12,7 +12,13 @@ import DownloadPdf from '@Src/components/@atoms/AtomPdf';
 import AtomModalImage from '@Src/components/@atoms/AtomModalImage';
 import PaymentModal from '@Src/components/@molecules/PaymentModal';
 import { useQuery } from '@apollo/client';
-import { IBoardSize, IQueryFilter, IRoom, IRoomSizesSizes } from 'graphql';
+import {
+  IBoard,
+  IBoardSize,
+  IQueryFilter,
+  IRoom,
+  IRoomSizesSizes
+} from 'graphql';
 import { GET_BOARDS } from '@Src/apollo/client/query/boards';
 import { GET_ROOM_SIZES, GET_ROOM_TYPES } from '@Src/apollo/client/query/rooms';
 
@@ -41,6 +47,11 @@ const OrganismsConvertImage: FC = () => {
     () => cropImages.length !== quantity,
     [cropImages, quantity]
   );
+
+  const boardSelected = useMemo(
+    () => boards?.getBoards?.find((board) => board?.type?.name === selected),
+    [boards, selected]
+  ) as IBoard;
 
   const selectedConfig = useMemo(
     () =>
@@ -645,9 +656,10 @@ const OrganismsConvertImage: FC = () => {
               />
             )}
             <PaymentModal
+              color={colors}
               isReady={!(cropImages.length === 0 || loading || isLoading)}
-              product={selected}
-              size={selectedSize}
+              board={boardSelected}
+              size={selectedConfig}
             />
           </AtomWrapper>
         </AtomWrapper>

@@ -6,11 +6,22 @@ export const NEWSALEORDER = gql`
       id
       stripeId
       secret
-      product
-      size
+      product {
+        id
+      }
+      board {
+        id
+      }
       quantity
-      price
+      total
+      customer {
+        id
+        name
+      }
       status
+      colorsaleorder {
+        id
+      }
     }
   }
 `;

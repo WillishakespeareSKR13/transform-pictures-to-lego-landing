@@ -1,9 +1,19 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { request } from 'graphql-request';
 import { COLORTYPE } from '@Src/config';
 import { Dispatch, SetStateAction } from 'react';
 import Pixel from '@Utils/pixelitJS';
-import color from '@Src/utils/colors';
 import { brick } from './legobricks';
+import { IColor } from 'graphql';
+
+const query = `query getColors{
+  getColors{
+    id
+    color
+    name
+    icon
+  }
+}`;
 
 const createImage = (src: string) => {
   const image = new Image();
@@ -11,7 +21,7 @@ const createImage = (src: string) => {
   return image;
 };
 
-export const cropAndFilter = (
+export const cropAndFilter = async (
   blob: string,
   setState: Dispatch<
     SetStateAction<
@@ -27,6 +37,7 @@ export const cropAndFilter = (
   setColors: Dispatch<SetStateAction<COLORTYPE[]>>,
   isPortrait: boolean
 ) => {
+  const color = await request('/api/graphql', query).then((e) => e.getColors);
   setStateLoading(true);
   const blobcreateImage = createImage(blob);
   setState([]);
@@ -117,22 +128,26 @@ export const cropAndFilter = (
         canvas2.width = w2;
         canvas2.height = h2;
         context2.drawImage(imgElement, 0, 0);
-        const mypalette = color.map((c) => {
+        const mypalette = color.map((c: IColor) => {
           const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(
-            c.hex
+            c.color ?? ''
           ) ?? ['0', '0', '0'];
 
-          return [
-            parseInt(result[1], 16),
-            parseInt(result[2], 16),
-            parseInt(result[3], 16)
-          ];
+          return {
+            id: c.id,
+            color: [
+              parseInt(result[1], 16),
+              parseInt(result[2], 16),
+              parseInt(result[3], 16)
+            ],
+            value: c.color ?? ''
+          };
         });
         const config = {
           to: canvas2,
           from: imgElement,
           scale: isPortrait ? 12.5 : 8,
-          palette: mypalette
+          palette: mypalette.map((c: any) => c.color)
         };
         // console.log(mypalette);
         const px = new Pixel(config);
@@ -154,7 +169,10 @@ export const cropAndFilter = (
           return '#' + hex(rgb2[1]) + hex(rgb2[2]) + hex(rgb2[3]);
         }
 
-        const colorList: string[] = [];
+        const colorList: {
+          id: string;
+          hex: string;
+        }[] = [];
         for (let i = 0, n = data.length; i < n; i += 4) {
           // const r = data[i];
           // const g = data[i + 1];
@@ -179,12 +197,14 @@ export const cropAndFilter = (
 
           const similarColor = (actualColor: number[], palette: any[]) => {
             let selectedColor: string[] = [];
-            let currentSim = colorSim(actualColor, palette[0]);
+            let currentSim = colorSim(actualColor, palette[0].color);
             let nextColor;
-            palette.forEach((color: any[]) => {
-              nextColor = colorSim(actualColor, color);
+            let id = '';
+            palette.forEach((color: any) => {
+              nextColor = colorSim(actualColor, color.color);
               if (nextColor <= currentSim) {
-                selectedColor = color;
+                id = color.id;
+                selectedColor = color.color;
                 currentSim = nextColor;
               }
             });
@@ -197,7 +217,10 @@ export const cropAndFilter = (
                 selectedColor[2] +
                 ')'
             );
-            return hex;
+            return {
+              id,
+              hex
+            };
           };
           colorList.push(
             similarColor([data[i], data[i + 1], data[i + 2]], mypalette)
@@ -207,15 +230,14 @@ export const cropAndFilter = (
         setColors((colorState) => [
           ...colorState,
           colorList.reduce((acc, curr) => {
-            // const isColor = color.find((g) => g.hex === curr);
-            const isRepeat = acc[curr] ? true : false;
-            // console.log(curr);
+            const isRepeat = acc[curr.hex] ? true : false;
             return {
               ...acc,
-              [curr]: {
-                color: curr,
-                value: curr,
-                count: isRepeat ? acc[curr].count + 1 : 1
+              [curr.hex]: {
+                id: curr.id,
+                color: curr.hex,
+                value: curr.hex,
+                count: isRepeat ? acc[curr.hex].count + 1 : 1
               }
             };
           }, {} as COLORTYPE)

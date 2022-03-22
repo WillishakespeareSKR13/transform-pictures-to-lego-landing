@@ -38,6 +38,7 @@ const typeDefs = gql`
     stock: Int
     image: String
     store: String
+    storeArray: [String]
   }
 
   #######################QUERY#######################

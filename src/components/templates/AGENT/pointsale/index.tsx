@@ -4,6 +4,7 @@ import { GET_BOARDS } from '@Src/apollo/client/query/boards';
 import { GETPRODUCTS } from '@Src/apollo/client/query/products';
 import MoleculeCardBoard from '@Src/components/@molecules/moleculeCardBoard';
 import MoleculeCardProduct from '@Src/components/@molecules/moleculeCardProduct';
+import { RootStateType } from '@Src/redux/reducer';
 
 export type ItemCardShopType = {
   id: string;
@@ -24,8 +25,8 @@ import {
   ItemCartShop
 } from '@sweetsyui/ui';
 import { IQueryFilter } from 'graphql';
-import { useRouter } from 'next/router';
 import React, { FC, useState } from 'react';
+import { useSelector } from 'react-redux';
 
 const variablesSale = {
   tax: 0.16,
@@ -33,20 +34,17 @@ const variablesSale = {
 };
 
 const PointSale: FC = () => {
-  const router = useRouter();
+  const user = useSelector((state: RootStateType) => state?.user);
   const [cartShop, setCartShop] = useState<ItemCardShopType[]>([]);
   const { data: boards } = useQuery<IQueryFilter<'getBoards'>>(GET_BOARDS);
   const { data, loading } = useQuery<IQueryFilter<'getProducts'>>(GETPRODUCTS, {
     variables: {
       filter: {
-        store: router?.query?.id?.[1]
+        storeArray: user.store?.map((e) => e.id)
       }
     }
   });
-  //   console.log([query.id]?.flat().find((_, i) => i === 1));
-  //   console.log(router?.query?.id?.[router.query.id.length - 2]);
-  //   console.log(router?.query?.id?.[1]);
-  //   console.log(boards?.getBoards);
+
   return (
     <AtomWrapper
       padding="10px 0"

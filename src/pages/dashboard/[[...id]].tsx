@@ -3,10 +3,13 @@ import { NextPageFC } from 'next';
 import React, { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import ADMIN from '@Templates/ADMIN';
+import AGENT from '@Templates/AGENT';
 import { BrowserRouter } from 'react-router-dom';
 
 const DASHBOARDS: { [key: string]: () => JSX.Element } = {
   ADMIN: ADMIN,
+  AGENT: AGENT,
+  OWNER: ADMIN,
   DEFAULT: () => <div>DEFAULT</div>
 };
 

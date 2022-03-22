@@ -15,6 +15,7 @@ const typeDefs = gql`
     total: Float
     currency: String
     status: String
+    colorsaleorder: [ColorSaleOrder]
   }
 
   #######################INPUT#######################
@@ -24,6 +25,7 @@ const typeDefs = gql`
     board: [InputBoardSelected]
     store: String
     customer: String
+    colorsaleorder: [String]
   }
 
   input FilterSaleOrder {
@@ -38,6 +40,7 @@ const typeDefs = gql`
     total: Int
     currency: String
     status: String
+    colorsaleorder: [String]
   }
   #######################QUERY#######################
 

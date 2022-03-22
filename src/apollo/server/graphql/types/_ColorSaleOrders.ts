@@ -4,8 +4,9 @@ const typeDefs = gql`
   #######################TYPES#######################
 
   type ColorColorsSaleOrder {
+    id: ID
     color: Color
-    Quantity: Int
+    quantity: Int
   }
 
   type ColorSaleOrder {
@@ -19,24 +20,17 @@ const typeDefs = gql`
 
   input InputColorColorsSaleOrder {
     color: ID
-    Quantity: Int
+    quantity: Int
   }
 
   input InputColorSaleOrder {
-    id: ID
     colors: [InputColorColorsSaleOrder]
-    total: Int
     store: ID
-  }
-
-  input FilterColorColorsSaleOrder {
-    color: ID
-    Quantity: Int
   }
 
   input FilterColorSaleOrder {
     id: ID
-    colors: [FilterColorColorsSaleOrder]
+    colors: [String]
     total: Int
     store: ID
   }

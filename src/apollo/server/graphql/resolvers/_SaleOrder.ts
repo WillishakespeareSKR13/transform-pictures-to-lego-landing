@@ -7,6 +7,7 @@ import BoardSelected from '../../models/boardSelected';
 import User from '../../models/users';
 import Store from '../../models/store';
 import StoreType from '../../models/storeTypes';
+import ColorSaleOrder from '../../models/colorSaleOrder';
 import Stripe from 'stripe';
 
 const stripe = new Stripe('sk_test_yzlw6HqnbaXA119soMjDkxVz00QguDKKBV', {
@@ -39,10 +40,14 @@ const resolvers: Resolvers = {
             }
           }
         })
-        .populate('store');
-
+        .populate('store')
+        .populate({
+          path: 'colorsaleorder',
+          populate: {
+            path: 'colors.color'
+          }
+        });
       if (!saleOrders) throw new Error('No sale orders found');
-
       return saleOrders;
     },
     getSaleOrderById: async (_, { id }) => {
@@ -67,7 +72,13 @@ const resolvers: Resolvers = {
             }
           }
         })
-        .populate('store');
+        .populate('store')
+        .populate({
+          path: 'colorsaleorder',
+          populate: {
+            path: 'colors.color'
+          }
+        });
       if (!saleOrder) throw new Error('No sale order found');
 
       return saleOrder.toJSON();
@@ -88,7 +99,7 @@ const resolvers: Resolvers = {
   },
   Mutation: {
     newSaleOrder: async (_, { input }) => {
-      const { product, board, customer, store } = input;
+      const { product, board, customer, store, colorsaleorder } = input;
 
       if (!product && !board) {
         throw new Error('Product or board is required');
@@ -176,11 +187,23 @@ const resolvers: Resolvers = {
         return currency[0] ?? 'USD';
       };
 
+      const colorSaleOrderExist = async () => {
+        if (!colorsaleorder) {
+          return {};
+        }
+        const getColorSaleOrder = await ColorSaleOrder.findById(colorsaleorder);
+        if (!getColorSaleOrder) throw new Error('Color sale order not found');
+        return {
+          colorsaleorder: getColorSaleOrder._id
+        };
+      };
+
       const getProduct = await productExist();
       const getBoard = await boardExist();
       const getQuantity = quantityExist();
       const getPrice = priceExist();
       const getCurrency = currencyExist();
+      const getColorSaleOrder = await colorSaleOrderExist();
 
       const paymentIntent = await stripe.paymentIntents.create({
         amount: Math.round(getPrice),
@@ -225,6 +248,7 @@ const resolvers: Resolvers = {
         product: getProduct?.map((e) => e._id),
         board: getBoard?.map((e) => e._id),
         ...customerGet,
+        ...getColorSaleOrder,
         store: storeGet._id,
         quantity: getQuantity,
         total: getPrice,
@@ -234,8 +258,32 @@ const resolvers: Resolvers = {
       const getSaleOrder = await SaleOrder.findById(saleOrder._id)
         .populate('customer')
         .populate('product')
-        .populate('board')
-        .populate('store');
+        .populate({
+          path: 'board',
+          populate: {
+            path: 'board',
+            populate: {
+              path: 'type'
+            }
+          }
+        })
+        .populate({
+          path: 'board',
+          populate: {
+            path: 'size',
+            populate: {
+              path: 'type'
+            }
+          }
+        })
+        .populate('store')
+        .populate({
+          path: 'colorsaleorder',
+          populate: {
+            path: 'colors.color'
+          }
+        });
+
       return getSaleOrder;
     }
   }

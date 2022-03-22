@@ -1,5 +1,6 @@
 import { useQuery } from '@apollo/client';
 import { css } from '@emotion/react';
+import { GETCOLORSALEORDERS } from '@Src/apollo/client/query/colors';
 import { GETSALEORDERBYID } from '@Src/apollo/client/query/saleOrder';
 import { GETSTOREBYID } from '@Src/apollo/client/query/stores';
 import DashWithTitle from '@Src/components/layouts/DashWithTitle';
@@ -13,7 +14,12 @@ import {
   AtomText,
   AtomWrapper
 } from '@sweetsyui/ui';
-import { IBoardSelected, IQueryFilter, IProducts } from 'graphql';
+import {
+  IBoardSelected,
+  IQueryFilter,
+  IProducts,
+  IColorColorsSaleOrder
+} from 'graphql';
 import { useRouter } from 'next/router';
 
 const VIEW = () => {
@@ -36,6 +42,8 @@ const VIEW = () => {
       }
     }
   );
+
+  useQuery(GETCOLORSALEORDERS);
 
   if (loading)
     return (
@@ -346,11 +354,76 @@ const VIEW = () => {
             customCSS={css`
               border-radius: 8px;
               margin-top: 20px;
-              background-color: #202026;
               overflow: auto;
               max-width: 100%;
             `}
-          ></AtomWrapper>
+          >
+            <AtomText
+              customCSS={css`
+                font-size: 20px;
+                font-weight: bold;
+                color: #dfdfdf;
+                margin-bottom: 10px;
+              `}
+            >
+              Colors
+            </AtomText>
+            <AtomWrapper
+              customCSS={css`
+                max-width: 100%;
+                overflow-x: scroll;
+              `}
+            >
+              {dataOrder?.getSaleOrderById?.colorsaleorder?.map((e) => (
+                <>
+                  <AtomTable
+                    key={e?.id}
+                    customCSS={TableStyles}
+                    data={e?.colors as IColorColorsSaleOrder[]}
+                    columns={[
+                      {
+                        title: 'Color',
+                        view: (item) => (
+                          <AtomWrapper
+                            customCSS={css`
+                              width: 20px;
+                              height: 20px;
+                              background-color: ${item?.color?.color};
+                            `}
+                          />
+                        )
+                      },
+                      {
+                        title: 'Name',
+                        view: (item) => <>{`${item?.color?.name}`}</>
+                      },
+                      {
+                        title: 'Quantity',
+                        view: (item) => <>{`${item?.quantity}`}</>
+                      }
+                    ]}
+                  />
+                  <AtomWrapper
+                    customCSS={css`
+                      align-items: flex-end;
+                      padding: 10px 40px;
+                      background-color: #1a1a1f;
+                    `}
+                  >
+                    <AtomText
+                      customCSS={css`
+                        font-size: 20px;
+                        font-weight: bold;
+                        color: #dfdfdf;
+                      `}
+                    >
+                      Total {e?.total}
+                    </AtomText>
+                  </AtomWrapper>
+                </>
+              ))}
+            </AtomWrapper>
+          </AtomWrapper>
         </AtomWrapper>
       </AtomWrapper>
     </DashWithTitle>

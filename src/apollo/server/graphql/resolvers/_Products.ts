@@ -5,8 +5,11 @@ import Store from '../../models/store';
 const resolvers: Resolvers = {
   Query: {
     getProducts: async (_, { filter }) => {
+      const { storeArray } = filter;
+      const store = storeArray ? { store: { $in: storeArray } } : {};
       return await Products.find({
-        ...filter
+        ...filter,
+        ...store
       }).populate({
         path: 'store',
         populate: {

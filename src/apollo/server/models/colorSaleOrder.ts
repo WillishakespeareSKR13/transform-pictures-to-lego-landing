@@ -4,7 +4,7 @@ export interface IColorSaleOrder extends Document {
   colors: [
     {
       color: ObjectId;
-      Quantity: number;
+      quantity: number;
     }
   ];
   total: number;
@@ -16,7 +16,7 @@ const ColorSaleOrderSchema: Schema = new Schema(
     colors: [
       {
         color: { type: Schema.Types.ObjectId, ref: 'Color' },
-        Quantity: {
+        quantity: {
           type: Number,
           required: true,
           trim: true

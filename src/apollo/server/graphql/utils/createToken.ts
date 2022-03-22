@@ -1,9 +1,11 @@
 import { IRole } from '@ApolloServer/models/roles';
 import { IUser } from '@ApolloServer/models/users';
+import { IStore } from '@ApolloServer/models/store';
 import jwt from 'jsonwebtoken';
 
 type IToken = IUser & {
   role: IRole;
+  store: IStore;
 };
 
 const createToken = (user: IToken, secret: string, expiresIn: string) => {
@@ -16,7 +18,8 @@ const createToken = (user: IToken, secret: string, expiresIn: string) => {
     role,
     photo,
     emailVerified,
-    birthdate
+    birthdate,
+    store
   } = user;
   return jwt.sign(
     {
@@ -28,7 +31,8 @@ const createToken = (user: IToken, secret: string, expiresIn: string) => {
       role,
       photo,
       emailVerified,
-      birthdate
+      birthdate,
+      store
     },
     secret,
     { expiresIn }

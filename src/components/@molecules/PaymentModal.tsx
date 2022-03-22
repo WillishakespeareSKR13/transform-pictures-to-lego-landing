@@ -6,13 +6,14 @@ import { FC, useEffect, useRef, useState } from 'react';
 const stripePromise = loadStripe('pk_test_8rT8GD6ByXYXhSxzRhhwcwBD00wfxfcg7a');
 
 type Props = {
-  product?: string;
-  size?: string;
+  board?: IBoard;
+  size?: IBoardSize;
   isReady?: boolean;
+  color?: COLORTYPE[];
 };
 
 const PaymentModal: FC<Props> = (props) => {
-  const { product, size, isReady } = props;
+  const { board, size, isReady, color } = props;
   const [isOpen, setIsOpen] = useState(false);
   const [saleOrder, setSaleOrder] = useState<ISaleOrder | undefined>();
 
@@ -32,6 +33,7 @@ const PaymentModal: FC<Props> = (props) => {
   }, [ref]);
 
   const [EXENEWSALEORDER, { data }] = useMutation(NEWSALEORDER);
+  const [EXENEWCOLORSALEORDER] = useMutation(NEWCOLORSALEORDER);
 
   useEffect(() => {
     const secret = data?.newSaleOrder;
@@ -98,13 +100,49 @@ const PaymentModal: FC<Props> = (props) => {
         onClick={() => {
           setIsOpen(true);
           if (!saleOrder) {
-            EXENEWSALEORDER({
+            const transformColor = color
+              ?.map((color) =>
+                Object.entries(color).map(([_, value]) => ({
+                  ...value,
+                  count: Math.round(value.count / 156.24)
+                }))
+              )
+              .flat()
+              .reduce((acc, curr) => {
+                const isColor = acc.find((color) => color.value === curr.value);
+                return isColor
+                  ? acc.map((e) =>
+                      e.value === curr.value
+                        ? { ...e, count: e.count + curr.count }
+                        : e
+                    )
+                  : [...acc, curr];
+              }, [] as { value: string; count: number; color: string; id: string }[]);
+
+            EXENEWCOLORSALEORDER({
               variables: {
                 input: {
-                  product,
-                  size
+                  colors: transformColor?.map((color) => ({
+                    color: color.id,
+                    quantity: color.count
+                  }))
                 }
               }
+            }).then((e) => {
+              const id = e.data.newColorSaleOrder.id;
+              EXENEWSALEORDER({
+                variables: {
+                  input: {
+                    board: [
+                      {
+                        board: board?.id,
+                        size: size?.id
+                      }
+                    ],
+                    colorsaleorder: [id]
+                  }
+                }
+              });
             });
           }
         }}
@@ -126,6 +164,9 @@ import { css } from '@emotion/react';
 import { useMutation } from '@apollo/client';
 import { NEWSALEORDER } from '@Src/apollo/client/mutation/saleOrder';
 import { ISaleOrder } from '@Src/apollo/server/models/saleOrder';
+import { IBoard, IBoardSize } from 'graphql';
+import { COLORTYPE } from '@Src/config';
+import { NEWCOLORSALEORDER } from '@Src/apollo/client/mutation/color';
 
 type CheckoutFormProps = {
   saleOrder?: ISaleOrder;

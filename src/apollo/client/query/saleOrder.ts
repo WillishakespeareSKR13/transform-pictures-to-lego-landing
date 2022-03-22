@@ -41,6 +41,17 @@ export const GETSALEORDES = gql`
       total
       currency
       status
+      colorsaleorder {
+        id
+        colors {
+          id
+          color {
+            id
+            color
+          }
+        }
+        total
+      }
     }
   }
 `;
@@ -90,6 +101,20 @@ export const GETSALEORDERBYID = gql`
       total
       currency
       status
+      colorsaleorder {
+        id
+        colors {
+          id
+          color {
+            id
+            color
+            name
+            icon
+          }
+          quantity
+        }
+        total
+      }
     }
   }
 `;
@@ -100,11 +125,6 @@ export const PAYSALEORDER = gql`
       id
       stripeId
       secret
-      product
-      size
-      quantity
-      price
-      status
     }
   }
 `;

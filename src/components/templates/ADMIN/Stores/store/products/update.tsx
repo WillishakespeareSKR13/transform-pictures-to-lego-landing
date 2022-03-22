@@ -14,6 +14,7 @@ import * as Yup from 'yup';
 import { UPDATEPRODUCT } from '@Src/apollo/client/query/products';
 import { useMutation } from '@apollo/client';
 import uploadImage from '@Src/utils/uploadImage';
+import { useRouter } from 'next/router';
 
 interface ModalUpdateProductType {
   state: ProductModalType;
@@ -21,6 +22,7 @@ interface ModalUpdateProductType {
 }
 
 const ModalUpdateProduct: FC<ModalUpdateProductType> = (props) => {
+  const router = useRouter();
   const { state, setState } = props;
   const [updateProduct, { loading: loadingUpdateProduct }] = useMutation(
     UPDATEPRODUCT,
@@ -29,13 +31,14 @@ const ModalUpdateProduct: FC<ModalUpdateProductType> = (props) => {
         setState({
           openModal: false
         });
+        router.reload();
       }
     }
   );
 
   const formik = useFormik({
     initialValues: {
-      photo: state?.image ?? '',
+      photo: {} as File,
       name: state?.name ?? '',
       description: state?.description ?? '',
       price: state?.price ?? 0,
@@ -60,11 +63,13 @@ const ModalUpdateProduct: FC<ModalUpdateProductType> = (props) => {
             description: values.description,
             price: values.price,
             stock: values.stock,
-            sku: values.sku
-            // image: await uploadImage(values.photo, {
-            //   name: 'store',
-            //   orgcode: 'LGO-0001'
-            // })
+            sku: values.sku,
+            image: values.photo.name
+              ? await uploadImage(values.photo, {
+                  name: 'store',
+                  orgcode: 'LGO-0001'
+                })
+              : state?.image
           }
         }
       });
@@ -111,7 +116,7 @@ const ModalUpdateProduct: FC<ModalUpdateProductType> = (props) => {
                 width="300px"
                 height="300px"
                 customCSS={InputDragAndDropStyles}
-                imagePreview={formik.values.photo}
+                imagePreview={state?.image}
               />
             </AtomWrapper>
             <AtomWrapper
@@ -171,7 +176,14 @@ const ModalUpdateProduct: FC<ModalUpdateProductType> = (props) => {
               />
             </AtomWrapper>
           </AtomWrapper>
-          <AtomButton>update Product</AtomButton>
+          <AtomButton
+            onClick={() => {
+              formik.validateForm();
+              formik.submitForm();
+            }}
+          >
+            update Product
+          </AtomButton>
         </>
       }
     />

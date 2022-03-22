@@ -26,6 +26,7 @@ const ModalNewProduct: FC<ModalNewProductType> = (props) => {
   const [newProduct, { loading: loadingNewProduct }] = useMutation(NEWPRODUCT, {
     onCompleted: () => {
       setState(false);
+      router.reload();
     }
   });
 

@@ -1,15 +1,36 @@
 import { useQuery } from '@apollo/client';
-import { css } from '@emotion/react';
+import { css, SerializedStyles } from '@emotion/react';
 import { GET_BOARDS } from '@Src/apollo/client/query/boards';
 import { GETPRODUCTS } from '@Src/apollo/client/query/products';
 import MoleculeCardBoard from '@Src/components/@molecules/moleculeCardBoard';
 import MoleculeCardProduct from '@Src/components/@molecules/moleculeCardProduct';
-import { ItemCardShopType } from '@Src/components/@molecules/MoleculeitemCartShop';
-import { AtomButton, AtomLoader, AtomText, AtomWrapper } from '@sweetsyui/ui';
+
+export type ItemCardShopType = {
+  id: string;
+  image: string;
+  name: string;
+  variant?: string;
+  price: number;
+  quantity: number;
+  type: string;
+  customCSS?: SerializedStyles;
+};
+
+import {
+  AtomButton,
+  AtomLoader,
+  AtomText,
+  AtomWrapper,
+  ItemCartShop
+} from '@sweetsyui/ui';
 import { IQueryFilter } from 'graphql';
 import { useRouter } from 'next/router';
-
 import React, { FC, useState } from 'react';
+
+const variablesSale = {
+  tax: 0.16,
+  discount: 200
+};
 
 const PointSale: FC = () => {
   const router = useRouter();
@@ -75,17 +96,17 @@ const PointSale: FC = () => {
             </AtomWrapper>
           ) : (
             <>
-              {data?.getProducts?.map((product) => (
-                <MoleculeCardProduct
-                  key={product?.id}
-                  {...product}
-                  setState={setCartShop}
-                />
-              ))}
               {boards?.getBoards?.map((board) => (
                 <MoleculeCardBoard
                   key={board?.id}
                   {...board}
+                  setState={setCartShop}
+                />
+              ))}
+              {data?.getProducts?.map((product) => (
+                <MoleculeCardProduct
+                  key={product?.id}
+                  {...product}
                   setState={setCartShop}
                 />
               ))}
@@ -94,6 +115,104 @@ const PointSale: FC = () => {
         </AtomWrapper>
       </AtomWrapper>
       <AtomWrapper width="30%" height="100%">
+        <AtomWrapper
+          maxHeight="770px"
+          justifyContent="flex-start"
+          customCSS={css`
+            height: 770px;
+            overflow-y: auto;
+          `}
+        >
+          {cartShop.map((item) => (
+            <ItemCartShop
+              key={item.id}
+              {...item}
+              src={item.image}
+              buttonProps={{
+                onClick: () => {
+                  setCartShop((cartShop) =>
+                    cartShop.filter((_) => _.id !== item.id)
+                  );
+                }
+              }}
+              //setState={setCartShop}
+            >
+              <AtomWrapper
+                flexDirection="row"
+                width="100%"
+                alignItems="center"
+                customCSS={css`
+                  gap: 1rem;
+                `}
+              >
+                <AtomWrapper width={item.type !== 'Product' ? '100%' : '50%'}>
+                  <AtomText color="#ffffff">{item.name}</AtomText>
+                  <AtomText color="#ffffff">$ {item.price}</AtomText>
+                </AtomWrapper>
+                {item.type === 'Product' && (
+                  <AtomWrapper
+                    width="50%"
+                    flexDirection="row"
+                    alignItems="center"
+                    customCSS={css`
+                      gap: 0.5rem;
+                    `}
+                  >
+                    <AtomButton
+                      padding="0px 10px"
+                      disabled={item.quantity === 1}
+                      onClick={() => {
+                        setCartShop(
+                          cartShop.map((item) => {
+                            if (item.id === item.id) {
+                              return {
+                                ...item,
+                                quantity: item.quantity - 1
+                              };
+                            }
+                            return item;
+                          })
+                        );
+                      }}
+                    >
+                      <AtomText color="#ffffff">-</AtomText>
+                    </AtomButton>
+                    <AtomText color="#ffffff">{item.quantity}</AtomText>
+                    <AtomButton
+                      padding="0px 10px"
+                      onClick={() => {
+                        setCartShop(
+                          cartShop.map((item) => {
+                            if (item.id === item.id) {
+                              return {
+                                ...item,
+                                quantity: item.quantity + 1
+                              };
+                            }
+                            return item;
+                          })
+                        );
+                      }}
+                    >
+                      <AtomText color="#ffffff">+</AtomText>
+                    </AtomButton>
+                  </AtomWrapper>
+                )}
+                {item.type === 'Board' && (
+                  <AtomWrapper
+                    width="50%"
+                    alignItems="center"
+                    customCSS={css`
+                      gap: 0.5rem;
+                    `}
+                  >
+                    <AtomText color="#ffffff">{item?.variant}</AtomText>
+                  </AtomWrapper>
+                )}
+              </AtomWrapper>
+            </ItemCartShop>
+          ))}
+        </AtomWrapper>
         <AtomWrapper
           height="100%"
           justifyContent="flex-end"
@@ -112,16 +231,27 @@ const PointSale: FC = () => {
                 color: #ffffff;
                 border: 1px solid #ffffff;
                 padding: 5px;
+                text-overflow: ellipsis;
+                overflow: hidden;
+                white-space: nowrap;
               }
             `}
           >
             <AtomText width="70%">Subtotal</AtomText>
             <AtomText width="30%" align="right">
-              $0
+              {`$${cartShop.reduce((acc, item) => {
+                return acc + item.price * item.quantity;
+              }, 0)}`}
             </AtomText>
             <AtomText width="70%">Tax</AtomText>
-            <AtomText width="30%" align="right">
-              $0
+            <AtomText width="30%" align="right" maxWidth="30%">
+              {`$${
+                (cartShop.reduce((acc, item) => {
+                  return acc + item.price * item.quantity;
+                }, 0) /
+                  (variablesSale.tax + 1)) *
+                variablesSale.tax
+              }`}
             </AtomText>
             <AtomText
               width="70%"

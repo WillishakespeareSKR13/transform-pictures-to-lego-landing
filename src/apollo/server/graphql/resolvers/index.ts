@@ -11,6 +11,7 @@ import BoardSize from './_BoardSize';
 import Board from './_Board';
 import Room from './_Room';
 import RoomSizes from './_RoomSizes';
+import Color from './_Color';
 
 const resolvers: Resolvers = {
   Query: {
@@ -25,7 +26,8 @@ const resolvers: Resolvers = {
     ...BoardSize.Query,
     ...Board.Query,
     ...Room.Query,
-    ...RoomSizes.Query
+    ...RoomSizes.Query,
+    ...Color.Query
   },
   Mutation: {
     ...User.Mutation,
@@ -39,7 +41,8 @@ const resolvers: Resolvers = {
     ...BoardSize.Mutation,
     ...Board.Mutation,
     ...Room.Mutation,
-    ...RoomSizes.Mutation
+    ...RoomSizes.Mutation,
+    ...Color.Mutation
   }
 };
 

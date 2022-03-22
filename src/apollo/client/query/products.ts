@@ -14,3 +14,35 @@ export const GETPRODUCTS = gql`
     }
   }
 `;
+
+export const NEWPRODUCT = gql`
+  mutation newProduct($input: InputProduct) {
+    newProduct(input: $input) {
+      id
+      name
+      price
+      description
+      sku
+      stock
+      image
+    }
+  }
+`;
+
+export const UPDATEPRODUCT = gql`
+  mutation updateProduct($input: InputProduct, $id: ID!) {
+    updateProduct(id: $id, input: $input) {
+      id
+      name
+      price
+      description
+      sku
+      stock
+      image
+    }
+  }
+`;
+
+// export const DELETEPRODUCT = gql`
+
+// `;

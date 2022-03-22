@@ -1,9 +1,9 @@
 import { css, SerializedStyles } from '@emotion/react';
+import { ItemCardShopType } from '@Src/components/templates/ADMIN/Stores/store/pointSale';
 import { AtomButton, AtomImage, AtomText, AtomWrapper } from '@sweetsyui/ui';
 import { AnimatePresence } from 'framer-motion';
 import { IBoard } from 'graphql';
 import React, { Dispatch, FC, SetStateAction, useState } from 'react';
-import { ItemCardShopType } from '../MoleculeitemCartShop';
 
 interface MoleculeCardBoardType extends IBoard {
   setState: Dispatch<SetStateAction<ItemCardShopType[]>>;
@@ -134,12 +134,13 @@ const MoleculeCardBoard: FC<MoleculeCardBoardType> = (props) => {
                     setState((prev) => [
                       ...prev,
                       {
-                        id: `${id}`,
+                        id: `${size?.id}`,
                         image: `${image}`,
                         name: `${title}`,
                         price: size?.price ?? 0,
                         quantity: 1,
-                        type: 'Product'
+                        type: 'Board',
+                        variant: size?.type?.name
                       }
                     ]);
                   }}

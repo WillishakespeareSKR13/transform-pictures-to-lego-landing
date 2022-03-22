@@ -7,6 +7,7 @@ import StoreView from './Stores/store';
 import StoreAddUser from './Stores/store/users';
 import PointSale from './Stores/store/pointSale';
 import Details from './Stores/store/details';
+import Products from './Stores/store/products';
 
 const ADMIN = () => {
   return (
@@ -19,6 +20,7 @@ const ADMIN = () => {
       <Route path="/store/add/storeType" element={<StoreAddStoreType />} />
       <Route path="/store/:id/users" element={<StoreAddUser />} />
       <Route path="/store/:id/pointsale" element={<PointSale />} />
+      <Route path="/store/:id/products" element={<Products />} />
     </Routes>
   );
 };

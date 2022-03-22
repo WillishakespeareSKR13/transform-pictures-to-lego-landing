@@ -4,7 +4,7 @@ import { SerializedStyles } from '@emotion/utils';
 import { AtomButton, AtomImage, AtomText, AtomWrapper } from '@sweetsyui/ui';
 import { css } from '@emotion/react';
 import { useRouter } from 'next/router';
-import { ItemCardShopType } from '../MoleculeitemCartShop';
+import { ItemCardShopType } from '@Src/components/templates/ADMIN/Stores/store/pointSale';
 
 interface MoleculeCardProductType extends IProducts {
   setState: Dispatch<SetStateAction<ItemCardShopType[]>>;

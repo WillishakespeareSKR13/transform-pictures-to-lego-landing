@@ -44,7 +44,10 @@ const resolvers: Resolvers = {
         .populate({
           path: 'colorsaleorder',
           populate: {
-            path: 'colors.color'
+            path: 'colors',
+            populate: {
+              path: 'color'
+            }
           }
         });
       if (!saleOrders) throw new Error('No sale orders found');
@@ -76,7 +79,10 @@ const resolvers: Resolvers = {
         .populate({
           path: 'colorsaleorder',
           populate: {
-            path: 'colors.color'
+            path: 'colors',
+            populate: {
+              path: 'color'
+            }
           }
         });
       if (!saleOrder) throw new Error('No sale order found');

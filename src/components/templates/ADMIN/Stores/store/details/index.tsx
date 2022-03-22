@@ -1,7 +1,6 @@
 import { useQuery } from '@apollo/client';
+import { request } from 'graphql-request';
 import { css } from '@emotion/react';
-import { GETCOLORSALEORDERS } from '@Src/apollo/client/query/colors';
-import { GETSALEORDERBYID } from '@Src/apollo/client/query/saleOrder';
 import { GETSTOREBYID } from '@Src/apollo/client/query/stores';
 import DashWithTitle from '@Src/components/layouts/DashWithTitle';
 import { TableStyles } from '@Src/styles';
@@ -18,12 +17,77 @@ import {
   IBoardSelected,
   IQueryFilter,
   IProducts,
-  IColorColorsSaleOrder
+  IColorColorsSaleOrder,
+  ISaleOrder
 } from 'graphql';
 import { useRouter } from 'next/router';
+import { useEffect, useState } from 'react';
+
+const query = `query getSaleOrderById($id: ID!) {
+  getSaleOrderById(id: $id) {
+    id
+    stripeId
+    secret
+    product {
+      id
+      name
+      sku
+      price
+      currency
+    }
+    board {
+      id
+      board {
+        id
+        title
+        type {
+          id
+          name
+        }
+        currency
+      }
+      size {
+        id
+        title
+        price
+        type {
+          id
+          name
+        }
+      }
+    }
+    customer {
+      id
+      name
+    }
+    store {
+      id
+    }
+    quantity
+    total
+    currency
+    status
+    colorsaleorder {
+      id
+      colors {
+        id
+        color {
+          id
+          color
+          name
+          icon
+        }
+        quantity
+      }
+      total
+    }
+  }
+}
+`;
 
 const VIEW = () => {
   const router = useRouter();
+  const [saleOrder, setSaleOrder] = useState<ISaleOrder>();
   const { data, loading } = useQuery<IQueryFilter<'getStoreById'>>(
     GETSTOREBYID,
     {
@@ -33,17 +97,16 @@ const VIEW = () => {
     }
   );
 
-  const { data: dataOrder } = useQuery<IQueryFilter<'getSaleOrderById'>>(
-    GETSALEORDERBYID,
-    {
-      skip: !data?.getStoreById?.id,
-      variables: {
+  useEffect(() => {
+    const getdata = async () => {
+      const data = await request('/api/graphql', query, {
         id: router?.query?.id?.[router.query.id.length - 1]
-      }
-    }
-  );
+      });
 
-  useQuery(GETCOLORSALEORDERS);
+      setSaleOrder(data.getSaleOrderById);
+    };
+    getdata();
+  }, [router?.query?.id?.[router.query.id.length - 1]]);
 
   if (loading)
     return (
@@ -52,7 +115,7 @@ const VIEW = () => {
 
   return (
     <DashWithTitle
-      title={`Store: ${data?.getStoreById?.name} - ${dataOrder?.getSaleOrderById?.id}`}
+      title={`Store: ${data?.getStoreById?.name} - ${saleOrder?.id}`}
       url={{
         pathname: router.pathname,
         query: {
@@ -95,7 +158,7 @@ const VIEW = () => {
           >
             <AtomTable
               customCSS={TableStyles}
-              data={dataOrder?.getSaleOrderById?.board as IBoardSelected[]}
+              data={saleOrder?.board as IBoardSelected[]}
               columns={[
                 {
                   title: 'Title',
@@ -107,11 +170,7 @@ const VIEW = () => {
                 },
                 {
                   title: 'Seller',
-                  view: () => (
-                    <>{`${
-                      dataOrder?.getSaleOrderById?.customer?.name ?? 'WEBSITE'
-                    }`}</>
-                  )
+                  view: () => <>{`${saleOrder?.customer?.name ?? 'WEBSITE'}`}</>
                 },
                 {
                   title: 'Price',
@@ -147,7 +206,7 @@ const VIEW = () => {
           >
             <AtomTable
               customCSS={TableStyles}
-              data={dataOrder?.getSaleOrderById?.product as IProducts[]}
+              data={saleOrder?.product as IProducts[]}
               columns={[
                 {
                   title: 'Title',
@@ -159,11 +218,7 @@ const VIEW = () => {
                 },
                 {
                   title: 'Seller',
-                  view: () => (
-                    <>{`${
-                      dataOrder?.getSaleOrderById?.customer?.name ?? 'WEBSITE'
-                    }`}</>
-                  )
+                  view: () => <>{`${saleOrder?.customer?.name ?? 'WEBSITE'}`}</>
                 },
                 {
                   title: 'Price',
@@ -205,7 +260,7 @@ const VIEW = () => {
                 `}
               >
                 {`Total Price: ${
-                  (dataOrder?.getSaleOrderById?.product?.reduce(
+                  (saleOrder?.product?.reduce(
                     (acc, cur) =>
                       acc +
                       TCINIT(
@@ -215,7 +270,7 @@ const VIEW = () => {
                       ),
                     0
                   ) ?? 0) +
-                  (dataOrder?.getSaleOrderById?.board?.reduce(
+                  (saleOrder?.board?.reduce(
                     (acc, cur) =>
                       acc +
                       TCINIT(
@@ -254,15 +309,15 @@ const VIEW = () => {
                   font-weight: 600;
                 `}
               >
-                Seller: {dataOrder?.getSaleOrderById?.customer?.name}
+                Seller: {saleOrder?.customer?.name}
               </AtomText>
               <AtomImage
                 src={`${
-                  dataOrder?.getSaleOrderById?.customer?.photo ??
+                  saleOrder?.customer?.photo ??
                   'https://via.placeholder.com/150'
                 }`}
                 alt={`${
-                  dataOrder?.getSaleOrderById?.customer?.photo ??
+                  saleOrder?.customer?.photo ??
                   'https://via.placeholder.com/150'
                 }`}
                 customCSS={css`
@@ -374,7 +429,7 @@ const VIEW = () => {
                 overflow-x: scroll;
               `}
             >
-              {dataOrder?.getSaleOrderById?.colorsaleorder?.map((e) => (
+              {saleOrder?.colorsaleorder?.map((e) => (
                 <>
                   <AtomTable
                     key={e?.id}

@@ -10,13 +10,23 @@ const resolvers: Resolvers = {
         ...filter
       })
         .populate('store')
-        .populate('colors.color');
+        .populate({
+          path: 'colors',
+          populate: {
+            path: 'color'
+          }
+        });
       return colorSaleOrders;
     },
     getColorSaleOrderById: async (_, { id }) => {
       const colorSaleOrder = await ColorSaleOrder.findById(id)
         .populate('store')
-        .populate('colors.color');
+        .populate({
+          path: 'colors',
+          populate: {
+            path: 'color'
+          }
+        });
       return colorSaleOrder;
     }
   },

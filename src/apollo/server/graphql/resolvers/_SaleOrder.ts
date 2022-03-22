@@ -49,7 +49,24 @@ const resolvers: Resolvers = {
       const saleOrder = await SaleOrder.findById(id)
         .populate('customer')
         .populate('product')
-        .populate('board')
+        .populate({
+          path: 'board',
+          populate: {
+            path: 'board',
+            populate: {
+              path: 'type'
+            }
+          }
+        })
+        .populate({
+          path: 'board',
+          populate: {
+            path: 'size',
+            populate: {
+              path: 'type'
+            }
+          }
+        })
         .populate('store');
       if (!saleOrder) throw new Error('No sale order found');
 

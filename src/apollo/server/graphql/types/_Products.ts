@@ -8,6 +8,7 @@ const typeDefs = gql`
     name: String
     price: Float
     description: String
+    currency: String
     sku: String
     stock: Int
     image: String
@@ -20,6 +21,7 @@ const typeDefs = gql`
     name: String
     price: Float
     description: String
+    currency: String
     sku: String
     stock: Int
     image: String
@@ -31,6 +33,7 @@ const typeDefs = gql`
     name: String
     price: Float
     description: String
+    currency: String
     sku: String
     stock: Int
     image: String
@@ -48,6 +51,7 @@ const typeDefs = gql`
   extend type Mutation {
     newProduct(input: InputProduct): Products
     updateProduct(id: ID!, input: InputProduct): Products
+    deleteProduct(id: ID!): Products
   }
 `;
 

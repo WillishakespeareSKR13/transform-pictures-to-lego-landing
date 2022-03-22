@@ -7,6 +7,7 @@ export const GETPRODUCTS = gql`
       name
       price
       description
+      currency
       sku
       stock
       image

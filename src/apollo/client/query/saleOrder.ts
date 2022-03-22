@@ -45,6 +45,55 @@ export const GETSALEORDES = gql`
   }
 `;
 
+export const GETSALEORDERBYID = gql`
+  query getSaleOrderById($id: ID!) {
+    getSaleOrderById(id: $id) {
+      id
+      stripeId
+      secret
+      product {
+        id
+        name
+        sku
+        price
+        currency
+      }
+      board {
+        id
+        board {
+          id
+          title
+          type {
+            id
+            name
+          }
+          currency
+        }
+        size {
+          id
+          title
+          price
+          type {
+            id
+            name
+          }
+        }
+      }
+      customer {
+        id
+        name
+      }
+      store {
+        id
+      }
+      quantity
+      total
+      currency
+      status
+    }
+  }
+`;
+
 export const PAYSALEORDER = gql`
   query paySaleOrder($id: ID!) {
     paySaleOrder(id: $id) {

@@ -49,6 +49,13 @@ const resolvers: Resolvers = {
         new: true
       });
       return product;
+    },
+    deleteProduct: async (_, { id }) => {
+      const productExist = await Products.findById(id);
+      if (!productExist) throw new Error('Product does not exist');
+
+      const product = await Products.findByIdAndDelete(id);
+      return product;
     }
   }
 };

@@ -69,6 +69,16 @@ export const InputStyles = css`
       color: #dfdfdf;
     }
   }
+  textarea {
+    height: 80px;
+    padding: 10px;
+    border: 1px solid #1a1a1f;
+    background-color: #202026;
+    color: #dfdfdf;
+    ::placeholder {
+      color: #dfdfdf;
+    }
+  }
 `;
 
 export const InputLightStyles = css`

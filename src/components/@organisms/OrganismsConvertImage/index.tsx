@@ -10,7 +10,6 @@ import { StyledImage } from './styles';
 import { cropAndFilter } from '@Src/utils/pixelit';
 import DownloadPdf from '@Src/components/@atoms/AtomPdf';
 import AtomModalImage from '@Src/components/@atoms/AtomModalImage';
-import PaymentModal from '@Src/components/@molecules/PaymentModal';
 import { useQuery } from '@apollo/client';
 import {
   IBoard,
@@ -653,14 +652,14 @@ const OrganismsConvertImage: FC = () => {
                 height={`${selectedConfig.y}`}
                 width={`${selectedConfig.x}`}
                 isPortrait={selectedConfig.isPortrait}
+                payment={{
+                  color: colors,
+                  isReady: !(cropImages.length === 0 || loading || isLoading),
+                  board: boardSelected,
+                  size: selectedConfig
+                }}
               />
             )}
-            <PaymentModal
-              color={colors}
-              isReady={!(cropImages.length === 0 || loading || isLoading)}
-              board={boardSelected}
-              size={selectedConfig}
-            />
           </AtomWrapper>
         </AtomWrapper>
       </AtomWrapper>

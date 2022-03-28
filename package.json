@@ -27,7 +27,7 @@
     "@react-pdf/renderer": "2.0.21",
     "@stripe/react-stripe-js": "1.7.0",
     "@stripe/stripe-js": "1.24.0",
-    "@sweetsyui/ui": "1.0.3",
+    "@sweetsyui/ui": "1.0.4",
     "apollo-server-core": "3.6.3",
     "apollo-server-micro": "^2.17.0",
     "bcryptjs": "2.4.3",

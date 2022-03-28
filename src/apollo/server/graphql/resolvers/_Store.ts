@@ -47,6 +47,13 @@ const resolvers: Resolvers = {
       });
       const getStore = await Store.findById(store.id).populate('storeType');
       return getStore;
+    },
+    deleteStore: async (_, { id }) => {
+      const storeExist = await Store.findById(id);
+      if (!storeExist) throw new Error('Store does not exist');
+
+      const store = await Store.findByIdAndDelete(id);
+      return store;
     }
   }
 };

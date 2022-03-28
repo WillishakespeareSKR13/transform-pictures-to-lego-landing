@@ -1,5 +1,6 @@
 import { useQuery } from '@apollo/client';
 import { css } from '@emotion/react';
+import { GETPRODUCTS } from '@Src/apollo/client/query/products';
 import { GETSALEORDES } from '@Src/apollo/client/query/saleOrder';
 import { GETSTOREBYID } from '@Src/apollo/client/query/stores';
 import { GETUSERS } from '@Src/apollo/client/query/user';
@@ -7,6 +8,7 @@ import DashWithTitle from '@Src/components/layouts/DashWithTitle';
 import { TableStyles } from '@Src/styles';
 import {
   AtomButton,
+  AtomCarruosell,
   AtomImage,
   AtomLink,
   AtomLoader,
@@ -50,6 +52,17 @@ const VIEW = () => {
     }
   });
 
+  const { data: dataProducts } = useQuery<IQueryFilter<'getProducts'>>(
+    GETPRODUCTS,
+    {
+      variables: {
+        filter: {
+          store: router?.query?.id?.[1]
+        }
+      }
+    }
+  );
+
   if (loading)
     return (
       <AtomLoader isLoading backgroundColor="#2e2e35" colorLoading="white" />
@@ -61,6 +74,23 @@ const VIEW = () => {
       onClick={() => {
         location.href = `/dashboard/`;
       }}
+      button={
+        <AtomButton
+          customCSS={css`
+            background-color: #f1576c;
+            padding: 8px 20px;
+            font-size: 10px;
+          `}
+          onClick={() => {
+            router.push(
+              `/dashboard/store/[id]/pointSale`,
+              `/dashboard/store/${data?.getStoreById?.id}/pointSale`
+            );
+          }}
+        >
+          Create sale order
+        </AtomButton>
+      }
     >
       <AtomWrapper
         customCSS={css`
@@ -74,6 +104,115 @@ const VIEW = () => {
             width: 60%;
           `}
         >
+          {(dataProducts?.getProducts?.length ?? 0) > 0 && (
+            <>
+              <AtomWrapper flexDirection="row" justifyContent="space-between">
+                <AtomText
+                  customCSS={css`
+                    font-size: 20px;
+                    font-weight: bold;
+                    color: #dfdfdf;
+                    margin-bottom: 10px;
+                  `}
+                >
+                  Products
+                </AtomText>
+                <AtomButton
+                  customCSS={css`
+                    background-color: #f1576c;
+                    padding: 8px 20px;
+                    font-size: 10px;
+                  `}
+                  onClick={() => {
+                    router.push(
+                      `/dashboard/store/[id]/products`,
+                      `/dashboard/store/${data?.getStoreById?.id}/products`
+                    );
+                  }}
+                >
+                  See all products
+                </AtomButton>
+              </AtomWrapper>
+              <AtomWrapper
+                customCSS={css`
+                  max-width: 100%;
+                  margin-bottom: 20px;
+                  overflow-x: scroll;
+                `}
+              >
+                <AtomCarruosell
+                  height="max-content"
+                  swiperProps={{
+                    spaceBetween: 10,
+                    slidesPerView: 3
+                  }}
+                >
+                  {dataProducts?.getProducts?.map((product) => (
+                    <AtomWrapper
+                      key={product?.id}
+                      customCSS={css`
+                        width: 100%;
+                        align-items: center;
+                        justify-content: flex-start;
+                        flex-direction: column;
+                        padding: 20px;
+                        background-color: #202026;
+                      `}
+                    >
+                      <AtomImage
+                        src={`${product?.image}`}
+                        alt={`${product?.image}`}
+                        height="120px"
+                        width="100%"
+                        customCSS={css`
+                          margin-bottom: 10px;
+                          overflow: hidden;
+                          border-radius: 4px;
+                        `}
+                      />
+                      <AtomText
+                        width="100%"
+                        align="left"
+                        fontSize="16px"
+                        fontWeight="bold"
+                        margin="0 0 10px 0"
+                        color="#dfdfdf"
+                      >{`${product?.name}`}</AtomText>
+                      <AtomText
+                        width="100%"
+                        align="left"
+                        margin="0 0 10px 0"
+                        color="#dfdfdf"
+                        customCSS={css`
+                          min-height: 63px;
+                          display: -webkit-box;
+                          max-width: 200px;
+                          -webkit-line-clamp: 3;
+                          -webkit-box-orient: vertical;
+                          overflow: hidden;
+                        `}
+                      >{`${product?.description}`}</AtomText>
+                      <AtomWrapper
+                        flexDirection="row"
+                        justifyContent="space-between"
+                      >
+                        <AtomText
+                          align="center"
+                          color="#dfdfdf"
+                          fontWeight="bold"
+                        >{`Stock: ${product?.stock}`}</AtomText>
+                        <AtomText
+                          align="center"
+                          color="#dfdfdf"
+                          fontWeight="bold"
+                        >{`Price: ${product?.price}`}</AtomText>
+                      </AtomWrapper>
+                    </AtomWrapper>
+                  ))}
+                </AtomCarruosell>
+              </AtomWrapper>
+            </>
+          )}
           <AtomText
             customCSS={css`
               font-size: 20px;
@@ -97,22 +236,46 @@ const VIEW = () => {
                 {
                   title: 'Details',
                   view: (item) => (
-                    <AtomButton
-                      onClick={() => {
-                        router.push({
-                          pathname: `${router.pathname}/${item?.id}`,
-                          query: {
-                            ...router.query
-                          }
-                        });
-                      }}
+                    <AtomWrapper
+                      flexDirection="row"
                       customCSS={css`
-                        padding: 8px 20px;
-                        background-color: #f1576c;
+                        gap: 10px;
                       `}
                     >
-                      Details
-                    </AtomButton>
+                      <AtomButton
+                        onClick={() => {
+                          router.push({
+                            pathname: `${router.pathname}/${item?.id}`,
+                            query: {
+                              ...router.query
+                            }
+                          });
+                        }}
+                        customCSS={css`
+                          padding: 8px 20px;
+                          background-color: #f1576c;
+                        `}
+                      >
+                        Details
+                      </AtomButton>
+                      <AtomButton
+                        onClick={() => {
+                          const pdf = item?.pdf;
+                          if (pdf) {
+                            const a = document.createElement('a');
+                            a.href = pdf;
+                            a.download = 'invoice.pdf';
+                            a.click();
+                          }
+                        }}
+                        customCSS={css`
+                          padding: 8px 20px;
+                          background-color: #f1576c;
+                        `}
+                      >
+                        PDF
+                      </AtomButton>
+                    </AtomWrapper>
                   )
                 },
 

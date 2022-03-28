@@ -142,6 +142,7 @@ declare module 'graphql' {
     total?: number;
     currency?: string;
     status?: string;
+    pdf?: string;
     colorsaleorder?: Array<IColorSaleOrder | null>;
   }
 
@@ -232,6 +233,7 @@ declare module 'graphql' {
     stock?: number;
     image?: string;
     store?: string;
+    storeArray?: Array<string | null>;
   }
 
   export interface IRoom {
@@ -261,14 +263,9 @@ declare module 'graphql' {
 
   export interface IFilterColorSaleOrder {
     id?: string;
-    colors?: Array<IFilterColorColorsSaleOrder | null>;
+    colors?: Array<string | null>;
     total?: number;
     store?: string;
-  }
-
-  export interface IFilterColorColorsSaleOrder {
-    color?: string;
-    quantity?: number;
   }
 
   export interface IMutation {
@@ -344,6 +341,7 @@ declare module 'graphql' {
     store?: string;
     customer?: string;
     colorsaleorder?: Array<string | null>;
+    pdf?: string;
   }
 
   export interface IInputBoardSelected {
@@ -1319,6 +1317,7 @@ declare module 'graphql' {
     total?: SaleOrderToTotalResolver<TParent>;
     currency?: SaleOrderToCurrencyResolver<TParent>;
     status?: SaleOrderToStatusResolver<TParent>;
+    pdf?: SaleOrderToPdfResolver<TParent>;
     colorsaleorder?: SaleOrderToColorsaleorderResolver<TParent>;
   }
 
@@ -1413,6 +1412,15 @@ declare module 'graphql' {
   }
 
   export interface SaleOrderToStatusResolver<TParent = any, TResult = any> {
+    (
+      parent: TParent,
+      args: {},
+      context: any,
+      info: GraphQLResolveInfo
+    ): TResult;
+  }
+
+  export interface SaleOrderToPdfResolver<TParent = any, TResult = any> {
     (
       parent: TParent,
       args: {},

@@ -22,6 +22,7 @@ import {
 } from 'graphql';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
+import AtomButton from '@Src/components/@atoms/AtomButton';
 
 const query = `query getSaleOrderById($id: ID!) {
   getSaleOrderById(id: $id) {
@@ -405,6 +406,25 @@ const VIEW = () => {
               </AtomText>
             </AtomWrapper>
           </AtomWrapper>
+          <AtomButton
+            width="100%"
+            onClick={() => {
+              const pdf = saleOrder?.pdf;
+              if (pdf) {
+                const a = document.createElement('a');
+                a.href = pdf;
+                a.download = 'invoice.pdf';
+                a.click();
+              }
+            }}
+            customCSS={css`
+              margin-top: 20px;
+              padding: 8px 20px;
+              background-color: #f1576c;
+            `}
+          >
+            PDF
+          </AtomButton>
           <AtomWrapper
             customCSS={css`
               border-radius: 8px;

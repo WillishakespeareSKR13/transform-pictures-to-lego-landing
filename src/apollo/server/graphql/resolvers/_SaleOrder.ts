@@ -105,7 +105,7 @@ const resolvers: Resolvers = {
   },
   Mutation: {
     newSaleOrder: async (_, { input }) => {
-      const { product, board, customer, store, colorsaleorder } = input;
+      const { product, board, customer, store, colorsaleorder, pdf } = input;
 
       if (!product && !board) {
         throw new Error('Product or board is required');
@@ -258,7 +258,8 @@ const resolvers: Resolvers = {
         store: storeGet._id,
         quantity: getQuantity,
         total: getPrice,
-        currency: getCurrency
+        currency: getCurrency,
+        pdf
       });
       if (!saleOrder) throw new Error('Error creating sale order');
       const getSaleOrder = await SaleOrder.findById(saleOrder._id)

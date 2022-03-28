@@ -10,10 +10,11 @@ type Props = {
   size?: IBoardSize;
   isReady?: boolean;
   color?: COLORTYPE[];
+  pdf: [ReactPDF.UsePDFInstance, () => void];
 };
 
 const PaymentModal: FC<Props> = (props) => {
-  const { board, size, isReady, color } = props;
+  const { board, size, isReady, color, pdf } = props;
   const [isOpen, setIsOpen] = useState(false);
   const [saleOrder, setSaleOrder] = useState<ISaleOrder | undefined>();
 
@@ -81,6 +82,7 @@ const PaymentModal: FC<Props> = (props) => {
               }}
             >
               <CheckoutForm
+                pdf={pdf}
                 saleOrder={saleOrder}
                 setSaleOrder={() => {
                   setSaleOrder(undefined);
@@ -97,9 +99,29 @@ const PaymentModal: FC<Props> = (props) => {
         padding="10px 30px"
         margin="0px 0px 0px 10px"
         disabled={!isReady}
-        onClick={() => {
+        onClick={async () => {
           setIsOpen(true);
           if (!saleOrder) {
+            const [instance] = pdf;
+            const BlobToFile = (blob: Blob, fileName: string) => {
+              const file = new File([blob], fileName, {
+                type: blob.type,
+                lastModified: Date.now()
+              });
+              return file;
+            };
+
+            const urlPdf = await uploadImage(
+              BlobToFile(
+                instance?.blob as Blob,
+                `${new Date().toDateString()}.pdf`
+              ),
+              {
+                name: 'pdf',
+                orgcode: 'LGO-0001'
+              }
+            );
+
             const transformColor = color
               ?.map((color) =>
                 Object.entries(color).map(([_, value]) => ({
@@ -139,7 +161,8 @@ const PaymentModal: FC<Props> = (props) => {
                         size: size?.id
                       }
                     ],
-                    colorsaleorder: [id]
+                    colorsaleorder: [id],
+                    pdf: urlPdf
                   }
                 }
               });
@@ -167,10 +190,13 @@ import { ISaleOrder } from '@Src/apollo/server/models/saleOrder';
 import { IBoard, IBoardSize } from 'graphql';
 import { COLORTYPE } from '@Src/config';
 import { NEWCOLORSALEORDER } from '@Src/apollo/client/mutation/color';
+import ReactPDF from '@react-pdf/renderer';
+import uploadImage from '@Src/utils/uploadImage';
 
 type CheckoutFormProps = {
   saleOrder?: ISaleOrder;
   setSaleOrder?: (saleOrder: ISaleOrder | undefined) => void;
+  pdf: [ReactPDF.UsePDFInstance, () => void];
 };
 
 const CheckoutForm: FC<CheckoutFormProps> = (props) => {

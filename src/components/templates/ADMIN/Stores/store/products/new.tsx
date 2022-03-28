@@ -69,6 +69,7 @@ const ModalNewProduct: FC<ModalNewProductType> = (props) => {
   return (
     <AtomModal
       isOpen={state}
+      setIsOpen={() => setState(false)}
       componentProps={{
         wrapperProps: {
           backgroundColor: '#2e2e35',
@@ -77,14 +78,7 @@ const ModalNewProduct: FC<ModalNewProductType> = (props) => {
       }}
       component={
         <>
-          <AtomWrapper alignItems="flex-end">
-            <AtomButton
-              backgroundColor="transparent"
-              onClick={() => setState(!state)}
-            >
-              X
-            </AtomButton>
-          </AtomWrapper>
+          <AtomWrapper alignItems="flex-end"></AtomWrapper>
           <AtomWrapper
             alignItems="center"
             justifyContent="center"

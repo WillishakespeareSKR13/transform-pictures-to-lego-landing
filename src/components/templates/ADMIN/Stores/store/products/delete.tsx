@@ -1,4 +1,6 @@
+import { useMutation } from '@apollo/client';
 import { css } from '@emotion/react';
+import { DELETEPRODUCT } from '@Src/apollo/client/query/products';
 import {
   AtomButton,
   AtomIcon,
@@ -7,7 +9,7 @@ import {
   AtomText,
   AtomWrapper
 } from '@sweetsyui/ui';
-import React, { Dispatch, FC, SetStateAction } from 'react';
+import { Dispatch, FC, SetStateAction } from 'react';
 import { ProductModalType } from './index';
 
 interface ModalNewProductType {
@@ -17,10 +19,22 @@ interface ModalNewProductType {
 
 const ModalDeleteProduct: FC<ModalNewProductType> = (props) => {
   const { state, setState } = props;
+  const [EXEDELETEPRODUCT] = useMutation(DELETEPRODUCT, {
+    onCompleted: () => {
+      location.reload();
+    }
+  });
 
   return (
     <AtomModal
       isOpen={state.openModal}
+      setIsOpen={() => setState({ ...state, openModal: false })}
+      componentProps={{
+        wrapperProps: {
+          backgroundColor: '#2e2e35',
+          padding: '0 30px'
+        }
+      }}
       component={
         <AtomWrapper
           maxWidth="380px"
@@ -44,7 +58,7 @@ const ModalDeleteProduct: FC<ModalNewProductType> = (props) => {
           <AtomText
             customCSS={css`
               text-align: center;
-              color: #373737;
+              color: #dfdfdf;
               font-weight: bold;
               font-size: 22px;
               line-height: 110%;
@@ -71,9 +85,9 @@ const ModalDeleteProduct: FC<ModalNewProductType> = (props) => {
               customCSS={css`
                 width: 100%;
                 background-color: transparent;
-                border: 1px solid #bfbfbf;
+                border: 1px solid #dfdfdf;
                 text-align: center;
-                color: #878787;
+                color: #dfdfdf;
                 font-weight: 500;
                 font-size: 14px;
                 margin: 10px 0px;
@@ -83,13 +97,11 @@ const ModalDeleteProduct: FC<ModalNewProductType> = (props) => {
             </AtomButton>
             <AtomButton
               onClick={() => {
-                //   deleteArticle({
-                //     variables: {
-                //       input: {
-                //         articleId: id
-                //       }
-                //     }
-                //   });
+                EXEDELETEPRODUCT({
+                  variables: {
+                    id: state.id
+                  }
+                });
               }}
               customCSS={css`
                 width: 100%;

@@ -6,11 +6,12 @@ import {
   Document,
   StyleSheet,
   Text,
-  // usePDF,
-  Image,
-  PDFDownloadLink
+  usePDF,
+  Image
 } from '@react-pdf/renderer';
-import { AtomButton } from '@sweetsyui/ui';
+import PaymentModal from '@Src/components/@molecules/PaymentModal';
+import { IBoard, IBoardSize } from 'graphql';
+import { COLORTYPE } from '@Src/config';
 
 // Create styles
 const styles = StyleSheet.create({
@@ -55,6 +56,12 @@ type AtomPdfProps = {
   height?: string;
   colors?: ColorType[];
   isPortrait?: boolean;
+  payment: {
+    board?: IBoard;
+    size?: IBoardSize;
+    isReady?: boolean;
+    color?: COLORTYPE[];
+  };
 };
 
 export const AtomPdf: FC<AtomPdfProps> = (props) => {
@@ -257,10 +264,16 @@ type DocumentProps = {
   width?: string;
   height?: string;
   isPortrait?: boolean;
+  payment: {
+    board?: IBoard;
+    size?: IBoardSize;
+    isReady?: boolean;
+    color?: COLORTYPE[];
+  };
 };
 
 const DownloadPdf: FC<DocumentProps> = (props) => {
-  const { images, colors, width, height, isPortrait } = props;
+  const { images, colors, width, height, isPortrait, payment } = props;
   const [Document, setDocument] = useState(
     <AtomPdf
       images={images}
@@ -268,6 +281,7 @@ const DownloadPdf: FC<DocumentProps> = (props) => {
       height={height}
       width={width}
       isPortrait={isPortrait}
+      payment={payment}
     />
   );
   useEffect(() => {
@@ -278,12 +292,15 @@ const DownloadPdf: FC<DocumentProps> = (props) => {
         height={height}
         width={width}
         isPortrait={isPortrait}
+        payment={payment}
       />
     );
   }, [images, colors]);
+  const pdf = usePDF({ document: Document });
   return (
     <div>
-      <PDFDownloadLink
+      <PaymentModal {...payment} pdf={pdf} />
+      {/* <PDFDownloadLink
         document={Document}
         fileName={`${new Date().toLocaleString()}.pdf`}
       >
@@ -299,17 +316,20 @@ const DownloadPdf: FC<DocumentProps> = (props) => {
               LOAD DOCUMENT
             </AtomButton>
           ) : (
-            <AtomButton
-              width="200px"
-              backgroundColor="#e95c10"
-              fontSize="12px"
-              padding="10px 30px"
-            >
-              DOWNLOAD
-            </AtomButton>
+            <>
+              <PaymentModal {...payment} />
+              <AtomButton
+                width="200px"
+                backgroundColor="#e95c10"
+                fontSize="12px"
+                padding="10px 30px"
+              >
+                DOWNLOAD
+              </AtomButton>
+            </>
           )
         }
-      </PDFDownloadLink>
+      </PDFDownloadLink> */}
     </div>
   );
 };

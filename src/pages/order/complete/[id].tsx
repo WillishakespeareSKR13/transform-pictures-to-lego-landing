@@ -11,6 +11,7 @@ import {
 import Confetti, { ConfettiConfig } from 'react-dom-confetti';
 import { useRouter } from 'next/router';
 import React from 'react';
+import { IQueryFilter } from 'graphql';
 
 const config = {
   angle: 90,
@@ -28,12 +29,15 @@ const config = {
 
 const CompleteOrderPay = () => {
   const router = useRouter();
-  const { data, loading } = useQuery(PAYSALEORDER, {
-    skip: !router.query.id,
-    variables: {
-      id: router.query.id
+  const { data, loading } = useQuery<IQueryFilter<'paySaleOrder'>>(
+    PAYSALEORDER,
+    {
+      skip: !router.query.id,
+      variables: {
+        id: router.query.id
+      }
     }
-  });
+  );
 
   return (
     <AtomWrapper
@@ -66,7 +70,7 @@ const CompleteOrderPay = () => {
           transform: translate(-50%, -50%);
         `}
       >
-        <Confetti active={data?.paySaleOrder} config={config} />
+        <Confetti active={!!data?.paySaleOrder} config={config} />
       </AtomWrapper>
       {data?.paySaleOrder && (
         <AtomWrapper
@@ -97,9 +101,33 @@ const CompleteOrderPay = () => {
           />
           <AtomButton
             onClick={() => {
+              const pdf = data.paySaleOrder?.pdf;
+              if (pdf) {
+                const a = document.createElement('a');
+                a.href = pdf;
+                a.download = 'invoice.pdf';
+                a.click();
+              }
+            }}
+            customCSS={css`
+              margin-bottom: 10px;
+              border: 2px solid #48d496;
+              background-color: transparent;
+              span {
+                font-size: 12px;
+                font-weight: 500;
+                color: #48d496;
+              }
+            `}
+          >
+            <AtomText>Download PDF</AtomText>
+          </AtomButton>
+          <AtomButton
+            onClick={() => {
               router.push('/');
             }}
             customCSS={css`
+              border: 2px solid #48d496;
               background-color: #48d496;
               span {
                 font-size: 12px;

@@ -10,6 +10,7 @@ export const GETSALEORDES = gql`
         id
         name
       }
+      pdf
       board {
         id
         board {
@@ -125,6 +126,7 @@ export const PAYSALEORDER = gql`
       id
       stripeId
       secret
+      pdf
     }
   }
 `;

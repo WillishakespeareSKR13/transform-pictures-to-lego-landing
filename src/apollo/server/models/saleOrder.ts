@@ -12,6 +12,7 @@ export interface ISaleOrder extends Document {
   currency: string;
   status: string;
   colorSaleOrder: [ObjectId];
+  pdf: string;
 }
 
 const SaleOrderSchema: Schema = new Schema(
@@ -40,6 +41,10 @@ const SaleOrderSchema: Schema = new Schema(
       type: String,
       default: 'PENDING',
       trim: true
+    },
+    pdf: {
+      type: String,
+      default: ''
     },
     colorsaleorder: [{ type: Schema.Types.ObjectId, ref: 'ColorSaleOrder' }]
   },

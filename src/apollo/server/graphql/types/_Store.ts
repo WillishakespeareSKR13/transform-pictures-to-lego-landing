@@ -52,7 +52,7 @@ const typeDefs = gql`
     city: String
     state: String
     zip: String
-    storeType: FilterStoreType
+    storeType: String
   }
 
   #######################QUERY#######################
@@ -65,6 +65,7 @@ const typeDefs = gql`
   extend type Mutation {
     newStore(input: InputStore): Store
     updateStore(id: ID!, input: InputStore): Store
+    deleteStore(id: ID!): Store
   }
 `;
 

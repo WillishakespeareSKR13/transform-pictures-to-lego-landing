@@ -1,6 +1,7 @@
 import { useQuery } from '@apollo/client';
 import { css, SerializedStyles } from '@emotion/react';
 import { GETPRODUCTS } from '@Src/apollo/client/query/products';
+import DashWithTitle from '@Src/components/layouts/DashWithTitle';
 import { TableStyles } from '@Src/styles';
 
 export type ItemCardShopType = {
@@ -49,10 +50,22 @@ const Products: FC = () => {
     }
   });
   return (
-    <>
-      <AtomButton onClick={() => setOpenNewProduct(!openNewProduct)}>
-        New Product
-      </AtomButton>
+    <DashWithTitle
+      url={{
+        pathname: router.pathname,
+        query: {
+          id: Array.isArray(router.query.id)
+            ? router.query.id.filter((_, idx, arr) => idx !== arr.length - 1)
+            : router.query.id
+        }
+      }}
+      title="Create new store type"
+      button={
+        <AtomButton onClick={() => setOpenNewProduct(!openNewProduct)}>
+          New Product
+        </AtomButton>
+      }
+    >
       <ModalDeleteProduct state={itemDelete} setState={setitemDelete} />
       <ModalNewProduct state={openNewProduct} setState={setOpenNewProduct} />
       <ModalUpdateProduct state={itemUpdate} setState={setItemUpdate} />
@@ -129,10 +142,10 @@ const Products: FC = () => {
                   src={`${item?.image}`}
                   alt={`${item?.image}`}
                   height="70px"
-                  width="70px"
+                  width="100%"
                   customCSS={css`
                     overflow: hidden;
-                    border-radius: 50%;
+                    border-radius: 4px;
                   `}
                 />
               )
@@ -157,7 +170,7 @@ const Products: FC = () => {
           ]}
         />
       </AtomWrapper>
-    </>
+    </DashWithTitle>
   );
 };
 export default Products;

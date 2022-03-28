@@ -3,6 +3,7 @@ import { css } from '@emotion/react';
 import { GETSTORES } from '@Src/apollo/client/query/stores';
 import {
   AtomButton,
+  AtomIcon,
   AtomImage,
   AtomLink,
   AtomLoader,
@@ -67,8 +68,11 @@ const STORES = () => {
               <AtomWrapper
                 key={store?.id}
                 customCSS={css`
-                  width: 32.3%;
+                  flex-basis: 350px;
+                  min-width: 350px;
+                  flex-grow: 1;
                   height: 300px;
+                  position: relative;
                   background-color: #202026;
                   justify-content: space-between;
                   border-radius: 8px;
@@ -196,6 +200,41 @@ const STORES = () => {
                     </AtomText>
                   </AtomButton>
                 </AtomWrapper>
+                <AtomButton
+                  onClick={() => {
+                    router.push(`./store/edit/${store?.id}`);
+                  }}
+                  customCSS={css`
+                    right: 0;
+                    top: 0;
+                    margin: 15px 20px;
+                    position: absolute;
+                    padding: 10px;
+                    border-radius: 50%;
+                    background-color: #2e2e35;
+                    cursor: pointer;
+                    :hover {
+                      background-color: #1a1a1f;
+                      svg {
+                        g {
+                          g {
+                            path {
+                              fill: #2e2e35 !important;
+                            }
+                          }
+                        }
+                      }
+                    }
+                    transition: background-color 0.3s ease;
+                  `}
+                >
+                  <AtomIcon
+                    height="22px"
+                    width="22px"
+                    color="#202026"
+                    icon="https://storage.googleapis.com/cdn-bucket-ixulabs-platform/LGO-0001/assets/settings-gear.svg"
+                  />
+                </AtomButton>
               </AtomWrapper>
             ))}
           </>
@@ -203,7 +242,9 @@ const STORES = () => {
 
         <AtomWrapper
           customCSS={css`
-            width: 32.3%;
+            flex-basis: 350px;
+            min-width: 350px;
+            flex-grow: 1;
             height: 300px;
             background-color: #202026;
             justify-content: space-between;

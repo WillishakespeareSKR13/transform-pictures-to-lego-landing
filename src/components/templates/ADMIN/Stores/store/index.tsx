@@ -258,23 +258,26 @@ const VIEW = () => {
                       >
                         Details
                       </AtomButton>
-                      <AtomButton
-                        onClick={() => {
-                          const pdf = item?.pdf;
-                          if (pdf) {
-                            const a = document.createElement('a');
-                            a.href = pdf;
-                            a.download = 'invoice.pdf';
-                            a.click();
-                          }
-                        }}
-                        customCSS={css`
-                          padding: 8px 20px;
-                          background-color: #f1576c;
-                        `}
-                      >
-                        PDF
-                      </AtomButton>
+                      {item?.board?.map((e) => (
+                        <AtomButton
+                          key={e?.id}
+                          onClick={() => {
+                            const pdf = e?.pdf;
+                            if (pdf) {
+                              const a = document.createElement('a');
+                              a.href = pdf;
+                              a.download = 'invoice.pdf';
+                              a.click();
+                            }
+                          }}
+                          customCSS={css`
+                            padding: 8px 20px;
+                            background-color: #f1576c;
+                          `}
+                        >
+                          PDF
+                        </AtomButton>
+                      ))}
                     </AtomWrapper>
                   )
                 },

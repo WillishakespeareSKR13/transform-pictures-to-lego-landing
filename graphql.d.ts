@@ -142,7 +142,6 @@ declare module 'graphql' {
     total?: number;
     currency?: string;
     status?: string;
-    pdf?: string;
     colorsaleorder?: Array<IColorSaleOrder | null>;
   }
 
@@ -162,6 +161,7 @@ declare module 'graphql' {
     id?: string;
     board?: IBoard;
     size?: IBoardSize;
+    pdf?: string;
   }
 
   export interface IBoard {
@@ -282,6 +282,7 @@ declare module 'graphql' {
     deleteStoreType?: IStoreType;
     newStore?: IStore;
     updateStore?: IStore;
+    deleteStore?: IStore;
     newProduct?: IProducts;
     updateProduct?: IProducts;
     deleteProduct?: IProducts;
@@ -341,12 +342,12 @@ declare module 'graphql' {
     store?: string;
     customer?: string;
     colorsaleorder?: Array<string | null>;
-    pdf?: string;
   }
 
   export interface IInputBoardSelected {
     board?: string;
     size?: string;
+    pdf?: string;
   }
 
   export interface IInputStoreType {
@@ -478,7 +479,7 @@ declare module 'graphql' {
     city?: string;
     state?: string;
     zip?: string;
-    storeType?: IFilterStoreType;
+    storeType?: string;
   }
 
   export interface IFilterBoardType {
@@ -524,6 +525,7 @@ declare module 'graphql' {
     id?: string;
     board?: string;
     size?: string;
+    pdf?: string;
   }
 
   export interface IFilterColor {
@@ -1317,7 +1319,6 @@ declare module 'graphql' {
     total?: SaleOrderToTotalResolver<TParent>;
     currency?: SaleOrderToCurrencyResolver<TParent>;
     status?: SaleOrderToStatusResolver<TParent>;
-    pdf?: SaleOrderToPdfResolver<TParent>;
     colorsaleorder?: SaleOrderToColorsaleorderResolver<TParent>;
   }
 
@@ -1412,15 +1413,6 @@ declare module 'graphql' {
   }
 
   export interface SaleOrderToStatusResolver<TParent = any, TResult = any> {
-    (
-      parent: TParent,
-      args: {},
-      context: any,
-      info: GraphQLResolveInfo
-    ): TResult;
-  }
-
-  export interface SaleOrderToPdfResolver<TParent = any, TResult = any> {
     (
       parent: TParent,
       args: {},
@@ -1538,6 +1530,7 @@ declare module 'graphql' {
     id?: BoardSelectedToIdResolver<TParent>;
     board?: BoardSelectedToBoardResolver<TParent>;
     size?: BoardSelectedToSizeResolver<TParent>;
+    pdf?: BoardSelectedToPdfResolver<TParent>;
   }
 
   export interface BoardSelectedToIdResolver<TParent = any, TResult = any> {
@@ -1559,6 +1552,15 @@ declare module 'graphql' {
   }
 
   export interface BoardSelectedToSizeResolver<TParent = any, TResult = any> {
+    (
+      parent: TParent,
+      args: {},
+      context: any,
+      info: GraphQLResolveInfo
+    ): TResult;
+  }
+
+  export interface BoardSelectedToPdfResolver<TParent = any, TResult = any> {
     (
       parent: TParent,
       args: {},
@@ -2112,6 +2114,7 @@ declare module 'graphql' {
     deleteStoreType?: MutationToDeleteStoreTypeResolver<TParent>;
     newStore?: MutationToNewStoreResolver<TParent>;
     updateStore?: MutationToUpdateStoreResolver<TParent>;
+    deleteStore?: MutationToDeleteStoreResolver<TParent>;
     newProduct?: MutationToNewProductResolver<TParent>;
     updateProduct?: MutationToUpdateProductResolver<TParent>;
     deleteProduct?: MutationToDeleteProductResolver<TParent>;
@@ -2306,6 +2309,18 @@ declare module 'graphql' {
     (
       parent: TParent,
       args: MutationToUpdateStoreArgs,
+      context: any,
+      info: GraphQLResolveInfo
+    ): TResult;
+  }
+
+  export interface MutationToDeleteStoreArgs {
+    id: string;
+  }
+  export interface MutationToDeleteStoreResolver<TParent = any, TResult = any> {
+    (
+      parent: TParent,
+      args: MutationToDeleteStoreArgs,
       context: any,
       info: GraphQLResolveInfo
     ): TResult;

@@ -99,29 +99,33 @@ const CompleteOrderPay = () => {
             width="max-content"
             margin="40px 0"
           />
-          <AtomButton
-            onClick={() => {
-              const pdf = data.paySaleOrder?.pdf;
-              if (pdf) {
-                const a = document.createElement('a');
-                a.href = pdf;
-                a.download = 'invoice.pdf';
-                a.click();
-              }
-            }}
-            customCSS={css`
-              margin-bottom: 10px;
-              border: 2px solid #48d496;
-              background-color: transparent;
-              span {
-                font-size: 12px;
-                font-weight: 500;
-                color: #48d496;
-              }
-            `}
-          >
-            <AtomText>Download PDF</AtomText>
-          </AtomButton>
+          {data?.paySaleOrder?.board?.map((e) => (
+            <AtomButton
+              key={e?.id}
+              onClick={() => {
+                const pdf = e?.pdf;
+                if (pdf) {
+                  const a = document.createElement('a');
+                  a.href = pdf;
+                  a.download = 'invoice.pdf';
+                  a.click();
+                }
+              }}
+              customCSS={css`
+                margin-bottom: 10px;
+                border: 2px solid #48d496;
+                background-color: transparent;
+                span {
+                  font-size: 12px;
+                  font-weight: 500;
+                  color: #48d496;
+                }
+              `}
+            >
+              <AtomText>Download PDF</AtomText>
+            </AtomButton>
+          ))}
+
           <AtomButton
             onClick={() => {
               router.push('/');

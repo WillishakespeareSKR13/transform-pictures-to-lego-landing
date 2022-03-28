@@ -38,6 +38,7 @@ const query = `query getSaleOrderById($id: ID!) {
     }
     board {
       id
+      pdf
       board {
         id
         title
@@ -406,25 +407,28 @@ const VIEW = () => {
               </AtomText>
             </AtomWrapper>
           </AtomWrapper>
-          <AtomButton
-            width="100%"
-            onClick={() => {
-              const pdf = saleOrder?.pdf;
-              if (pdf) {
-                const a = document.createElement('a');
-                a.href = pdf;
-                a.download = 'invoice.pdf';
-                a.click();
-              }
-            }}
-            customCSS={css`
-              margin-top: 20px;
-              padding: 8px 20px;
-              background-color: #f1576c;
-            `}
-          >
-            PDF
-          </AtomButton>
+          {saleOrder?.board?.map((e) => (
+            <AtomButton
+              key={e?.id}
+              width="100%"
+              onClick={() => {
+                const pdf = e?.pdf ?? '';
+                if (pdf) {
+                  const a = document.createElement('a');
+                  a.href = pdf;
+                  a.download = 'invoice.pdf';
+                  a.click();
+                }
+              }}
+              customCSS={css`
+                margin-top: 20px;
+                padding: 8px 20px;
+                background-color: #f1576c;
+              `}
+            >
+              PDF
+            </AtomButton>
+          ))}
           <AtomWrapper
             customCSS={css`
               border-radius: 8px;

@@ -7,6 +7,7 @@ const typeDefs = gql`
     id: ID
     board: Board
     size: BoardSize
+    pdf: String
   }
 
   #######################INPUT#######################
@@ -14,12 +15,14 @@ const typeDefs = gql`
   input InputBoardSelected {
     board: ID
     size: ID
+    pdf: String
   }
 
   input FilterBoardSelected {
     id: ID
     board: ID
     size: ID
+    pdf: String
   }
 
   #######################QUERY#######################

@@ -158,11 +158,11 @@ const PaymentModal: FC<Props> = (props) => {
                     board: [
                       {
                         board: board?.id,
-                        size: size?.id
+                        size: size?.id,
+                        pdf: urlPdf
                       }
                     ],
-                    colorsaleorder: [id],
-                    pdf: urlPdf
+                    colorsaleorder: [id]
                   }
                 }
               });

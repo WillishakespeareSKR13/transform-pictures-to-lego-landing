@@ -15,7 +15,6 @@ const typeDefs = gql`
     total: Float
     currency: String
     status: String
-    pdf: String
     colorsaleorder: [ColorSaleOrder]
   }
 
@@ -27,7 +26,6 @@ const typeDefs = gql`
     store: String
     customer: String
     colorsaleorder: [String]
-    pdf: String
   }
 
   input FilterSaleOrder {

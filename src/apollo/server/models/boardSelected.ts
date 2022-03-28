@@ -3,6 +3,7 @@ import mongoose, { Schema, Document, ObjectId } from 'mongoose';
 export interface IBoardSelected extends Document {
   board: ObjectId;
   size: ObjectId;
+  pdf: string;
 }
 
 const BoardSelectedSchema: Schema = new Schema(
@@ -16,6 +17,10 @@ const BoardSelectedSchema: Schema = new Schema(
       type: Schema.Types.ObjectId,
       ref: 'BoardSize',
       required: true
+    },
+    pdf: {
+      type: String,
+      default: ''
     }
   },
   {

@@ -90,7 +90,37 @@ const resolvers: Resolvers = {
       return saleOrder.toJSON();
     },
     paySaleOrder: async (_, { id }) => {
-      const saleOrder = await SaleOrder.findById(id);
+      const saleOrder = await SaleOrder.findById(id)
+        .populate('customer')
+        .populate('product')
+        .populate({
+          path: 'board',
+          populate: {
+            path: 'board',
+            populate: {
+              path: 'type'
+            }
+          }
+        })
+        .populate({
+          path: 'board',
+          populate: {
+            path: 'size',
+            populate: {
+              path: 'type'
+            }
+          }
+        })
+        .populate('store')
+        .populate({
+          path: 'colorsaleorder',
+          populate: {
+            path: 'colors',
+            populate: {
+              path: 'color'
+            }
+          }
+        });
       if (!saleOrder) throw new Error('No sale order found');
       const paymentRetrieve = await stripe.paymentIntents.retrieve(
         saleOrder.stripeId
@@ -105,7 +135,7 @@ const resolvers: Resolvers = {
   },
   Mutation: {
     newSaleOrder: async (_, { input }) => {
-      const { product, board, customer, store, colorsaleorder, pdf } = input;
+      const { product, board, customer, store, colorsaleorder } = input;
 
       if (!product && !board) {
         throw new Error('Product or board is required');
@@ -131,29 +161,33 @@ const resolvers: Resolvers = {
         if (!board) {
           return null;
         }
-        const boards = board.map(async (e: { board: string; size: string }) => {
-          if (e.board && e.size) {
-            const findBoard = await Board.findById(e.board);
-            const findBoardSize = await BoardSize.findById(e.size);
-            if (!findBoard) throw new Error('Board not found');
-            if (!findBoardSize) throw new Error('Board size not found');
+        const boards = board.map(
+          async (e: { board: string; size: string; pdf: string }) => {
+            if ((e.board && e.size, e.pdf)) {
+              const findBoard = await Board.findById(e.board);
+              const findBoardSize = await BoardSize.findById(e.size);
+              if (!findBoard) throw new Error('Board not found');
+              if (!findBoardSize) throw new Error('Board size not found');
 
-            const createBoardSelected = await BoardSelected.create({
-              board: findBoard,
-              size: findBoardSize
-            });
+              const createBoardSelected = await BoardSelected.create({
+                board: findBoard,
+                size: findBoardSize,
+                pdf: e.pdf
+              });
 
-            const getBoardSelected = await BoardSelected.findById(
-              createBoardSelected.id
-            )
-              .populate('board')
-              .populate('size');
+              const getBoardSelected = await BoardSelected.findById(
+                createBoardSelected.id
+              )
+                .populate('board')
+                .populate('size');
 
-            if (!getBoardSelected) throw new Error('Board selected not found');
+              if (!getBoardSelected)
+                throw new Error('Board selected not found');
 
-            return getBoardSelected;
+              return getBoardSelected;
+            }
           }
-        });
+        );
         return (await Promise.all(boards)).filter(
           (e) => typeof e !== 'undefined'
         );
@@ -258,8 +292,7 @@ const resolvers: Resolvers = {
         store: storeGet._id,
         quantity: getQuantity,
         total: getPrice,
-        currency: getCurrency,
-        pdf
+        currency: getCurrency
       });
       if (!saleOrder) throw new Error('Error creating sale order');
       const getSaleOrder = await SaleOrder.findById(saleOrder._id)

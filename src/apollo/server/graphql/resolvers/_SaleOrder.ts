@@ -246,7 +246,7 @@ const resolvers: Resolvers = {
       const getColorSaleOrder = await colorSaleOrderExist();
 
       const paymentIntent = await stripe.paymentIntents.create({
-        amount: Math.round(getPrice),
+        amount: Math.round(getPrice) * 100,
         currency: getCurrency,
         payment_method_types: ['card']
       });

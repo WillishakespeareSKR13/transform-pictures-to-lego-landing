@@ -23,8 +23,9 @@ import {
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import AtomButton from '@Src/components/@atoms/AtomButton';
+import { convertDate } from '@Src/utils/convertDate';
 
-const query = `query getSaleOrderById($id: ID!) {
+export const query = `query getSaleOrderById($id: ID!) {
   getSaleOrderById(id: $id) {
     id
     stripeId
@@ -86,6 +87,33 @@ const query = `query getSaleOrderById($id: ID!) {
   }
 }
 `;
+
+const arrayToCsv = (data?: string[][]) =>
+  data
+    ?.map((row) =>
+      row
+        .map((v) => v.replaceAll('"', '""'))
+        .map((v) => `"${v}"`)
+        .join(',')
+    )
+    .join('\r\n');
+
+const downloadCsv = (data: string, filename: string) => {
+  const blob = new Blob([data], {
+    type: 'text/csv;charset=utf-8;'
+  });
+  const link = document.createElement('a');
+  if (link.download !== undefined) {
+    // Browsers that support HTML5 download attribute
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', filename);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+};
 
 const VIEW = () => {
   const router = useRouter();
@@ -407,28 +435,57 @@ const VIEW = () => {
               </AtomText>
             </AtomWrapper>
           </AtomWrapper>
-          {saleOrder?.board?.map((e) => (
-            <AtomButton
-              key={e?.id}
-              width="100%"
-              onClick={() => {
-                const pdf = e?.pdf ?? '';
-                if (pdf) {
-                  const a = document.createElement('a');
-                  a.href = pdf;
-                  a.download = 'invoice.pdf';
-                  a.click();
-                }
-              }}
-              customCSS={css`
-                margin-top: 20px;
-                padding: 8px 20px;
-                background-color: #f1576c;
-              `}
-            >
-              PDF
-            </AtomButton>
-          ))}
+          <AtomWrapper
+            customCSS={css`
+              gap: 10px;
+            `}
+          >
+            {saleOrder?.board?.map((e) => (
+              <AtomButton
+                key={e?.id}
+                width="100%"
+                onClick={() => {
+                  const pdf = e?.pdf ?? '';
+                  if (pdf) {
+                    const a = document.createElement('a');
+                    a.href = pdf;
+                    a.download = 'invoice.pdf';
+                    a.click();
+                  }
+                }}
+                customCSS={css`
+                  margin-top: 20px;
+                  padding: 8px 20px;
+                  background-color: #f1576c;
+                `}
+              >
+                PDF
+              </AtomButton>
+            ))}
+            {saleOrder?.colorsaleorder?.map((e) => (
+              <AtomButton
+                key={e?.id}
+                width="100%"
+                onClick={() => {
+                  const map =
+                    e?.colors?.map((e) => [
+                      `${e?.color?.name}`,
+                      `${e?.color?.color}`,
+                      `${e?.quantity}`
+                    ]) ?? [];
+                  const csv =
+                    arrayToCsv([['Color', 'Code', 'Quantity'], ...map]) ?? '';
+                  downloadCsv(csv, `${e?.id}_${convertDate(new Date())}.csv`);
+                }}
+                customCSS={css`
+                  padding: 8px 20px;
+                  background-color: #f1576c;
+                `}
+              >
+                CSV
+              </AtomButton>
+            ))}
+          </AtomWrapper>
           <AtomWrapper
             customCSS={css`
               border-radius: 8px;

@@ -49,7 +49,9 @@ export const GETSALEORDES = gql`
           color {
             id
             color
+            name
           }
+          quantity
         }
         total
       }

@@ -6,6 +6,7 @@ import { GETSTOREBYID } from '@Src/apollo/client/query/stores';
 import { GETUSERS } from '@Src/apollo/client/query/user';
 import DashWithTitle from '@Src/components/layouts/DashWithTitle';
 import { TableStyles } from '@Src/styles';
+import { convertDate } from '@Src/utils/convertDate';
 import {
   AtomButton,
   AtomCarruosell,
@@ -19,6 +20,33 @@ import {
 } from '@sweetsyui/ui';
 import { IQueryFilter, ISaleOrder, IUser } from 'graphql';
 import { useRouter } from 'next/router';
+
+const arrayToCsv = (data?: string[][]) =>
+  data
+    ?.map((row) =>
+      row
+        .map((v) => v.replaceAll('"', '""'))
+        .map((v) => `"${v}"`)
+        .join(',')
+    )
+    .join('\r\n');
+
+const downloadCsv = (data: string, filename: string) => {
+  const blob = new Blob([data], {
+    type: 'text/csv;charset=utf-8;'
+  });
+  const link = document.createElement('a');
+  if (link.download !== undefined) {
+    // Browsers that support HTML5 download attribute
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', filename);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+};
 
 const VIEW = () => {
   const router = useRouter();
@@ -276,6 +304,34 @@ const VIEW = () => {
                           `}
                         >
                           PDF
+                        </AtomButton>
+                      ))}
+                      {item?.colorsaleorder?.map((e) => (
+                        <AtomButton
+                          key={e?.id}
+                          onClick={() => {
+                            const map =
+                              e?.colors?.map((e) => [
+                                `${e?.color?.name}`,
+                                `${e?.color?.color}`,
+                                `${e?.quantity}`
+                              ]) ?? [];
+                            const csv =
+                              arrayToCsv([
+                                ['Color', 'Code', 'Quantity'],
+                                ...map
+                              ]) ?? '';
+                            downloadCsv(
+                              csv,
+                              `${e?.id}_${convertDate(new Date())}.csv`
+                            );
+                          }}
+                          customCSS={css`
+                            padding: 8px 20px;
+                            background-color: #f1576c;
+                          `}
+                        >
+                          CSV
                         </AtomButton>
                       ))}
                     </AtomWrapper>

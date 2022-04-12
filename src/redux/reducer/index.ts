@@ -2,6 +2,7 @@ import { combineReducers } from 'redux';
 // import ModalReducer, { ModalReduceType } from './modal';
 import SideBarReducer, { SidebarReducerType } from './sidebar';
 import UserReducer, { UserReducerType } from './user';
+import ModalReducer, { ModalReducerType } from './modal';
 // import UserQuotation, { QuotationReduceType } from './quotation';
 // import memberID, { MemberIDReduceType } from './memberId';
 // import Customize, { CustomizeReducerType } from './customize';
@@ -9,7 +10,8 @@ import UserReducer, { UserReducerType } from './user';
 
 const RootReducer = combineReducers({
   user: UserReducer,
-  sideBar: SideBarReducer
+  sideBar: SideBarReducer,
+  modal: ModalReducer
   // modal: ModalReducer,
   // quotation: UserQuotation,
   // memberID: memberID,
@@ -20,6 +22,7 @@ const RootReducer = combineReducers({
 export type RootStateType = {
   user: UserReducerType;
   sideBar: SidebarReducerType;
+  modal: ModalReducerType;
   // modal: ModalReduceType;
   // quotation: QuotationReduceType;
   // memberID: MemberIDReduceType;

@@ -11,6 +11,12 @@ export const GETPRODUCTS = gql`
       sku
       stock
       image
+      color {
+        id
+        color
+        name
+        icon
+      }
     }
   }
 `;

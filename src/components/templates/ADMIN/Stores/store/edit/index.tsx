@@ -80,7 +80,7 @@ const ADD = () => {
             `${value}`
           )
         ),
-      photo: Yup.string().required('Required'),
+      photo: Yup.mixed().required('Required'),
       cash: Yup.number().required('Required'),
       currency: Yup.mixed().test(
         'currency',

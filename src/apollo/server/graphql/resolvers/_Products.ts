@@ -10,20 +10,28 @@ const resolvers: Resolvers = {
       return await Products.find({
         ...filter,
         ...store
-      }).populate({
-        path: 'store',
-        populate: {
-          path: 'storeType'
-        }
-      });
+      })
+        .populate({
+          path: 'store',
+          populate: {
+            path: 'storeType'
+          }
+        })
+        .populate({
+          path: 'color'
+        });
     },
     getProductById: async (_, { id }) => {
-      return await Products.findById(id).populate({
-        path: 'store',
-        populate: {
-          path: 'storeType'
-        }
-      });
+      return await Products.findById(id)
+        .populate({
+          path: 'store',
+          populate: {
+            path: 'storeType'
+          }
+        })
+        .populate({
+          path: 'color'
+        });
     }
   },
   Mutation: {

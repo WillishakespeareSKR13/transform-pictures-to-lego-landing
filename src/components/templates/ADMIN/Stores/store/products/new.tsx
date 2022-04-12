@@ -1,4 +1,4 @@
-import { useMutation } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client';
 import { css } from '@emotion/react';
 import { NEWPRODUCT } from '@Src/apollo/client/query/products';
 import { InputDragAndDropStyles, InputStyles } from '@Src/styles';
@@ -14,6 +14,8 @@ import { useFormik } from 'formik';
 import React, { Dispatch, FC, SetStateAction } from 'react';
 import * as Yup from 'yup';
 import { useRouter } from 'next/router';
+import { GETCOLORS } from '@Src/apollo/client/query/colors';
+import { IQueryFilter } from 'graphql';
 
 interface ModalNewProductType {
   state: boolean;
@@ -29,6 +31,7 @@ const ModalNewProduct: FC<ModalNewProductType> = (props) => {
       router.reload();
     }
   });
+  const { data } = useQuery<IQueryFilter<'getColors'>>(GETCOLORS);
 
   const formik = useFormik({
     initialValues: {
@@ -37,7 +40,8 @@ const ModalNewProduct: FC<ModalNewProductType> = (props) => {
       description: '',
       price: 0,
       stock: 0,
-      sku: ''
+      sku: '',
+      color: 'DEFAULT'
     },
     validationSchema: Yup.object({
       photo: Yup.string().required('Required'),
@@ -48,6 +52,7 @@ const ModalNewProduct: FC<ModalNewProductType> = (props) => {
       sku: Yup.string().required('Required')
     }),
     onSubmit: async (values) => {
+      const color = values.color === 'DEFAULT' ? {} : { color: values.color };
       newProduct({
         variables: {
           input: {
@@ -60,7 +65,8 @@ const ModalNewProduct: FC<ModalNewProductType> = (props) => {
               name: 'store',
               orgcode: 'LGO-0001'
             }),
-            store: router?.query?.id?.[1]
+            store: router?.query?.id?.[1],
+            ...color
           }
         }
       });
@@ -143,6 +149,21 @@ const ModalNewProduct: FC<ModalNewProductType> = (props) => {
                 labelFontSize="14px"
                 labelWidth="45%"
                 formik={formik}
+                customCSS={InputStyles}
+              />
+              <AtomInput
+                id="color"
+                type="select"
+                label="color"
+                labelFontSize="14px"
+                labelWidth="90%"
+                formik={formik}
+                defaultText="Select Color"
+                options={data?.getColors?.map((e) => ({
+                  id: `${e?.id}`,
+                  label: `${e?.name}`,
+                  value: `${e?.id}`
+                }))}
                 customCSS={InputStyles}
               />
               <AtomInput

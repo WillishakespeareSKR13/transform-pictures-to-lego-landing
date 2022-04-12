@@ -1,9 +1,11 @@
 import { css, SerializedStyles } from '@emotion/react';
 import { ItemCardShopType } from '@Src/components/templates/ADMIN/Stores/store/pointSale';
+import { OpenModal } from '@Src/redux/actions/modal';
 import { AtomButton, AtomImage, AtomText, AtomWrapper } from '@sweetsyui/ui';
 import { AnimatePresence } from 'framer-motion';
 import { IBoard } from 'graphql';
 import React, { Dispatch, FC, SetStateAction, useState } from 'react';
+import { useDispatch } from 'react-redux';
 
 interface MoleculeCardBoardType extends IBoard {
   setState: Dispatch<SetStateAction<ItemCardShopType[]>>;
@@ -21,8 +23,9 @@ const variants = {
   })
 };
 const MoleculeCardBoard: FC<MoleculeCardBoardType> = (props) => {
-  const { image, title, description, customCSS, sizes, currency, setState } =
+  const { id, image, title, description, customCSS, sizes, currency, type } =
     props;
+  const dispatch = useDispatch();
   const [show, setshow] = useState(false);
   return (
     <AtomWrapper
@@ -123,18 +126,14 @@ const MoleculeCardBoard: FC<MoleculeCardBoardType> = (props) => {
                   key={size?.id}
                   onClick={() => {
                     setshow(false);
-                    setState((prev) => [
-                      ...prev,
-                      {
-                        id: `${size?.id}`,
-                        image: `${image}`,
-                        name: `${title}`,
-                        price: size?.price ?? 0,
-                        quantity: 1,
-                        type: 'Board',
-                        variant: size?.type?.name
-                      }
-                    ]);
+                    dispatch(
+                      OpenModal({
+                        id: id,
+                        size: type?.name,
+                        sizeType: size?.type?.name,
+                        modal: true
+                      })
+                    );
                   }}
                   customCSS={css`
                     background-color: #f1576c;

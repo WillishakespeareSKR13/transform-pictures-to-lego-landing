@@ -12,9 +12,11 @@ import React, { Dispatch, FC, SetStateAction } from 'react';
 import { ProductModalType } from './index';
 import * as Yup from 'yup';
 import { UPDATEPRODUCT } from '@Src/apollo/client/query/products';
-import { useMutation } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client';
 import uploadImage from '@Src/utils/uploadImage';
 import { useRouter } from 'next/router';
+import { IQueryFilter } from 'graphql';
+import { GETCOLORS } from '@Src/apollo/client/query/colors';
 
 interface ModalUpdateProductType {
   state: ProductModalType;
@@ -36,6 +38,8 @@ const ModalUpdateProduct: FC<ModalUpdateProductType> = (props) => {
     }
   );
 
+  const { data } = useQuery<IQueryFilter<'getColors'>>(GETCOLORS);
+
   const formik = useFormik({
     initialValues: {
       photo: {} as File,
@@ -43,10 +47,10 @@ const ModalUpdateProduct: FC<ModalUpdateProductType> = (props) => {
       description: state?.description ?? '',
       price: state?.price ?? 0,
       stock: state?.stock ?? 0,
-      sku: state?.sku ?? ''
+      sku: state?.sku ?? '',
+      color: state?.color?.id ?? 'DEFAULT'
     },
     validationSchema: Yup.object({
-      photo: Yup.string().required('Required'),
       name: Yup.string().required('Required'),
       description: Yup.string().required('Required'),
       price: Yup.number().required('Required'),
@@ -55,6 +59,7 @@ const ModalUpdateProduct: FC<ModalUpdateProductType> = (props) => {
     }),
     enableReinitialize: true,
     onSubmit: async (values) => {
+      const color = values.color === 'DEFAULT' ? {} : { color: values.color };
       updateProduct({
         variables: {
           id: state?.id,
@@ -69,7 +74,8 @@ const ModalUpdateProduct: FC<ModalUpdateProductType> = (props) => {
                   name: 'store',
                   orgcode: 'LGO-0001'
                 })
-              : state?.image
+              : state?.image,
+            ...color
           }
         }
       });
@@ -153,6 +159,21 @@ const ModalUpdateProduct: FC<ModalUpdateProductType> = (props) => {
                 labelFontSize="14px"
                 labelWidth="45%"
                 formik={formik}
+                customCSS={InputStyles}
+              />
+              <AtomInput
+                id="color"
+                type="select"
+                label="color"
+                labelFontSize="14px"
+                labelWidth="90%"
+                formik={formik}
+                defaultText="Select Color"
+                options={data?.getColors?.map((e) => ({
+                  id: `${e?.id}`,
+                  label: `${e?.name}`,
+                  value: `${e?.id}`
+                }))}
                 customCSS={InputStyles}
               />
               <AtomInput

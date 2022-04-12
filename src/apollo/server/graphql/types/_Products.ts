@@ -13,6 +13,7 @@ const typeDefs = gql`
     stock: Int
     image: String
     store: Store
+    color: Color
   }
 
   #######################INPUT#######################
@@ -26,6 +27,7 @@ const typeDefs = gql`
     stock: Int
     image: String
     store: ID
+    color: ID
   }
 
   input FilterProduct {
@@ -39,6 +41,7 @@ const typeDefs = gql`
     image: String
     store: String
     storeArray: [String]
+    color: String
   }
 
   #######################QUERY#######################

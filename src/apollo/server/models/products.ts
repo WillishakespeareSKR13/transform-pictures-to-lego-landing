@@ -9,6 +9,7 @@ export interface IProducts extends Document {
   stock: number;
   image: string;
   store: ObjectId;
+  color: ObjectId;
 }
 
 const ProductsSchema: Schema = new Schema(
@@ -46,6 +47,10 @@ const ProductsSchema: Schema = new Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Store',
       required: true
+    },
+    color: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Color'
     }
   },
   {

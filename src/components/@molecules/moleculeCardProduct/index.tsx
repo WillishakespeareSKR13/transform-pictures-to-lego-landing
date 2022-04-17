@@ -4,6 +4,8 @@ import { SerializedStyles } from '@emotion/utils';
 import { AtomButton, AtomImage, AtomText, AtomWrapper } from '@sweetsyui/ui';
 import { css } from '@emotion/react';
 import { ItemCardShopType } from '@Src/components/templates/ADMIN/Stores/store/pointSale';
+import { useAtom } from 'jotai';
+import { ICart, setCartAtom } from '@Src/jotai/cart';
 
 interface MoleculeCardProductType extends IProducts {
   setState: Dispatch<SetStateAction<ItemCardShopType[]>>;
@@ -11,8 +13,8 @@ interface MoleculeCardProductType extends IProducts {
 }
 
 const MoleculeCardProduct: FC<MoleculeCardProductType> = (props) => {
-  const { id, image, name, price, description, stock, customCSS, setState } =
-    props;
+  const [cart, setCart] = useAtom(setCartAtom);
+  const { id, image, name, price, description, stock, customCSS } = props;
   return (
     <AtomWrapper
       customCSS={css`
@@ -93,26 +95,28 @@ const MoleculeCardProduct: FC<MoleculeCardProductType> = (props) => {
             transition: background-color 0.3s ease;
           `}
           onClick={() => {
-            setState((prev) => {
-              const isExist = prev.find((item) => item.id === id);
-              return isExist
-                ? prev.map((item) =>
-                    item.id === id
-                      ? { ...item, quantity: item.quantity + 1 }
-                      : item
-                  )
-                : [
-                    ...prev,
-                    {
-                      id: `${id}`,
-                      image: `${image}`,
-                      name: `${name}`,
-                      price: price ?? 0,
-                      quantity: 1,
-                      type: 'Product'
-                    }
-                  ];
-            });
+            const product = Object.fromEntries(
+              Object.entries(props).filter(
+                ([key]) => !['customCSS', 'setState'].includes(key)
+              )
+            );
+            const isCart = cart.find((item) => item.id === id);
+            if (isCart) {
+              setCart({
+                key: 'ADDQUANTITY',
+                payload: id
+              });
+            } else {
+              setCart({
+                key: 'ADDCART',
+                payload: {
+                  id: id,
+                  type: 'PRODUCT',
+                  quantity: 1,
+                  product: product
+                } as ICart
+              });
+            }
           }}
         >
           <AtomText

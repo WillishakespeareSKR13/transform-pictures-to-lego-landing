@@ -5,6 +5,7 @@ import { GETPRODUCTS } from '@Src/apollo/client/query/products';
 import MoleculeCardBoard from '@Src/components/@molecules/moleculeCardBoard';
 import MoleculeCardProduct from '@Src/components/@molecules/moleculeCardProduct';
 import PageIndex from '@Src/components/pages/index';
+import { colorsAtoms, ICart, setCartAtom } from '@Src/jotai/cart';
 import { RootStateType } from '@Src/redux/reducer';
 
 export type ItemCardShopType = {
@@ -20,13 +21,15 @@ export type ItemCardShopType = {
 
 import {
   AtomButton,
+  AtomIcon,
+  AtomImage,
   AtomLoader,
   AtomModal,
   AtomText,
-  AtomWrapper,
-  ItemCartShop
+  AtomWrapper
 } from '@sweetsyui/ui';
 import { IQueryFilter } from 'graphql';
+import { useAtom } from 'jotai';
 import { useRouter } from 'next/router';
 import React, { FC, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -37,6 +40,8 @@ const variablesSale = {
 };
 
 const PointSale: FC = () => {
+  const [cart, setCart] = useAtom(setCartAtom);
+  const [colors] = useAtom(colorsAtoms);
   const router = useRouter();
   const modal = useSelector((state: RootStateType) => state.modal);
   const [cartShop, setCartShop] = useState<ItemCardShopType[]>([]);
@@ -48,6 +53,175 @@ const PointSale: FC = () => {
       }
     }
   });
+
+  const BOARD = (e: ICart) => {
+    const board = boards?.getBoards?.find((x) => x?.id === e.id);
+    const size = board?.sizes?.find((x) => x?.id === e.board?.size);
+    return (
+      <AtomWrapper
+        key={e.id}
+        customCSS={css`
+          width: 100%;
+          padding: 15px 20px;
+          flex-direction: row;
+          background-color: #202026;
+          border-radius: 4px;
+          gap: 20px;
+          color: #fff;
+          font-weight: bold;
+        `}
+      >
+        <AtomImage
+          customCSS={css`
+            width: 60px;
+            height: 60px;
+          `}
+          src={board?.image ?? 'http://via.placeholder.com/300x300'}
+          alt={e.id}
+        />
+        <AtomWrapper
+          customCSS={css`
+            width: calc(100% - 80px);
+            display: flex;
+            flex-direction: column;
+          `}
+        >
+          <AtomText
+            customCSS={css`
+              font-size: 12px;
+              font-weight: bold;
+              color: #fff;
+              margin-bottom: 10px;
+            `}
+          >
+            {board?.description} {size?.title}
+          </AtomText>
+          <AtomWrapper
+            customCSS={css`
+              display: flex;
+              flex-direction: row;
+              width: max-content;
+              gap: 10px;
+            `}
+          >
+            <AtomText color="#ffffff">{e.quantity}</AtomText>
+
+            <AtomButton
+              padding="4px"
+              onClick={() =>
+                setCart({
+                  key: 'REMOVECART',
+                  payload: board?.id
+                })
+              }
+            >
+              <AtomIcon
+                width="13px"
+                height="13px"
+                icon="https://storage.googleapis.com/cdn-bucket-ixulabs-platform/IXU-0001/icons8-basura.svg"
+                color="#ffffff"
+              />
+            </AtomButton>
+          </AtomWrapper>
+        </AtomWrapper>
+      </AtomWrapper>
+    );
+  };
+
+  const PRODUCT = (e: ICart) => {
+    const { image, name } = e?.product ?? {};
+    return (
+      <AtomWrapper
+        key={e.id}
+        customCSS={css`
+          width: 100%;
+          padding: 15px 20px;
+          flex-direction: row;
+          background-color: #202026;
+          border-radius: 4px;
+          gap: 20px;
+          color: #fff;
+          font-weight: bold;
+        `}
+      >
+        <AtomImage
+          customCSS={css`
+            width: 60px;
+            height: 60px;
+          `}
+          src={image ?? 'http://via.placeholder.com/300x300'}
+          alt={e.id}
+        />
+        <AtomWrapper
+          customCSS={css`
+            width: calc(100% - 80px);
+            display: flex;
+            flex-direction: column;
+          `}
+        >
+          <AtomText
+            customCSS={css`
+              font-size: 12px;
+              font-weight: bold;
+              color: #fff;
+              margin-bottom: 10px;
+            `}
+          >
+            {name}
+          </AtomText>
+          <AtomWrapper
+            customCSS={css`
+              display: flex;
+              flex-direction: row;
+              width: max-content;
+              gap: 10px;
+            `}
+          >
+            <AtomButton
+              padding="0px 10px"
+              disabled={e.quantity <= 1}
+              onClick={() =>
+                setCart({
+                  key: 'REMOVEQUANTITY',
+                  payload: e.id
+                })
+              }
+            >
+              <AtomText color="white">-</AtomText>
+            </AtomButton>
+            <AtomText color="#ffffff">{e.quantity}</AtomText>
+            <AtomButton
+              padding="0px 10px"
+              onClick={() =>
+                setCart({
+                  key: 'ADDQUANTITY',
+                  payload: e.id
+                })
+              }
+            >
+              <AtomText color="white">+</AtomText>
+            </AtomButton>
+            <AtomButton
+              padding="4px"
+              onClick={() =>
+                setCart({
+                  key: 'REMOVECART',
+                  payload: e.id
+                })
+              }
+            >
+              <AtomIcon
+                width="13px"
+                height="13px"
+                icon="https://storage.googleapis.com/cdn-bucket-ixulabs-platform/IXU-0001/icons8-basura.svg"
+                color="white"
+              />
+            </AtomButton>
+          </AtomWrapper>
+        </AtomWrapper>
+      </AtomWrapper>
+    );
+  };
 
   return (
     <>
@@ -123,98 +297,14 @@ const PointSale: FC = () => {
             customCSS={css`
               height: 770px;
               overflow-y: auto;
+              gap: 10px;
             `}
           >
-            {cartShop.map((item) => (
-              <ItemCartShop
-                key={item.id}
-                {...item}
-                src={item.image}
-                buttonProps={{
-                  onClick: () => {
-                    setCartShop((cartShop) =>
-                      cartShop.filter((_) => _.id !== item.id)
-                    );
-                  }
-                }}
-                //setState={setCartShop}
-              >
-                <AtomWrapper
-                  flexDirection="row"
-                  width="100%"
-                  alignItems="center"
-                  customCSS={css`
-                    gap: 1rem;
-                  `}
-                >
-                  <AtomWrapper width={item.type !== 'Product' ? '100%' : '50%'}>
-                    <AtomText color="#ffffff">{item.name}</AtomText>
-                    <AtomText color="#ffffff">$ {item.price}</AtomText>
-                  </AtomWrapper>
-                  {item.type === 'Product' && (
-                    <AtomWrapper
-                      width="50%"
-                      flexDirection="row"
-                      alignItems="center"
-                      customCSS={css`
-                        gap: 0.5rem;
-                      `}
-                    >
-                      <AtomButton
-                        padding="0px 10px"
-                        disabled={item.quantity === 1}
-                        onClick={() => {
-                          setCartShop(
-                            cartShop.map((item) => {
-                              if (item.id === item.id) {
-                                return {
-                                  ...item,
-                                  quantity: item.quantity - 1
-                                };
-                              }
-                              return item;
-                            })
-                          );
-                        }}
-                      >
-                        <AtomText color="#ffffff">-</AtomText>
-                      </AtomButton>
-                      <AtomText color="#ffffff">{item.quantity}</AtomText>
-                      <AtomButton
-                        padding="0px 10px"
-                        onClick={() => {
-                          setCartShop(
-                            cartShop.map((item) => {
-                              if (item.id === item.id) {
-                                return {
-                                  ...item,
-                                  quantity: item.quantity + 1
-                                };
-                              }
-                              return item;
-                            })
-                          );
-                        }}
-                      >
-                        <AtomText color="#ffffff">+</AtomText>
-                      </AtomButton>
-                    </AtomWrapper>
-                  )}
-                  {item.type === 'Board' && (
-                    <AtomWrapper
-                      width="50%"
-                      alignItems="center"
-                      customCSS={css`
-                        gap: 0.5rem;
-                      `}
-                    >
-                      <AtomText color="#ffffff">{item?.variant}</AtomText>
-                    </AtomWrapper>
-                  )}
-                </AtomWrapper>
-              </ItemCartShop>
-            ))}
+            {cart.map((e) =>
+              e.type === 'BOARD' ? <BOARD {...e} /> : <PRODUCT {...e} />
+            )}
           </AtomWrapper>
+
           <AtomWrapper
             height="100%"
             justifyContent="flex-end"
@@ -222,6 +312,53 @@ const PointSale: FC = () => {
               gap: 10px;
             `}
           >
+            <AtomWrapper
+              customCSS={css`
+                width: 100%;
+                flex-wrap: wrap;
+                flex-direction: row;
+                justify-content: flex-start;
+                gap: 5px;
+              `}
+            >
+              {colors.map((e) => (
+                <AtomWrapper
+                  key={e.color}
+                  customCSS={css`
+                    flex-direction: row;
+                    max-width: max-content;
+                    min-width: 48px;
+                    justify-content: flex-start;
+                    gap: 5px;
+                  `}
+                >
+                  <AtomWrapper
+                    customCSS={css`
+                      width: 15px;
+                      height: 15px;
+                      background-color: ${e.color};
+                      border: 1px solid #eeeeee;
+                    `}
+                  />
+                  <AtomText
+                    customCSS={css`
+                      ${e.rest > 0
+                        ? css`
+                            color: #e42222;
+                          `
+                        : css`
+                            color: #14cf68;
+                          `}
+                      font-size: 10px;
+                      font-weight: bold;
+                    `}
+                  >
+                    {/* {e.count} */}
+                    {e.rest > 0 ? e.rest : `+${Math.abs(e.rest)}`}
+                  </AtomText>
+                </AtomWrapper>
+              ))}
+            </AtomWrapper>
             <AtomButton width="100%" backgroundColor="#eeeeee" color="#000000">
               Apply Coupon
             </AtomButton>

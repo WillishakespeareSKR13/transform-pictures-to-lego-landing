@@ -1,12 +1,13 @@
-import { useMutation } from '@apollo/client';
 import { css } from '@emotion/react';
 import ReactPDF from '@react-pdf/renderer';
-import { NEWCOLORSALEORDER } from '@Src/apollo/client/mutation/color';
-import { NEWSALEORDER } from '@Src/apollo/client/mutation/saleOrder';
 import { COLORTYPE } from '@Src/config';
+import { ICart, setCartAtom } from '@Src/jotai/cart';
+import { CloseModal } from '@Src/redux/actions/modal';
 import { AtomWrapper, AtomButton, uploadImage } from '@sweetsyui/ui';
-import { IBoard, IBoardSize, ISaleOrder } from 'graphql';
-import { FC, useEffect, useState } from 'react';
+import { IBoard, IBoardSize } from 'graphql';
+import { useAtom } from 'jotai';
+import { FC } from 'react';
+import { useDispatch } from 'react-redux';
 
 type Props = {
   board?: IBoard;
@@ -18,15 +19,8 @@ type Props = {
 
 const PaymentModal: FC<Props> = (props) => {
   const { board, size, isReady, color, pdf } = props;
-  const [saleOrder, setSaleOrder] = useState<ISaleOrder | undefined>();
-
-  const [EXENEWSALEORDER, { data }] = useMutation(NEWSALEORDER);
-  const [EXENEWCOLORSALEORDER] = useMutation(NEWCOLORSALEORDER);
-
-  useEffect(() => {
-    const secret = data?.newSaleOrder;
-    setSaleOrder(secret);
-  }, [data?.newSaleOrder]);
+  const dispatch = useDispatch();
+  const [_, setCart] = useAtom(setCartAtom);
 
   return (
     <AtomWrapper
@@ -82,32 +76,21 @@ const PaymentModal: FC<Props> = (props) => {
                 : [...acc, curr];
             }, [] as { value: string; count: number; color: string; id: string }[]);
 
-          EXENEWCOLORSALEORDER({
-            variables: {
-              input: {
-                colors: transformColor?.map((color) => ({
-                  color: color.id,
-                  quantity: color.count
-                }))
-              }
-            }
-          }).then((e) => {
-            const id = e.data.newColorSaleOrder.id;
-            EXENEWSALEORDER({
-              variables: {
-                input: {
-                  board: [
-                    {
-                      board: board?.id,
-                      size: size?.id,
-                      pdf: urlPdf
-                    }
-                  ],
-                  colorsaleorder: [id]
-                }
-              }
-            });
+          setCart({
+            key: 'ADDCART',
+            payload: {
+              id: board?.id,
+              type: 'BOARD',
+              quantity: 1,
+              board: {
+                id: board?.id,
+                size: size?.id,
+                pdf: urlPdf
+              },
+              color: transformColor
+            } as ICart
           });
+          dispatch(CloseModal());
         }}
       >
         ADD

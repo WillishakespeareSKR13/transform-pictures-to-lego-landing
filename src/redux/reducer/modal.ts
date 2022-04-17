@@ -25,7 +25,7 @@ export type ModalReducerType = {
 };
 
 export const initialState: ModalReducerType = {
-  modal: true,
+  modal: false,
   id: '',
   size: '',
   sizeType: ''

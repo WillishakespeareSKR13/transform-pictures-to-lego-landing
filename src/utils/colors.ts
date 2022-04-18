@@ -5,32 +5,32 @@ const color = [
     id: 0
   },
   {
-    name: 'White',
+    name: 'White 2',
     hex: '#f8e7e3',
     id: 0
   },
   {
-    name: 'White',
+    name: 'White 3',
     hex: '#d7d6dd',
     id: 1
   },
   {
-    name: 'White',
+    name: 'White 4',
     hex: '#ebebeb',
     id: 111
   },
   {
-    name: 'White',
+    name: 'White 5',
     hex: '#b0b0b0',
     id: 112
   },
   {
-    name: 'White',
+    name: 'White 6',
     hex: '#a5a5a5',
     id: 112
   },
   {
-    name: 'White',
+    name: 'White 7',
     hex: '#d2d2d2',
     id: 112
   },
@@ -229,7 +229,6 @@ const color = [
     hex: '#9A866A',
     id: 40
   },
-  /////////
   {
     name: 'Green',
     hex: '#6e923b',

@@ -126,7 +126,7 @@ const PaymentModal: FC<Props> = (props) => {
               ?.map((color) =>
                 Object.entries(color).map(([_, value]) => ({
                   ...value,
-                  count: Math.round(value.count / 156.24)
+                  count: Math.ceil(value.count / 156.25)
                 }))
               )
               .flat()

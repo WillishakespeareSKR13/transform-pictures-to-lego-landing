@@ -16,9 +16,11 @@ const resolvers: Resolvers = {
     },
     getUsers: async (_, { filter }) => {
       const store = filter.store ? { store: filter.store } : {};
+      const role = filter.role ? { role: filter.role } : {};
       return await Users.find({
         ...filter,
-        ...store
+        ...store,
+        ...role
       })
         .populate('role')
         .populate({

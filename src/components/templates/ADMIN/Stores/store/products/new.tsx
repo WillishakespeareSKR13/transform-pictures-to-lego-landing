@@ -16,6 +16,7 @@ import * as Yup from 'yup';
 import { useRouter } from 'next/router';
 import { GETCOLORS } from '@Src/apollo/client/query/colors';
 import { IQueryFilter } from 'graphql';
+// import color from '@Src/utils/colors';
 
 interface ModalNewProductType {
   state: boolean;
@@ -90,6 +91,35 @@ const ModalNewProduct: FC<ModalNewProductType> = (props) => {
             justifyContent="center"
             flexDirection="row"
           >
+            {/* <AtomButton
+              onClick={() => {
+                color.map(async (e) => {
+                  const findColor = data?.getColors?.find(
+                    (color) => color?.color === e.hex
+                  );
+                  const col = findColor ? { color: findColor?.id } : {};
+                  newProduct({
+                    variables: {
+                      input: {
+                        name: e.name,
+                        description: `Brick ${e.name}`,
+                        price: 5,
+                        stock: 1000,
+                        sku: `${e.name}-brick`.toUpperCase(),
+                        image: `https://www.colorbook.io/imagecreator.php?hex=${e.hex.replace(
+                          '#',
+                          ''
+                        )}&width=80&height=80`,
+                        store: router?.query?.id?.[1],
+                        ...col
+                      }
+                    }
+                  });
+                });
+              }}
+            >
+              ADD COLORS
+            </AtomButton> */}
             <AtomLoader
               isLoading={loadingNewProduct}
               backgroundColor="transparent"

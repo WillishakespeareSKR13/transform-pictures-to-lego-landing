@@ -155,7 +155,7 @@ export const AtomPdf: FC<AtomPdfProps> = (props) => {
               {Object.entries(colors?.[index] ?? {})
                 .map((color) => ({
                   ...color[1],
-                  count: Math.round(color[1].count / 156.25)
+                  count: Math.ceil(color[1].count / 156.25)
                 }))
                 .filter((color) => color.count > 0)
                 .map((color) => (

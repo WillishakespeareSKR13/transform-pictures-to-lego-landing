@@ -73,7 +73,7 @@ const Products: FC = () => {
         padding="10px 0"
         flexDirection="row"
         customCSS={css`
-          height: calc(100vh - 140px);
+          min-height: calc(100vh - 140px);
           gap: 30px;
         `}
       >

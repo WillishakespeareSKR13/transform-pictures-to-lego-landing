@@ -8,7 +8,6 @@ import React, { Dispatch, FC, SetStateAction, useState } from 'react';
 import { useDispatch } from 'react-redux';
 
 interface MoleculeCardBoardType extends IBoard {
-  setState: Dispatch<SetStateAction<ItemCardShopType[]>>;
   customCSS?: SerializedStyles;
 }
 

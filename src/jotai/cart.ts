@@ -52,6 +52,7 @@ export type ICart = {
   quantity: number;
   color?: IColor;
   board?: {
+    id: string;
     board?: string;
     size?: string;
     pdf?: string;
@@ -75,7 +76,7 @@ const bricksAtoms = atom((get) =>
           ? [
               ...acc,
               {
-                id: cur?.product?.color?.color ?? '',
+                id: cur?.product?.color?.id ?? '',
                 quantity: cur?.quantity * 50
               }
             ]
@@ -105,7 +106,7 @@ export const colorsAtoms = atom((get) =>
     }, [] as IColor)
     .map((e) => {
       const bricks = get(bricksAtoms);
-      const isBrick = bricks.find((item) => item.id === e.color);
+      const isBrick = bricks.find((item) => item.id === e.id);
       return {
         ...e,
         rest: isBrick ? e.count - isBrick?.quantity : e.count
@@ -114,7 +115,16 @@ export const colorsAtoms = atom((get) =>
 );
 
 export const setCartAtom = atom<ICart[], IAction>(
-  (get) => get(cartAtom),
+  (get) =>
+    get(cartAtom).sort((a, b) => {
+      if (a.type === 'BOARD' && b.type === 'PRODUCT') {
+        return -1;
+      }
+      if (a.type === 'PRODUCT' && b.type === 'BOARD') {
+        return 1;
+      }
+      return 0;
+    }),
   (get, set, action) => {
     const { key, payload } = action;
     const getReducer = reducerAtom[key];

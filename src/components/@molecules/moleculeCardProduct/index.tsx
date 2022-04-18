@@ -8,7 +8,6 @@ import { useAtom } from 'jotai';
 import { ICart, setCartAtom } from '@Src/jotai/cart';
 
 interface MoleculeCardProductType extends IProducts {
-  setState: Dispatch<SetStateAction<ItemCardShopType[]>>;
   customCSS?: SerializedStyles;
 }
 

@@ -64,54 +64,93 @@ type AtomPdfProps = {
   };
 };
 
+const styles = StyleSheet.create({
+  page: {
+    padding: 40,
+    flexDirection: 'column',
+    backgroundColor: '#ffffff',
+    alignItems: 'center'
+  },
+  section: {
+    width: '100%',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  image: {
+    width: 750,
+    height: 750
+  },
+  mainUP: {
+    width: '100%',
+    height: 200,
+    flexDirection: 'column',
+    flexWrap: 'wrap',
+    justifyContent: 'flex-start',
+    alignItems: 'flex-start'
+  },
+  main: {
+    width: '100%',
+    height: 300,
+    flexDirection: 'column',
+    flexWrap: 'wrap',
+    justifyContent: 'flex-start',
+    alignItems: 'flex-start'
+  },
+  mainContainer: {
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    marginBottom: 5,
+    alignItems: 'center'
+  },
+  text: {
+    marginLeft: 5,
+    fontSize: 18,
+    marginRight: 10,
+    textAlign: 'center',
+    color: '#000000',
+    fontWeight: 'bold'
+  },
+  ImageLogo: {
+    height: '80px',
+    width: '200px',
+    marginBottom: 20
+  },
+  colorsView: {
+    width: '100%',
+    marginTop: 20,
+    flexDirection: 'column',
+    justifyContent: 'flex-start',
+    alignItems: 'flex-start'
+  }
+});
+type AtomPdfProps = {
+  images: string[];
+  width?: string;
+  height?: string;
+  colors?: ColorType[];
+  isPortrait?: boolean;
+  payment: {
+    board?: IBoard;
+    size?: IBoardSize;
+    isReady?: boolean;
+    color?: COLORTYPE[];
+  };
+};
+
 export const AtomPdf: FC<AtomPdfProps> = (props) => {
   const { images, colors, width, height, isPortrait } = props;
   const stylesImg = StyleSheet.create({
     image: {
-      width: 400 / Number(width),
-      height: 400 / Number(width)
+      width: 750 / Number(width),
+      height: 750 / Number(width)
     }
   });
   return (
     <Document>
-      <Page style={styles.page}>
+      <Page style={styles.page} size={'A3'}>
+        <Image style={styles.ImageLogo} src="/images/logo.png" />
         <View style={styles.section}>
-          <View style={styles.main}>
-            {colors
-              ?.map((color) =>
-                Object.entries(color).map(([_, value]) => ({
-                  ...value,
-                  count: Math.round(value.count / 156.25)
-                }))
-              )
-              .flat()
-              .reduce((acc, curr) => {
-                const isColor = acc.find((color) => color.value === curr.value);
-                return isColor
-                  ? acc.map((e) =>
-                      e.value === curr.value
-                        ? { ...e, count: e.count + curr.count }
-                        : e
-                    )
-                  : [...acc, curr];
-              }, [] as { value: string; count: number; color: string }[])
-              .map((color) => (
-                <View key={color.value} style={styles.mainContainer}>
-                  <View
-                    style={{
-                      width: '20px',
-                      height: '20px',
-                      backgroundColor: color.value,
-                      border: '1px solid #ffffff'
-                    }}
-                  ></View>
-                  <Text style={styles.text}>{color.count}</Text>
-                </View>
-              ))}
-            <Text style={styles.text}>
-              Total: {isPortrait ? 2500 : 1024 * Number(width) * Number(height)}
-            </Text>
-          </View>
           <View
             style={{
               display: 'flex',
@@ -119,8 +158,8 @@ export const AtomPdf: FC<AtomPdfProps> = (props) => {
               flexWrap: 'wrap',
               width:
                 Number(width) > Number(height)
-                  ? (400 / Number(height)) * Number(width)
-                  : (400 / Number(width)) * Number(height) + Number(width) * 4
+                  ? (750 / Number(height)) * Number(width)
+                  : (750 / Number(width)) * Number(height) + Number(width) * 4
             }}
           >
             {images.map((image, index) => (
@@ -135,10 +174,10 @@ export const AtomPdf: FC<AtomPdfProps> = (props) => {
                 <Text
                   style={{
                     position: 'absolute',
-                    color: '#ffffff',
-                    top: `${400 / Number(width) / 2 - 7}px`,
-                    left: `${400 / Number(width) / 2 - 7}px`,
-                    fontSize: 32
+                    color: 'black',
+                    top: `${750 / Number(width) / 2 - 14}px`,
+                    left: `${750 / Number(width) / 2 - 14}px`,
+                    fontSize: 64
                   }}
                 >
                   {index + 1}
@@ -146,106 +185,200 @@ export const AtomPdf: FC<AtomPdfProps> = (props) => {
               </View>
             ))}
           </View>
-        </View>
-      </Page>
-      {images?.map((image, index) => (
-        <Page key={`${index + 1}`} size="A4" style={styles.page}>
-          <View style={styles.section} key={index}>
-            <View style={styles.main}>
-              {Object.entries(colors?.[index] ?? {})
-                .map((color) => ({
-                  ...color[1],
-                  count: Math.ceil(color[1].count / 156.25)
-                }))
-                .filter((color) => color.count > 0)
+          <View style={styles.colorsView}>
+            <View style={styles.mainUP}>
+              {colors
+                ?.map((color) =>
+                  Object.entries(color).map(([_, value]) => ({
+                    ...value,
+                    count: Math.ceil(value.count / 156.25)
+                  }))
+                )
+                .flat()
+                .reduce((acc, curr) => {
+                  const isColor = acc.find(
+                    (color) => color.value === curr.value
+                  );
+                  return isColor
+                    ? acc.map((e) =>
+                        e.value === curr.value
+                          ? { ...e, count: e.count + curr.count }
+                          : e
+                      )
+                    : [...acc, curr];
+                }, [] as { value: string; count: number; color: string }[])
                 .map((color) => (
                   <View key={color.value} style={styles.mainContainer}>
                     <View
                       style={{
-                        width: '20px',
-                        height: '20px',
-                        backgroundColor: color.value
+                        width: '30px',
+                        height: '30px',
+                        backgroundColor: color.value,
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        justifyContent: 'center'
                       }}
-                    ></View>
+                    >
+                      <Image
+                        src={
+                          color?.img ??
+                          'http://via.placeholder.com/300.jpg/transparent?text=W'
+                        }
+                        style={{
+                          width: '20px',
+                          height: '20px'
+                        }}
+                      />
+                    </View>
                     <Text style={styles.text}>{color.count}</Text>
                   </View>
                 ))}
-              <Text style={styles.text}>Total: {isPortrait ? 2500 : 1024}</Text>
             </View>
-
+            <Text style={styles.text}>
+              Total: {isPortrait ? 2500 : 1024 * Number(width) * Number(height)}
+            </Text>
+          </View>
+        </View>
+      </Page>
+      {images?.map((image, index) => (
+        <Page key={`${index + 1}`} size="A3" style={styles.page}>
+          <View style={styles.section} key={index}>
             {/* <Text style={styles.text}>
-              {Object.entries(colors?.find((_, idx) => idx === index) ?? {})
-                .map((color) => ({
-                  ...color[1],
-                  count: Math.round(color[1].count / 156.25)
-                }))
-                .filter((color) => color.count > 0)
-                .reduce((acc, color) => acc + color.count, 0)}
-            </Text> */}
+                {Object.entries(colors?.find((_, idx) => idx === index) ?? {})
+                  .map((color) => ({
+                    ...color[1],
+                    count: Math.round(color[1].count / 156.25)
+                  }))
+                  .filter((color) => color.count > 0)
+                  .reduce((acc, color) => acc + color.count, 0)}
+              </Text> */}
             <View
               style={{
-                width: '440px',
-                height: '440px'
+                width: '750px',
+                height: '750px',
+                position: 'relative'
               }}
             >
               <View
                 style={{
-                  width: '440px',
+                  width: '800px',
                   height: '20px',
                   flexDirection: 'row',
-                  padding: '0px 0px 0px 20px',
-                  justifyContent: 'space-between',
-                  alignItems: 'center'
-                }}
-              >
-                {Array.from({ length: isPortrait ? 50 : 32 }, (_, idx) => (
-                  <Text
-                    style={{
-                      fontSize: `${isPortrait ? 6 : 9}px`,
-                      fontWeight: 600,
-                      color: '#ffffff'
-                    }}
-                  >
-                    {idx + 1}
-                  </Text>
-                ))}
-              </View>
-              <View
-                style={{
-                  width: '440px',
-                  height: '420px',
-                  flexDirection: 'row'
+                  position: 'absolute',
+                  left: `-${750 / (isPortrait ? 50 : 32)}px`,
+                  top: `-${750 / (isPortrait ? 50 : 32)}px`
                 }}
               >
                 <View
                   style={{
-                    width: '20px',
-                    height: '420px',
-                    padding: '0px 0px 0px 0px',
-                    justifyContent: 'space-between',
-                    alignItems: 'center'
+                    width: `${750 / (isPortrait ? 50 : 32)}px`,
+                    height: `${750 / (isPortrait ? 50 : 32)}px`
                   }}
-                >
-                  {Array.from({ length: isPortrait ? 50 : 32 }, (_, idx) => (
+                />
+                {Array.from({ length: isPortrait ? 50 : 32 }, (_, idx) => (
+                  <View
+                    style={{
+                      width: `${750 / (isPortrait ? 50 : 32)}px`,
+                      height: `${750 / (isPortrait ? 50 : 32)}px`,
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}
+                  >
                     <Text
                       style={{
                         fontSize: `${isPortrait ? 6 : 9}px`,
                         fontWeight: 600,
-                        color: '#ffffff'
+                        color: 'black'
                       }}
                     >
                       {idx + 1}
                     </Text>
-                  ))}
-                </View>
-                <Image
-                  src={image}
+                  </View>
+                ))}
+              </View>
+              <View
+                style={{
+                  height: '800px',
+                  width: '20px',
+                  flexDirection: 'column',
+                  position: 'absolute',
+                  left: `-${750 / (isPortrait ? 50 : 32)}px`,
+                  top: `-${750 / (isPortrait ? 50 : 32)}px`
+                }}
+              >
+                <View
                   style={{
-                    width: '420px',
-                    height: '420px'
+                    width: `${750 / (isPortrait ? 50 : 32)}px`,
+                    height: `${750 / (isPortrait ? 50 : 32)}px`
                   }}
                 />
+                {Array.from({ length: isPortrait ? 50 : 32 }, (_, idx) => (
+                  <View
+                    style={{
+                      width: `${750 / (isPortrait ? 50 : 32)}px`,
+                      height: `${750 / (isPortrait ? 50 : 32)}px`,
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}
+                  >
+                    <Text
+                      style={{
+                        fontSize: `${isPortrait ? 6 : 9}px`,
+                        fontWeight: 600,
+                        color: 'black'
+                      }}
+                    >
+                      {idx + 1}
+                    </Text>
+                  </View>
+                ))}
               </View>
+
+              <Image
+                src={image}
+                style={{
+                  width: '750px',
+                  height: '750px'
+                }}
+              />
+            </View>
+
+            <View style={styles.colorsView}>
+              <View style={styles.main}>
+                {Object.entries(colors?.[index] ?? {})
+                  .map((color) => ({
+                    ...color[1],
+                    count: Math.ceil(color[1].count / 156.25)
+                  }))
+                  .filter((color) => color.count > 0)
+                  .map((color) => (
+                    <View key={color.value} style={styles.mainContainer}>
+                      <View
+                        style={{
+                          width: '30px',
+                          height: '30px',
+                          backgroundColor: color.value,
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          justifyContent: 'center'
+                        }}
+                      >
+                        <Image
+                          src={
+                            color?.img ??
+                            'http://via.placeholder.com/300.jpg/transparent?text=W'
+                          }
+                          style={{
+                            width: '20px',
+                            height: '20px'
+                          }}
+                        />
+                      </View>
+                      <Text style={styles.text}>{color.count}</Text>
+                    </View>
+                  ))}
+              </View>
+              <Text style={styles.text}>Total: {isPortrait ? 2500 : 1024}</Text>
             </View>
           </View>
         </Page>
@@ -255,7 +388,7 @@ export const AtomPdf: FC<AtomPdfProps> = (props) => {
 };
 
 type ColorType = {
-  [key: string]: { value: string; count: number; color: string };
+  [key: string]: { value: string; count: number; color: string; img: string };
 };
 
 type DocumentProps = {

@@ -4,7 +4,7 @@ import { COLORTYPE } from '@Src/config';
 import { Dispatch, SetStateAction } from 'react';
 import Pixel from '@Utils/pixelitJS';
 import { brick } from './legobricks';
-import { IColor } from 'graphql';
+import { IQueryFilter } from 'graphql';
 
 const query = `query getColors{
   getColors{
@@ -37,7 +37,10 @@ export const cropAndFilter = async (
   setColors: Dispatch<SetStateAction<COLORTYPE[]>>,
   isPortrait: boolean
 ) => {
-  const color = await request('/api/graphql', query).then((e) => e.getColors);
+  const color = await request<IQueryFilter<'getColors'>>(
+    '/api/graphql',
+    query
+  ).then((e) => e.getColors);
   setStateLoading(true);
   const blobcreateImage = createImage(blob);
   setState([]);
@@ -128,26 +131,26 @@ export const cropAndFilter = async (
         canvas2.width = w2;
         canvas2.height = h2;
         context2.drawImage(imgElement, 0, 0);
-        const mypalette = color.map((c: IColor) => {
+        const mypalette = color?.map((c) => {
           const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(
-            c.color ?? ''
+            c?.color ?? ''
           ) ?? ['0', '0', '0'];
 
           return {
-            id: c.id,
+            id: c?.id,
             color: [
               parseInt(result[1], 16),
               parseInt(result[2], 16),
               parseInt(result[3], 16)
             ],
-            value: c.color ?? ''
+            value: c?.color ?? ''
           };
         });
         const config = {
           to: canvas2,
           from: imgElement,
           scale: isPortrait ? 12.5 : 8,
-          palette: mypalette.map((c: any) => c.color)
+          palette: mypalette?.map((c: any) => c.color)
         };
         // console.log(mypalette);
         const px = new Pixel(config);
@@ -223,7 +226,7 @@ export const cropAndFilter = async (
             };
           };
           colorList.push(
-            similarColor([data[i], data[i + 1], data[i + 2]], mypalette)
+            similarColor([data[i], data[i + 1], data[i + 2]], mypalette ?? [])
           );
         }
 
@@ -237,7 +240,8 @@ export const cropAndFilter = async (
                 id: curr.id,
                 color: curr.hex,
                 value: curr.hex,
-                count: isRepeat ? acc[curr.hex].count + 1 : 1
+                count: isRepeat ? acc[curr.hex].count + 1 : 1,
+                img: color?.find((c) => c?.id === curr?.id)?.icon ?? ''
               }
             };
           }, {} as COLORTYPE)

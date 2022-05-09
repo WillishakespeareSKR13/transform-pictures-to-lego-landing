@@ -20,6 +20,8 @@ const STORES = () => {
     <AtomWrapper>
       <AtomWrapper
         customCSS={css`
+          flex-direction: row;
+          justify-content: space-between;
           background-color: #202026;
           margin-bottom: 15px;
           border-radius: 5px;
@@ -35,6 +37,11 @@ const STORES = () => {
         >
           All Stores
         </AtomText>
+        <AtomWrapper width="max-content">
+          <AtomButton onClick={() => router.push('/dashboard/colors')}>
+            Colors
+          </AtomButton>
+        </AtomWrapper>
       </AtomWrapper>
       <AtomWrapper
         customCSS={css`

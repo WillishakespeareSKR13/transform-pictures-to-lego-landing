@@ -1,4 +1,4 @@
-import { useLazyQuery, useMutation, useQuery } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client';
 import { css } from '@emotion/react';
 import { GETCOLORS } from '@Src/apollo/client/query/colors';
 import DashWithTitle from '@Src/components/layouts/DashWithTitle';
@@ -95,7 +95,7 @@ const PageColor = () => {
                       padding="0px 0px"
                       margin="0px 5px 0px 15px"
                       onClick={() => {
-                        console.log(item);
+                        console.warn(item);
                       }}
                     >
                       <AtomIcon
@@ -120,7 +120,7 @@ const PageColor = () => {
                       padding="0px 0px"
                       margin="0px 5px 0px 15px"
                       onClick={() => {
-                        console.log(item);
+                        console.warn(item);
                       }}
                     >
                       <AtomIcon
@@ -246,8 +246,8 @@ const PageColor = () => {
             borderRadius="2px"
             onClick={() => {
               formik.validateForm();
-              console.log(formik.errors);
-              console.log(formik);
+              // console.log(formik.errors);
+              // console.log(formik);
               formik.submitForm();
               formik.handleSubmit();
             }}

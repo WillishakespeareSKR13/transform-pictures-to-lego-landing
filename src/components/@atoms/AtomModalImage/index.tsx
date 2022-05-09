@@ -46,7 +46,6 @@ const AtomModalImage: FC<AtomModalImageProps> = (props) => {
             top: 0;
             background-color: #0000008a;
             backdrop-filter: blur(12px);
-            z-index: 9000;
           `
         },
         wrapperProps: {
@@ -58,24 +57,6 @@ const AtomModalImage: FC<AtomModalImageProps> = (props) => {
       }}
       component={
         <>
-          <AtomButton
-            onClick={() => setState?.(false)}
-            customCSS={css`
-              padding: 0px;
-              background-color: transparent;
-              position: absolute;
-              right: 0;
-              top: -50px;
-              z-index: 9999;
-              * {
-                color: #fff;
-                font-size: 24px;
-                font-weight: bold;
-              }
-            `}
-          >
-            <AtomText>X</AtomText>
-          </AtomButton>
           <AtomWrapper
             maxWidth="100%"
             alignItems="center"
@@ -193,6 +174,24 @@ const AtomModalImage: FC<AtomModalImageProps> = (props) => {
               ))}
             </AtomWrapper>
           </AtomWrapper>
+          <AtomButton
+            onClick={() => setState?.(false)}
+            customCSS={css`
+              padding: 0px;
+              background-color: transparent;
+              position: absolute;
+              right: 0;
+              top: 0px;
+              z-index: 9999;
+              * {
+                color: #fff;
+                font-size: 24px;
+                font-weight: bold;
+              }
+            `}
+          >
+            <AtomText>X</AtomText>
+          </AtomButton>
         </>
       }
     />

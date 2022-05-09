@@ -71,8 +71,8 @@ export const cropAndFilter = async (
   blobcreateImage.addEventListener('load', () => {
     const canvas = document.createElement('canvas');
     const context = canvas.getContext('2d') as CanvasRenderingContext2D;
-    const w2 = 400;
-    const h2 = 400;
+    const w2 = 800;
+    const h2 = 800;
     canvas.width = w2;
     canvas.height = h2;
     // const base = Math.pow(2, 2 + (splitx + splity) / 2);
@@ -268,21 +268,21 @@ export const cropAndFilter = async (
           }, {} as COLORTYPE)
         ]);
 
-        Array.from({ length: 32 }).map((_, idx) => {
-          Array.from({ length: 32 }).map(async (_, idx2) => {
+        Array.from({ length: isPortrait ? 50 : 32 }).map((_, idx) => {
+          Array.from({ length: isPortrait ? 50 : 32 }).map(async (_, idx2) => {
             //get section canvas and get color data from canvas
 
             const data = context2.getImageData(
-              idx * (canvas2.width / 32),
-              idx2 * (canvas2.height / 32),
-              canvas2.width / 32,
-              canvas2.height / 32
+              idx * (canvas2.width / (isPortrait ? 50 : 32)),
+              idx2 * (canvas2.height / (isPortrait ? 50 : 32)),
+              canvas2.width / (isPortrait ? 50 : 32),
+              canvas2.height / (isPortrait ? 50 : 32)
             ).data;
             const colorList: {
               id: string;
               hex: string;
             }[] = [];
-            for (let i = 0, n = data.length / 4096; i < n; i += 4) {
+            for (let i = 0, n = 1; i < n; i += 4) {
               const colorSim = (
                 rgbColor: string | any[],
                 compareColor: number[]
@@ -341,10 +341,10 @@ export const cropAndFilter = async (
             if (findColorImage) {
               context2.fillStyle = findColorImage.color ?? 'black';
               context2.fillRect(
-                idx * (canvas2.width / 32),
-                idx2 * (canvas2.height / 32),
-                canvas2.width / 32,
-                canvas2.height / 32
+                idx * (canvas2.width / (isPortrait ? 50 : 32)),
+                idx2 * (canvas2.height / (isPortrait ? 50 : 32)),
+                canvas2.width / (isPortrait ? 50 : 32),
+                canvas2.height / (isPortrait ? 50 : 32)
               );
 
               context2.drawImage(
@@ -353,10 +353,10 @@ export const cropAndFilter = async (
                 0,
                 findColorImage.canvas.width,
                 findColorImage.canvas.height,
-                idx * (canvas2.width / 32),
-                idx2 * (canvas2.height / 32),
-                canvas2.width / 32,
-                canvas2.height / 32
+                idx * (canvas2.width / (isPortrait ? 50 : 32)),
+                idx2 * (canvas2.height / (isPortrait ? 50 : 32)),
+                canvas2.width / (isPortrait ? 50 : 32),
+                canvas2.height / (isPortrait ? 50 : 32)
               );
             }
             //put image to canvas

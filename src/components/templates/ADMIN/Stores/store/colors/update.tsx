@@ -9,19 +9,19 @@ import {
 } from '@sweetsyui/ui';
 import { useFormik } from 'formik';
 import React, { Dispatch, FC, SetStateAction } from 'react';
-import { ProductModalType } from './index';
+import { ColorModalType } from './index';
 import * as Yup from 'yup';
 import { useMutation } from '@apollo/client';
 import uploadImage from '@Src/utils/uploadImage';
 import { useRouter } from 'next/router';
 import { UPDATECOLOR } from '@Src/apollo/client/query/colors';
 
-interface ModalUpdateProductType {
-  state: ProductModalType;
-  setState: Dispatch<SetStateAction<ProductModalType>>;
+interface ModalUpdateColorType {
+  state: ColorModalType;
+  setState: Dispatch<SetStateAction<ColorModalType>>;
 }
 
-const ModalUpdateProduct: FC<ModalUpdateProductType> = (props) => {
+const ModalUpdateColor: FC<ModalUpdateColorType> = (props) => {
   const router = useRouter();
   const { state, setState } = props;
   const [updateProduct, { loading: loadingUpdateProduct }] = useMutation(
@@ -143,4 +143,4 @@ const ModalUpdateProduct: FC<ModalUpdateProductType> = (props) => {
     />
   );
 };
-export default ModalUpdateProduct;
+export default ModalUpdateColor;

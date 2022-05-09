@@ -105,4 +105,7 @@ export const InputDragAndDropStyles = css`
     background-color: #202026;
     color: #dfdfdf;
   }
+  span:last-of-type {
+    color: #a83240;
+  }
 `;

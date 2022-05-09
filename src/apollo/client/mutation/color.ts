@@ -11,6 +11,28 @@ export const NEWCOLOR = gql`
   }
 `;
 
+export const UPDATECOLOR = gql`
+  mutation updateColor($input: InputColor, $id: ID!) {
+    updateColor(input: $input, id: $id) {
+      id
+      color
+      name
+      icon
+    }
+  }
+`;
+
+export const DELETECOLOR = gql`
+  mutation deleteColor($id: ID!) {
+    deleteColor(id: $id) {
+      id
+      color
+      name
+      icon
+    }
+  }
+`;
+
 export const NEWCOLORSALEORDER = gql`
   mutation newColorSaleOrder($input: InputColorSaleOrder) {
     newColorSaleOrder(input: $input) {

@@ -301,6 +301,7 @@ export const InputTextStyled = styled(motion.input)<AtomInputTypes>`
   max-width: ${({ maxWidth }) => maxWidth || `100%`};
   border-radius: ${({ borderRadius }) => borderRadius || `4px`};
   border: ${({ border }) => border || `1px solid #f2f2f2`};
+  ${({ customCSS }) => customCSS};
 `;
 
 export const InputCheckboxStyled = styled(motion.input)<AtomInputTypes>`

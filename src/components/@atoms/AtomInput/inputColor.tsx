@@ -12,7 +12,7 @@ const Animation = {
   whileTap: { scale: 0.98, opacity: 0.8 }
 };
 
-const InputText: FC<AtomInputTypes> = (props) => {
+const InputColor: FC<AtomInputTypes> = (props) => {
   const { value, onChange, formik, id, children } = props;
   const {
     labelWidth,
@@ -44,19 +44,18 @@ const InputText: FC<AtomInputTypes> = (props) => {
         </InputTextSpanStyled>
       )}
       <InputTextStyled
+        type="text"
         {...Animation}
         {...props}
         value={lodash.get(formik?.values, `${id}`) ?? value}
-        onChange={(e) => {
-          formik?.handleChange(e);
-          onChange?.(e);
-        }}
+        onChange={formik?.handleChange ?? onChange}
         onBlur={formik?.handleBlur}
       />
+      <input type="color" />
       {children}
       <InputTextError {...props} />
     </InputTextLabelStyled>
   );
 };
 
-export default InputText;
+export default InputColor;

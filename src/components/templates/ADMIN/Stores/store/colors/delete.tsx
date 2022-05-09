@@ -1,25 +1,26 @@
 import { useMutation } from '@apollo/client';
 import { css } from '@emotion/react';
-import { DELETEPRODUCT } from '@Src/apollo/client/query/products';
+import { DELETECOLOR } from '@Src/apollo/client/mutation/color';
 import {
   AtomButton,
   AtomIcon,
+  AtomImage,
   AtomLoader,
   AtomModal,
   AtomText,
   AtomWrapper
 } from '@sweetsyui/ui';
 import { Dispatch, FC, SetStateAction } from 'react';
-import { ProductModalType } from './index';
+import { ColorModalType } from './index';
 
-interface ModalNewProductType {
-  state: ProductModalType;
-  setState: Dispatch<SetStateAction<ProductModalType>>;
+interface ModalDeleteColorType {
+  state: ColorModalType;
+  setState: Dispatch<SetStateAction<ColorModalType>>;
 }
 
-const ModalDeleteProduct: FC<ModalNewProductType> = (props) => {
+const ModalDeleteColor: FC<ModalDeleteColorType> = (props) => {
   const { state, setState } = props;
-  const [EXEDELETEPRODUCT] = useMutation(DELETEPRODUCT, {
+  const [EXEDELETECOLOR] = useMutation(DELETECOLOR, {
     onCompleted: () => {
       location.reload();
     }
@@ -32,7 +33,8 @@ const ModalDeleteProduct: FC<ModalNewProductType> = (props) => {
       componentProps={{
         wrapperProps: {
           backgroundColor: '#2e2e35',
-          padding: '0 30px'
+          height: 'max-content',
+          padding: '10 30px'
         }
       }}
       component={
@@ -64,17 +66,53 @@ const ModalDeleteProduct: FC<ModalNewProductType> = (props) => {
               line-height: 110%;
             `}
           >
-            {'do you want to remove the product?'}
+            {'do you want to remove the color?'}
           </AtomText>
-          <AtomText
-            margin="20px 0px"
-            fontSize="18px"
-            fontWeight="bold"
-            color="#7e7b7b"
-            align="center"
+          <AtomWrapper
+            flexDirection="row"
+            alignItems="center"
+            customCSS={css`
+              gap: 0 20px;
+            `}
           >
-            {state?.name}
-          </AtomText>
+            <AtomWrapper
+              customCSS={css`
+                justify-content: center;
+                align-items: center;
+                background-color: ${state?.color};
+              `}
+            >
+              <AtomImage
+                src={`${state?.icon}`}
+                alt={`${state?.icon}`}
+                height="200px"
+                width="200px"
+                customCSS={css`
+                  overflow: hidden;
+                  border-radius: 4px;
+                `}
+              />
+            </AtomWrapper>
+            <AtomWrapper justifyContent="center">
+              <AtomText
+                margin="20px 0px"
+                fontSize="18px"
+                fontWeight="bold"
+                color="#7e7b7b"
+                align="center"
+              >
+                {state?.color}
+              </AtomText>
+              <AtomText
+                fontSize="18px"
+                fontWeight="bold"
+                color="#7e7b7b"
+                align="center"
+              >
+                {state?.name}
+              </AtomText>
+            </AtomWrapper>
+          </AtomWrapper>
           <AtomWrapper width="100%">
             <AtomButton
               onClick={() => {
@@ -93,11 +131,11 @@ const ModalDeleteProduct: FC<ModalNewProductType> = (props) => {
                 margin: 10px 0px;
               `}
             >
-              CANCELAR
+              CANCEL
             </AtomButton>
             <AtomButton
               onClick={() => {
-                EXEDELETEPRODUCT({
+                EXEDELETECOLOR({
                   variables: {
                     id: state.id
                   }
@@ -114,7 +152,7 @@ const ModalDeleteProduct: FC<ModalNewProductType> = (props) => {
                 margin: 10px 0px;
               `}
             >
-              {'BORRAR'}
+              DELETE
             </AtomButton>
           </AtomWrapper>
         </AtomWrapper>
@@ -122,4 +160,4 @@ const ModalDeleteProduct: FC<ModalNewProductType> = (props) => {
     />
   );
 };
-export default ModalDeleteProduct;
+export default ModalDeleteColor;

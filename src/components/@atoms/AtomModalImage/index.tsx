@@ -4,10 +4,11 @@ import {
   AtomIcon,
   AtomImage,
   AtomModal,
+  AtomText,
   AtomWrapper
 } from '@sweetsyui/ui';
 
-import { Dispatch, FC, SetStateAction, useEffect, useRef } from 'react';
+import { Dispatch, FC, SetStateAction } from 'react';
 
 type AtomModalImageProps = {
   images?: string[];
@@ -31,20 +32,6 @@ const animation = {
 
 const AtomModalImage: FC<AtomModalImageProps> = (props) => {
   const { images, selected, setSelected, state, setState } = props;
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (ref.current && !ref.current.contains(event.target as Node)) {
-        setState?.(false);
-      }
-    };
-
-    document.addEventListener(`mousedown`, handleClickOutside);
-    return () => {
-      document.removeEventListener(`mousedown`, handleClickOutside);
-    };
-  }, [ref]);
 
   return (
     <AtomModal
@@ -65,7 +52,6 @@ const AtomModalImage: FC<AtomModalImageProps> = (props) => {
         wrapperProps: {
           width: 'max-content',
           height: 'max-content',
-          refObject: ref,
           backgroundColor: 'transparent'
         }
       }}
@@ -76,7 +62,26 @@ const AtomModalImage: FC<AtomModalImageProps> = (props) => {
             alignItems="center"
             justifyContent="center"
             flexDirection="row"
+            position="relative"
           >
+            <AtomButton
+              onClick={() => setState?.(false)}
+              customCSS={css`
+                padding: 0px;
+                background-color: transparent;
+                position: absolute;
+                right: 0;
+                top: -50px;
+                z-index: 9999;
+                * {
+                  color: #fff;
+                  font-size: 24px;
+                  font-weight: bold;
+                }
+              `}
+            >
+              <AtomText>X</AtomText>
+            </AtomButton>
             <AtomButton
               padding="0px 0px"
               backgroundColor="transparent"

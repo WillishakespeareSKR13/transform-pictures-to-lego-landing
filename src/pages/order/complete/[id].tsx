@@ -13,6 +13,9 @@ import { useRouter } from 'next/router';
 import React from 'react';
 import { IQueryFilter } from 'graphql';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const ConfettiComponent = Confetti as any;
+
 const config = {
   angle: 90,
   spread: 360,
@@ -70,7 +73,7 @@ const CompleteOrderPay = () => {
           transform: translate(-50%, -50%);
         `}
       >
-        <Confetti active={!!data?.paySaleOrder} config={config} />
+        <ConfettiComponent active={!!data?.paySaleOrder} config={config} />
       </AtomWrapper>
       {data?.paySaleOrder && (
         <AtomWrapper

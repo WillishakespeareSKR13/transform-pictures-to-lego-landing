@@ -11,9 +11,31 @@ export const GETCOLORS = gql`
   }
 `;
 
-export const GETCOLORBYID = gql`
-  query getColorByID($id: ID!) {
-    getColorById(id: $id) {
+export const UPDATECOLOR = gql`
+  mutation updateColor($id: ID!, $input: InputColor) {
+    updateColor(id: $id, input: $input) {
+      id
+      color
+      name
+      icon
+    }
+  }
+`;
+
+export const NEWCOLOR = gql`
+  mutation newColor($input: InputColor) {
+    newColor(input: $input) {
+      id
+      color
+      name
+      icon
+    }
+  }
+`;
+
+export const DELETECOLOR = gql`
+  mutation deleteColor($id: ID!) {
+    deleteColor(id: $id) {
       id
       color
       name

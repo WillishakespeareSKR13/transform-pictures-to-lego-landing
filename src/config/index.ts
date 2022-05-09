@@ -29,7 +29,13 @@ export type SELECTEDCONFIG = {
 };
 
 export type COLORTYPE = {
-  [key: string]: { value: string; count: number; color: string; id: string };
+  [key: string]: {
+    value: string;
+    count: number;
+    color: string;
+    id: string;
+    img: string;
+  };
 };
 
 const CONFIG = [

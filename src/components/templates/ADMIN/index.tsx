@@ -9,6 +9,7 @@ import PointSale from './Stores/store/pointSale';
 import Details from './Stores/store/details';
 import Products from './Stores/store/products';
 import PageColor from './Stores/store/color';
+// import Colors from './Stores/store/colors';
 
 const ADMIN = () => {
   return (
@@ -23,6 +24,7 @@ const ADMIN = () => {
       <Route path="/store/:id/pointsale" element={<PointSale />} />
       <Route path="/store/:id/products" element={<Products />} />
       <Route path="/colors" element={<PageColor />} />
+      {/* <Route path="/colors2" element={<Colors />} /> */}
     </Routes>
   );
 };

@@ -1,9 +1,8 @@
 import { IProducts } from 'graphql';
-import React, { Dispatch, FC, SetStateAction } from 'react';
+import React, { FC } from 'react';
 import { SerializedStyles } from '@emotion/utils';
 import { AtomButton, AtomImage, AtomText, AtomWrapper } from '@sweetsyui/ui';
 import { css } from '@emotion/react';
-import { ItemCardShopType } from '@Src/components/templates/ADMIN/Stores/store/pointSale';
 import { useAtom } from 'jotai';
 import { ICart, setCartAtom } from '@Src/jotai/cart';
 

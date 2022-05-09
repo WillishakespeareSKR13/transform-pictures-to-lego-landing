@@ -1,10 +1,9 @@
 import { css, SerializedStyles } from '@emotion/react';
-import { ItemCardShopType } from '@Src/components/templates/ADMIN/Stores/store/pointSale';
 import { OpenModal } from '@Src/redux/actions/modal';
 import { AtomButton, AtomImage, AtomText, AtomWrapper } from '@sweetsyui/ui';
 import { AnimatePresence } from 'framer-motion';
 import { IBoard } from 'graphql';
-import React, { Dispatch, FC, SetStateAction, useState } from 'react';
+import React, { FC, useState } from 'react';
 import { useDispatch } from 'react-redux';
 
 interface MoleculeCardBoardType extends IBoard {

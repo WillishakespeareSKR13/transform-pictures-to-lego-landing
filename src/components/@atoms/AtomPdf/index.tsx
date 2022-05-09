@@ -8,8 +8,7 @@ import {
   Text,
   usePDF,
   Image,
-  PDFDownloadLink,
-  PDFViewer
+  PDFDownloadLink
 } from '@react-pdf/renderer';
 import PaymentModal from '@Src/components/@molecules/PaymentModal';
 import { IBoard, IBoardSize } from 'graphql';
@@ -92,7 +91,7 @@ type AtomPdfProps = {
   };
 };
 
-export const AtomPdf: FC<AtomPdfProps> = (props) => {
+export const AtomPdf = (props: AtomPdfProps) => {
   const { images, colors, width, height, isPortrait } = props;
   const stylesImg = StyleSheet.create({
     image: {
@@ -159,7 +158,7 @@ export const AtomPdf: FC<AtomPdfProps> = (props) => {
                           : e
                       )
                     : [...acc, curr];
-                }, [] as { value: string; count: number; color: string }[])
+                }, [] as { value: string; count: number; color: string; img: string }[])
                 .map((color) => (
                   <View key={color.value} style={styles.mainContainer}>
                     <View

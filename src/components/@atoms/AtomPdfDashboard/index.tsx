@@ -154,7 +154,7 @@ export const AtomPdf: FC<AtomPdfProps> = (props) => {
                           : e
                       )
                     : [...acc, curr];
-                }, [] as { value: string; count: number; color: string }[])
+                }, [] as { value: string; count: number; color: string; img: string }[])
                 .map((color) => (
                   <View key={color.value} style={styles.mainContainer}>
                     <View

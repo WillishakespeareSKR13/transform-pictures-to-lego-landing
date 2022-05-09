@@ -13,57 +13,6 @@ import PaymentModal from '@Src/components/@molecules/PaymentModalDashboard';
 import { IBoard, IBoardSize } from 'graphql';
 import { COLORTYPE } from '@Src/config';
 
-// Create styles
-const styles = StyleSheet.create({
-  page: {
-    flexDirection: 'row',
-    backgroundColor: '#202024'
-  },
-  section: {
-    margin: 10,
-    padding: 10,
-    flexDirection: 'row',
-    justifyContent: 'space-between'
-  },
-  image: {
-    width: 400,
-    height: 400
-  },
-  main: {
-    width: '100px',
-    flexDirection: 'column',
-    justifyContent: 'flex-start',
-    alignItems: 'flex-start'
-  },
-  mainContainer: {
-    flexDirection: 'row',
-    justifyContent: 'flex-start',
-    marginBottom: 5,
-    alignItems: 'center'
-  },
-  text: {
-    marginLeft: 5,
-    fontSize: 12,
-    textAlign: 'center',
-    color: '#ffffff',
-    fontWeight: 'bold'
-  }
-});
-
-type AtomPdfProps = {
-  images: string[];
-  width?: string;
-  height?: string;
-  colors?: ColorType[];
-  isPortrait?: boolean;
-  payment: {
-    board?: IBoard;
-    size?: IBoardSize;
-    isReady?: boolean;
-    color?: COLORTYPE[];
-  };
-};
-
 const styles = StyleSheet.create({
   page: {
     padding: 40,
@@ -166,8 +115,7 @@ export const AtomPdf: FC<AtomPdfProps> = (props) => {
               <View
                 key={index}
                 style={{
-                  position: 'relative',
-                  border: '2px solid #202024'
+                  position: 'relative'
                 }}
               >
                 <Image style={stylesImg.image} src={image} />

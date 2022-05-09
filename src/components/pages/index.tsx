@@ -3,7 +3,6 @@ import OrganismsConvertImage from '@Src/components/@organisms/OrganismsConvertIm
 import OrganismsLoadImage from '@Src/components/@organisms/OrganismsLoadImageDashboard';
 import { CloseModal } from '@Src/redux/actions/modal';
 import { AtomButton, AtomWrapper } from '@sweetsyui/ui';
-import { NextPageFC } from 'next';
 import { createContext, Dispatch, SetStateAction, useState } from 'react';
 import { useDispatch } from 'react-redux';
 
@@ -14,7 +13,7 @@ interface IContextProps {
 
 export const ContextFile = createContext({} as IContextProps);
 
-const PageIndex: NextPageFC = () => {
+const PageIndex = () => {
   const [file, setFile] = useState<File>();
 
   const dispatch = useDispatch();

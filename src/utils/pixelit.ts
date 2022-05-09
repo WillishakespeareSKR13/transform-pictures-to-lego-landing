@@ -4,7 +4,7 @@ import { COLORTYPE } from '@Src/config';
 import { Dispatch, SetStateAction } from 'react';
 import Pixel from '@Utils/pixelitJS';
 import { brick } from './legobricks';
-import { IQueryFilter } from 'graphql';
+import { IColor, IQueryFilter } from 'graphql';
 
 const query = `query getColors{
   getColors{
@@ -20,6 +20,8 @@ const createImage = (src: string) => {
   image.setAttribute('src', src);
   return image;
 };
+
+type IColorWithIcon = IColor & { canvas: HTMLImageElement };
 
 export const cropAndFilter = async (
   blob: string,
@@ -37,10 +39,30 @@ export const cropAndFilter = async (
   setColors: Dispatch<SetStateAction<COLORTYPE[]>>,
   isPortrait: boolean
 ) => {
-  const color = await request<IQueryFilter<'getColors'>>(
+  const color = (await request<IQueryFilter<'getColors'>>(
     '/api/graphql',
     query
-  ).then((e) => e.getColors);
+  ).then((e) => {
+    const arrayPromise = e?.getColors?.map(async (color) => {
+      const loadImage = (url: string) =>
+        new Promise((resolve, reject) => {
+          const img = new Image();
+          img.setAttribute('src', url);
+          img.setAttribute('crossOrigin', '*');
+          img.addEventListener('load', () => resolve(img));
+          img.addEventListener('error', (err) => reject(err));
+        });
+
+      return {
+        ...color,
+        canvas: (await loadImage(
+          'https://storage.googleapis.com/cdn-bucket-ixulabs-platform/LGO-0001/store/f5ce-4889-a486-4b9f7a3fbea1-Bat-Black.png'
+        )) as HTMLImageElement
+      };
+    });
+
+    return Promise.all(arrayPromise as any);
+  })) as IColorWithIcon[];
   setStateLoading(true);
   const blobcreateImage = createImage(blob);
   setState([]);
@@ -229,7 +251,6 @@ export const cropAndFilter = async (
             similarColor([data[i], data[i + 1], data[i + 2]], mypalette ?? [])
           );
         }
-
         setColors((colorState) => [
           ...colorState,
           colorList.reduce((acc, curr) => {
@@ -246,21 +267,109 @@ export const cropAndFilter = async (
             };
           }, {} as COLORTYPE)
         ]);
-        // console.log((400 - 87.5 * ((splitx + splity) / 2 - 2)) * 0.03125);
-        const svg = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
-                         height="${h2}" width="${w2}">
-                         <defs>
-                            <pattern id="bricks" patternUnits="userSpaceOnUse" width="${size}" height="${size}">
-                                  <image xlink:href="${brick}" width="${size}" height="${size}" x="0" y="0" />
-                              </pattern>
-                       </defs>
-                       <g transform="scale(${1})">
-                           <image width="${w2}" height="${h2}" x="0" y="0" xlink:href="${canvas2.toDataURL()}" />
-                           <rect style="mix-blend-mode: ${blendMode}" fill="url(#bricks)" x="0" y="0" width="${w2}" height="${h2}" />
-                       </g>
-                       </svg>`;
-        const imagesvg = `data:image/svg+xml;base64,${btoa(svg)}`;
-        // const imagesvg = canvas.toDataURL();
+
+        Array.from({ length: 32 }).map((_, idx) => {
+          Array.from({ length: 32 }).map(async (_, idx2) => {
+            //get section canvas and get color data from canvas
+
+            const data = context2.getImageData(
+              idx * 32,
+              idx2 * 32,
+              32,
+              32
+            ).data;
+            const colorList: {
+              id: string;
+              hex: string;
+            }[] = [];
+            for (let i = 0, n = data.length / 4096; i < n; i += 4) {
+              const colorSim = (
+                rgbColor: string | any[],
+                compareColor: number[]
+              ) => {
+                let i;
+                let max;
+                let d = 0;
+                for (i = 0, max = rgbColor.length; i < max; i++) {
+                  d +=
+                    (rgbColor[i] - compareColor[i]) *
+                    (rgbColor[i] - compareColor[i]);
+                }
+                return Math.sqrt(d);
+              };
+
+              const similarColor = (actualColor: number[], palette: any[]) => {
+                let selectedColor: string[] = [];
+                let currentSim = colorSim(actualColor, palette[0].color);
+                let nextColor;
+                let id = '';
+                palette.forEach((color: any) => {
+                  nextColor = colorSim(actualColor, color.color);
+                  if (nextColor <= currentSim) {
+                    id = color.id;
+                    selectedColor = color.color;
+                    currentSim = nextColor;
+                  }
+                });
+                const hex = rgb2hex(
+                  'rgb(' +
+                    selectedColor[0] +
+                    ',' +
+                    selectedColor[1] +
+                    ',' +
+                    selectedColor[2] +
+                    ')'
+                );
+                return {
+                  id,
+                  hex
+                };
+              };
+              colorList.push(
+                similarColor(
+                  [data[i], data[i + 1], data[i + 2]],
+                  mypalette ?? []
+                )
+              );
+            }
+            const colorID =
+              [...new Set(colorList.map((c) => c.id))]?.[0] ??
+              '6239a9a6c3476996d70f0eeb';
+            const findColorImage =
+              color?.find((c) => c?.id === colorID)?.canvas ??
+              color?.[0]?.canvas;
+            context2.imageSmoothingEnabled = true;
+            if (findColorImage) {
+              context2.drawImage(
+                findColorImage,
+                0,
+                0,
+                findColorImage.width,
+                findColorImage.height,
+                idx * (canvas2.width / 32),
+                idx2 * (canvas2.height / 32),
+                canvas2.width / 32,
+                canvas2.height / 32
+              );
+            }
+            //put image to canvas
+          });
+        });
+        //put image into
+        // const svg = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+        //                  height="${h2}" width="${w2}">
+        //                  <defs>
+        //                     <pattern id="bricks" patternUnits="userSpaceOnUse" width="${size}" height="${size}">
+        //                           <image xlink:href="${brick}" width="${size}" height="${size}" x="0" y="0" />
+        //                       </pattern>
+        //                </defs>
+        //                <g transform="scale(${1})">
+        //                    <image width="${w2}" height="${h2}" x="0" y="0" xlink:href="${canvas2.toDataURL()}" />
+        //                    <rect style="mix-blend-mode: ${blendMode}" fill="url(#bricks)" x="0" y="0" width="${w2}" height="${h2}" />
+        //                </g>
+        //                </svg>`;
+        // const imagesvg = `data:image/svg+xml;base64,${btoa(svg)}`;
+        const imagesvg = canvas2.toDataURL();
         // return imagesvg;
         const imgElement3 = createImage(imagesvg);
         imgElement3.addEventListener('load', () => {

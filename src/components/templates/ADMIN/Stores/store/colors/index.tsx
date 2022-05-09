@@ -1,6 +1,6 @@
 import { useQuery } from '@apollo/client';
 import { css, SerializedStyles } from '@emotion/react';
-import { GETPRODUCTS } from '@Src/apollo/client/query/products';
+import { GETCOLORS } from '@Src/apollo/client/query/colors';
 import DashWithTitle from '@Src/components/layouts/DashWithTitle';
 import { TableStyles } from '@Src/styles';
 
@@ -22,14 +22,14 @@ import {
   AtomTable,
   AtomWrapper
 } from '@sweetsyui/ui';
-import { IProducts, IQueryFilter } from 'graphql';
+import { IColor, IQueryFilter } from 'graphql';
 import { useRouter } from 'next/router';
 import React, { FC, useState } from 'react';
 import ModalDeleteProduct from './delete';
 import ModalNewProduct from './new';
 import ModalUpdateProduct from './update';
 
-export type ProductModalType = IProducts & {
+export type ProductModalType = IColor & {
   openModal: boolean;
 };
 
@@ -42,7 +42,7 @@ const Products: FC = () => {
     openModal: false
   });
   const [openNewProduct, setOpenNewProduct] = useState<boolean>(false);
-  const { data } = useQuery<IQueryFilter<'getProducts'>>(GETPRODUCTS, {
+  const { data } = useQuery<IQueryFilter<'getColors'>>(GETCOLORS, {
     variables: {
       filter: {
         store: router?.query?.id?.[1]
@@ -59,10 +59,10 @@ const Products: FC = () => {
             : router.query.id
         }
       }}
-      title="Create new store type"
+      title="Colors"
       button={
         <AtomButton onClick={() => setOpenNewProduct(!openNewProduct)}>
-          New Product
+          New Color
         </AtomButton>
       }
     >
@@ -78,7 +78,7 @@ const Products: FC = () => {
         `}
       >
         <AtomTable
-          data={data?.getProducts as IProducts[]}
+          data={data?.getColors as IColor[]}
           customCSS={TableStyles}
           columns={[
             {
@@ -140,14 +140,16 @@ const Products: FC = () => {
               view: (item) => (
                 <AtomWrapper
                   customCSS={css`
-                    background-color: ${item?.color?.color};
+                    justify-content: center;
+                    align-items: center;
+                    background-color: ${item?.color};
                   `}
                 >
                   <AtomImage
-                    src={`${item?.image}`}
-                    alt={`${item?.image}`}
-                    height="70px"
-                    width="100%"
+                    src={`${item?.icon}`}
+                    alt={`${item?.icon}`}
+                    height="100px"
+                    width="100px"
                     customCSS={css`
                       overflow: hidden;
                       border-radius: 4px;
@@ -161,17 +163,9 @@ const Products: FC = () => {
               view: (item) => <>{`${item?.name}`}</>
             },
             {
-              title: 'description',
-              view: (item) => <>{`${item?.description}`}</>,
+              title: 'Color',
+              view: (item) => <>{`${item?.color}`}</>,
               width: '400px'
-            },
-            {
-              title: 'stock',
-              view: (item) => <>{`${item?.stock}`}</>
-            },
-            {
-              title: 'price',
-              view: (item) => <>{`${item?.price}`}</>
             }
           ]}
         />

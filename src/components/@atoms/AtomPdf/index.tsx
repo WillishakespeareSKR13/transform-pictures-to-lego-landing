@@ -67,11 +67,12 @@ const styles = StyleSheet.create({
   ImageLogo: {
     height: '80px',
     width: '200px',
-    marginBottom: 20
+    marginBottom: 40
   },
   colorsView: {
     width: '100%',
     marginTop: 20,
+    height: 200,
     flexDirection: 'column',
     justifyContent: 'flex-start',
     alignItems: 'flex-start'
@@ -119,8 +120,7 @@ export const AtomPdf: FC<AtomPdfProps> = (props) => {
               <View
                 key={index}
                 style={{
-                  position: 'relative',
-                  border: '2px solid #202024'
+                  position: 'relative'
                 }}
               >
                 <Image style={stylesImg.image} src={image} />
@@ -195,6 +195,8 @@ export const AtomPdf: FC<AtomPdfProps> = (props) => {
       </Page>
       {images?.map((image, index) => (
         <Page key={`${index + 1}`} size="A3" style={styles.page}>
+          <Image style={styles.ImageLogo} src="/images/logo.png" />
+
           <View style={styles.section} key={index}>
             {/* <Text style={styles.text}>
                 {Object.entries(colors?.find((_, idx) => idx === index) ?? {})

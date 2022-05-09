@@ -386,12 +386,15 @@ const PointSale: FC = () => {
                   >
                     <AtomWrapper
                       customCSS={css`
-                        width: 15px;
-                        height: 15px;
+                        width: 25px;
+                        height: 25px;
+                        padding: 4px;
                         background-color: ${e.color};
                         border: 1px solid #eeeeee;
                       `}
-                    />
+                    >
+                      <AtomImage src={e.img} alt={e.img} />
+                    </AtomWrapper>
                     <AtomText
                       customCSS={css`
                         ${e.rest > 0

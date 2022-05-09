@@ -42,6 +42,7 @@ type IColor = {
   value: string;
   count: number;
   color: string;
+  img: string;
   id: string;
   rest: number;
 }[];

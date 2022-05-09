@@ -75,7 +75,6 @@ const PaymentModal: FC<Props> = (props) => {
                   )
                 : [...acc, curr];
             }, [] as { value: string; count: number; color: string; id: string }[]);
-
           setCart({
             key: 'ADDCART',
             payload: {

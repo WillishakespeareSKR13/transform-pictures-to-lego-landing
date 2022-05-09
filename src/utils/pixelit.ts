@@ -273,10 +273,10 @@ export const cropAndFilter = async (
             //get section canvas and get color data from canvas
 
             const data = context2.getImageData(
-              idx * 32,
-              idx2 * 32,
-              32,
-              32
+              idx * (canvas2.width / 32),
+              idx2 * (canvas2.height / 32),
+              canvas2.width / 32,
+              canvas2.height / 32
             ).data;
             const colorList: {
               id: string;
@@ -336,16 +336,23 @@ export const cropAndFilter = async (
               [...new Set(colorList.map((c) => c.id))]?.[0] ??
               '6239a9a6c3476996d70f0eeb';
             const findColorImage =
-              color?.find((c) => c?.id === colorID)?.canvas ??
-              color?.[0]?.canvas;
+              color?.find((c) => c?.id === colorID) ?? color?.[0];
             context2.imageSmoothingEnabled = true;
             if (findColorImage) {
+              context2.fillStyle = findColorImage.color ?? 'black';
+              context2.fillRect(
+                idx * (canvas2.width / 32),
+                idx2 * (canvas2.height / 32),
+                canvas2.width / 32,
+                canvas2.height / 32
+              );
+
               context2.drawImage(
-                findColorImage,
+                findColorImage.canvas,
                 0,
                 0,
-                findColorImage.width,
-                findColorImage.height,
+                findColorImage.canvas.width,
+                findColorImage.canvas.height,
                 idx * (canvas2.width / 32),
                 idx2 * (canvas2.height / 32),
                 canvas2.width / 32,

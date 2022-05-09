@@ -56,7 +56,8 @@ export const cropAndFilter = async (
       return {
         ...color,
         canvas: (await loadImage(
-          'https://storage.googleapis.com/cdn-bucket-ixulabs-platform/LGO-0001/store/f5ce-4889-a486-4b9f7a3fbea1-Bat-Black.png'
+          color?.icon ??
+            'https://storage.googleapis.com/cdn-bucket-ixulabs-platform/LGO-0001/store/f5ce-4889-a486-4b9f7a3fbea1-Bat-Black.png'
         )) as HTMLImageElement
       };
     });
@@ -177,7 +178,6 @@ export const cropAndFilter = async (
         // console.log(mypalette);
         const px = new Pixel(config);
         px.draw().pixelate().convertPalette().saveImage();
-        const size = isPortrait ? 8 : 12.5;
 
         const data = context2.getImageData(0, 0, w2, h2).data;
         // console.log(data.length);

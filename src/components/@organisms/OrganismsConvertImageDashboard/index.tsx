@@ -34,6 +34,7 @@ const OrganismsConvertImage: FC = () => {
   const [showBorder, setShowBorder] = useState(false);
   const [selectedRoom, setSelectedRoom] = useState('DEFAULT');
   const [cropImages, setCropImages] = useState<CROPPEDIMAGE>([]);
+  const [cropImagesBlock, setCropImagesBlock] = useState<CROPPEDIMAGE>([]);
   const [colors, setColors] = useState<COLORTYPE[]>([]);
   const [quantity, setQuantity] = useState<number>(0);
   const [isLoading, setIsLoading] = useState(false);
@@ -49,8 +50,8 @@ const OrganismsConvertImage: FC = () => {
   // const { data: boards } = useQuery<IQueryFilter<'getBoards'>>(GET_BOARDS);
 
   const loading = useMemo(
-    () => cropImages.length !== quantity,
-    [cropImages, quantity]
+    () => cropImagesBlock.length !== quantity,
+    [cropImagesBlock, quantity]
   );
 
   const boardSelected = useMemo(
@@ -161,7 +162,8 @@ const OrganismsConvertImage: FC = () => {
                 selectedConfig?.y ?? 0,
                 setIsLoading,
                 setColors,
-                selectedConfig?.isPortrait ?? false
+                selectedConfig?.isPortrait ?? false,
+                setCropImagesBlock
               );
               setQuantity((selectedConfig?.x ?? 0) * (selectedConfig?.y ?? 0));
             }}
@@ -382,9 +384,9 @@ const OrganismsConvertImage: FC = () => {
                       background-color: #313139;
                     `}
                   >
-                    {cropImages.length > 0 ? (
+                    {cropImagesBlock.length > 0 ? (
                       <>
-                        {cropImages.map((image, i) => (
+                        {cropImagesBlock.map((image, i) => (
                           <AtomButton
                             key={`image${i}`}
                             customCSS={css`
@@ -489,9 +491,9 @@ const OrganismsConvertImage: FC = () => {
                         justify-content: center;
                       `}
                     >
-                      {cropImages.length > 0 ? (
+                      {cropImagesBlock.length > 0 ? (
                         <>
-                          {cropImages.map((image, i) => (
+                          {cropImagesBlock.map((image, i) => (
                             <AtomButton
                               key={`image${i}`}
                               customCSS={css`
@@ -653,6 +655,7 @@ const OrganismsConvertImage: FC = () => {
               </AtomButton>
             ) : (
               <DownloadPdf
+                imagesBlock={cropImages.map((image) => image.image)}
                 images={cropImages.map((image) => image.image)}
                 colors={colors}
                 height={`${selectedConfig.y}`}
@@ -675,7 +678,7 @@ const OrganismsConvertImage: FC = () => {
         setState={setModalImage}
         selected={selectedImage}
         setSelected={setSelectedImage}
-        images={cropImages
+        images={cropImagesBlock
           .sort((a, b) => (a.id > b.id ? 1 : b.id > a.id ? -1 : 0))
           .map((image) => image.image)}
       />

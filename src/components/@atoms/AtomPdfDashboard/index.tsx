@@ -74,6 +74,7 @@ const styles = StyleSheet.create({
   }
 });
 type AtomPdfProps = {
+  imagesBlock: string[];
   images: string[];
   width?: string;
   height?: string;
@@ -87,8 +88,8 @@ type AtomPdfProps = {
   };
 };
 
-export const AtomPdf: FC<AtomPdfProps> = (props) => {
-  const { images, colors, width, height, isPortrait } = props;
+export const AtomPdf = (props: AtomPdfProps) => {
+  const { images, imagesBlock, colors, width, height, isPortrait } = props;
   const stylesImg = StyleSheet.create({
     image: {
       width: 750 / Number(width),
@@ -111,7 +112,7 @@ export const AtomPdf: FC<AtomPdfProps> = (props) => {
                   : (750 / Number(width)) * Number(height) + Number(width) * 4
             }}
           >
-            {images.map((image, index) => (
+            {imagesBlock.map((image, index) => (
               <View
                 key={index}
                 style={{
@@ -119,17 +120,6 @@ export const AtomPdf: FC<AtomPdfProps> = (props) => {
                 }}
               >
                 <Image style={stylesImg.image} src={image} />
-                <Text
-                  style={{
-                    position: 'absolute',
-                    color: 'black',
-                    top: `${750 / Number(width) / 2 - 14}px`,
-                    left: `${750 / Number(width) / 2 - 14}px`,
-                    fontSize: 64
-                  }}
-                >
-                  {index + 1}
-                </Text>
               </View>
             ))}
           </View>
@@ -159,8 +149,8 @@ export const AtomPdf: FC<AtomPdfProps> = (props) => {
                   <View key={color.value} style={styles.mainContainer}>
                     <View
                       style={{
-                        width: '30px',
-                        height: '30px',
+                        width: '25px',
+                        height: '25px',
                         backgroundColor: color.value,
                         flexDirection: 'row',
                         alignItems: 'center',
@@ -173,8 +163,8 @@ export const AtomPdf: FC<AtomPdfProps> = (props) => {
                           'http://via.placeholder.com/300.jpg/transparent?text=W'
                         }
                         style={{
-                          width: '20px',
-                          height: '20px'
+                          width: '15px',
+                          height: '15px'
                         }}
                       />
                     </View>
@@ -190,16 +180,9 @@ export const AtomPdf: FC<AtomPdfProps> = (props) => {
       </Page>
       {images?.map((image, index) => (
         <Page key={`${index + 1}`} size="A3" style={styles.page}>
+          <Image style={styles.ImageLogo} src="/images/logo.png" />
+
           <View style={styles.section} key={index}>
-            {/* <Text style={styles.text}>
-                {Object.entries(colors?.find((_, idx) => idx === index) ?? {})
-                  .map((color) => ({
-                    ...color[1],
-                    count: Math.round(color[1].count / 156.25)
-                  }))
-                  .filter((color) => color.count > 0)
-                  .reduce((acc, color) => acc + color.count, 0)}
-              </Text> */}
             <View
               style={{
                 width: '750px',
@@ -303,8 +286,8 @@ export const AtomPdf: FC<AtomPdfProps> = (props) => {
                     <View key={color.value} style={styles.mainContainer}>
                       <View
                         style={{
-                          width: '30px',
-                          height: '30px',
+                          width: '25px',
+                          height: '25px',
                           backgroundColor: color.value,
                           flexDirection: 'row',
                           alignItems: 'center',
@@ -317,8 +300,8 @@ export const AtomPdf: FC<AtomPdfProps> = (props) => {
                             'http://via.placeholder.com/300.jpg/transparent?text=W'
                           }
                           style={{
-                            width: '20px',
-                            height: '20px'
+                            width: '15px',
+                            height: '15px'
                           }}
                         />
                       </View>
@@ -341,6 +324,7 @@ type ColorType = {
 
 type DocumentProps = {
   images: string[];
+  imagesBlock: string[];
   colors?: ColorType[];
   width?: string;
   height?: string;
@@ -354,9 +338,11 @@ type DocumentProps = {
 };
 
 const DownloadPdf: FC<DocumentProps> = (props) => {
-  const { images, colors, width, height, isPortrait, payment } = props;
+  const { images, imagesBlock, colors, width, height, isPortrait, payment } =
+    props;
   const [Document, setDocument] = useState(
     <AtomPdf
+      imagesBlock={imagesBlock}
       images={images}
       colors={colors}
       height={height}
@@ -368,6 +354,7 @@ const DownloadPdf: FC<DocumentProps> = (props) => {
   useEffect(() => {
     setDocument(
       <AtomPdf
+        imagesBlock={imagesBlock}
         images={images}
         colors={colors}
         height={height}

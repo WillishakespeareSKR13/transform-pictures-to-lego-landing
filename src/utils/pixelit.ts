@@ -37,7 +37,15 @@ export const cropAndFilter = async (
   splity: number,
   setStateLoading: Dispatch<SetStateAction<boolean>>,
   setColors: Dispatch<SetStateAction<COLORTYPE[]>>,
-  isPortrait: boolean
+  isPortrait: boolean,
+  setStateBlock: Dispatch<
+    SetStateAction<
+      {
+        id: number;
+        image: string;
+      }[]
+    >
+  >
 ) => {
   const color = (await request<IQueryFilter<'getColors'>>(
     '/api/graphql',
@@ -67,12 +75,13 @@ export const cropAndFilter = async (
   setStateLoading(true);
   const blobcreateImage = createImage(blob);
   setState([]);
+  setStateBlock([]);
   setColors([]);
   blobcreateImage.addEventListener('load', () => {
     const canvas = document.createElement('canvas');
     const context = canvas.getContext('2d') as CanvasRenderingContext2D;
-    const w2 = 800;
-    const h2 = 800;
+    const w2 = 400;
+    const h2 = 400;
     canvas.width = w2;
     canvas.height = h2;
     // const base = Math.pow(2, 2 + (splitx + splity) / 2);
@@ -120,30 +129,8 @@ export const cropAndFilter = async (
 
         return canvas.toDataURL('image/png');
 
-        const svg = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
-                         height="${h2}" width="${w2}">
-                         <defs>
-                           <pattern id="bricks" patternUnits="userSpaceOnUse" width="${
-                             (800 - 87.5 * ((splitx + splity) / 2 - 2)) *
-                             0.03125
-                           }" height="${
-          (800 - 87.5 * ((splitx + splity) / 2 - 2)) * 0.03125
-        }">
-                               <image xlink:href="${brick}" width="${
-          (800 - 87.5 * ((splitx + splity) / 2 - 2)) * 0.03125
-        }" height="${
-          (800 - 87.5 * ((splitx + splity) / 2 - 2)) * 0.03125
-        }" x="0" y="0" />
-                           </pattern>
-                       </defs>
-                       <g transform="scale(${1})">
-                           <image width="${w2}" height="${h2}" x="0" y="0" xlink:href="${canvas.toDataURL()}" />
-                           <rect style="mix-blend-mode: ${blendMode}" fill="url(#bricks)" x="0" y="0" width="${w2}" height="${h2}" />
-                       </g>
-                       </svg>`;
-        const imagesvg = `data:image/svg+xml;base64,${btoa(svg)}`;
-        // const imagesvg = canvas.toDataURL();
-        return imagesvg;
+        // // const imagesvg = canvas.toDataURL();
+        // return imagesvg;
       }
     );
     getArray.map((image, idx) => {
@@ -268,6 +255,42 @@ export const cropAndFilter = async (
           }, {} as COLORTYPE)
         ]);
 
+        const size = isPortrait ? 8 : 12.5;
+        const svgBlock = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+        height="${h2}" width="${w2}">
+        <defs>
+           <pattern id="bricks" patternUnits="userSpaceOnUse" width="${size}" height="${size}">
+                 <image xlink:href="${brick}" width="${size}" height="${size}" x="0" y="0" />
+             </pattern>
+      </defs>
+      <g transform="scale(${1})">
+          <image width="${w2}" height="${h2}" x="0" y="0" xlink:href="${canvas2.toDataURL()}" />
+          <rect style="mix-blend-mode: ${blendMode}" fill="url(#bricks)" x="0" y="0" width="${w2}" height="${h2}" />
+      </g>
+      </svg>`;
+        const imagesvgBlock = `data:image/svg+xml;base64,${btoa(svgBlock)}`;
+
+        const imgElement3 = createImage(imagesvgBlock);
+        imgElement3.addEventListener('load', () => {
+          const canvas3 = document.createElement('canvas');
+          const context3 = canvas3.getContext('2d') as CanvasRenderingContext2D;
+          canvas3.width = w2;
+          canvas3.height = h2;
+          context3.drawImage(imgElement3, 0, 0);
+
+          setStateBlock((state) =>
+            [
+              ...state,
+              {
+                id: idx,
+                image: canvas3.toDataURL()
+              }
+            ].sort((a, b) => (a.id > b.id ? 1 : b.id > a.id ? -1 : 0))
+          );
+
+          // setState((state) => [...new Set([...state, canvas2.toDataURL()])]);
+        });
+
         Array.from({ length: isPortrait ? 50 : 32 }).map((_, idx) => {
           Array.from({ length: isPortrait ? 50 : 32 }).map(async (_, idx2) => {
             //get section canvas and get color data from canvas
@@ -362,41 +385,18 @@ export const cropAndFilter = async (
             //put image to canvas
           });
         });
-        //put image into
-        // const svg = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
-        //                  height="${h2}" width="${w2}">
-        //                  <defs>
-        //                     <pattern id="bricks" patternUnits="userSpaceOnUse" width="${size}" height="${size}">
-        //                           <image xlink:href="${brick}" width="${size}" height="${size}" x="0" y="0" />
-        //                       </pattern>
-        //                </defs>
-        //                <g transform="scale(${1})">
-        //                    <image width="${w2}" height="${h2}" x="0" y="0" xlink:href="${canvas2.toDataURL()}" />
-        //                    <rect style="mix-blend-mode: ${blendMode}" fill="url(#bricks)" x="0" y="0" width="${w2}" height="${h2}" />
-        //                </g>
-        //                </svg>`;
-        // const imagesvg = `data:image/svg+xml;base64,${btoa(svg)}`;
-        const imagesvg = canvas2.toDataURL();
-        // return imagesvg;
-        const imgElement3 = createImage(imagesvg);
-        imgElement3.addEventListener('load', () => {
-          const canvas3 = document.createElement('canvas');
-          const context3 = canvas3.getContext('2d') as CanvasRenderingContext2D;
-          canvas3.width = w2;
-          canvas3.height = h2;
-          context3.drawImage(imgElement3, 0, 0);
-          setState((state) =>
-            [
-              ...state,
-              {
-                id: idx,
-                image: canvas3.toDataURL()
-              }
-            ].sort((a, b) => (a.id > b.id ? 1 : b.id > a.id ? -1 : 0))
-          );
 
-          // setState((state) => [...new Set([...state, canvas2.toDataURL()])]);
-        });
+        const imagesvg = canvas2.toDataURL();
+        setState((state) =>
+          [
+            ...state,
+            {
+              id: idx,
+              image: imagesvg
+            }
+          ].sort((a, b) => (a.id > b.id ? 1 : b.id > a.id ? -1 : 0))
+        );
+
         // setState((state) => [...state, imagesvg]);
       });
     });

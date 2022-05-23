@@ -25,3 +25,29 @@ export const NEWSALEORDER = gql`
     }
   }
 `;
+
+export const NEWSALEORDERCASH = gql`
+  mutation newSaleOrderCash($input: InputSaleOrder) {
+    newSaleOrderCash(input: $input) {
+      id
+      stripeId
+      secret
+      product {
+        id
+      }
+      board {
+        id
+      }
+      quantity
+      total
+      customer {
+        id
+        name
+      }
+      status
+      colorsaleorder {
+        id
+      }
+    }
+  }
+`;

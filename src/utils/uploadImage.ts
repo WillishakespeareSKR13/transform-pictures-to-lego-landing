@@ -1,65 +1,61 @@
-import { request } from 'graphql-request';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { ApolloClient, gql, InMemoryCache } from '@apollo/client';
 
-const removeWhiteSpaces = (name: string) =>
-  name.replace(/\s+/g, '').replace('(', '').replace(')', '');
-
-const endpoint = 'https://files-service.ixulabs.com/graphql';
-
-export const getUrl = async (
-  fileName: string,
-  orgCode: string,
-  path: string
-) => {
-  const sanitizedName = removeWhiteSpaces(fileName);
-
-  const query = `query(
-    $orgCode: String!
-    $fileName: String!
-    $path: String!
-  ) {
-    getUploadFileUrl(
-      orgCode: $orgCode
-      fileName: $fileName
-      path: $path
-    ) {
+const queryUpload = gql`
+  query UploadFileUrl($orgCode: String!, $path: String!, $fileName: String!) {
+    uploadFileUrl(orgCode: $orgCode, path: $path, fileName: $fileName) {
       url
       fileName
     }
   }
-  `;
+`;
 
-  const value = await request(endpoint, query, {
-    fileName: sanitizedName,
-    orgCode,
-    path
-  });
-
-  return value;
-};
-
-export const uploadFile = (url: string, file: File) =>
-  fetch(url, {
-    method: 'PUT',
-    body: file,
-    headers: {
-      'Content-Type': 'application/octet-stream'
-    },
-    mode: 'cors'
-  }).catch((e) => console.error(e));
-
-type uploadImageType = {
-  orgcode: string;
+type UploadFile = {
   name: string;
+  orgcode: string;
 };
+const removeWhiteSpaces = (name: string) =>
+  name?.replace(/\s+/g, '')?.replace('(', '')?.replace(')', '');
 
-const uploadImage = async (image: File, options: uploadImageType) =>
-  image?.name
-    ? getUrl(`${image?.name}`, `${options.orgcode}`, `${options.name}`).then(
-        async ({ getUploadFileUrl: { url, fileName } }) => {
-          await uploadFile(url, image);
-          return fileName;
-        }
-      )
-    : image;
+const uploadImage = async (image: File, options?: UploadFile) => {
+  const endpoint = 'https://file-service.staging.ixuapis.com/graphql/';
+  const client = new ApolloClient({
+    uri: endpoint,
+    cache: new InMemoryCache()
+  });
+  const uploadFile = (url: string, file: File) =>
+    fetch(url, {
+      method: 'PUT',
+      body: file ?? new Blob(),
+      headers: {
+        'Content-Type': 'application/octet-stream'
+      },
+      mode: 'cors'
+    }).catch((e) => console.error(e));
 
+  type Props = {
+    uploadFileUrl?: {
+      fileName?: string;
+      url: string;
+    };
+  };
+
+  const result = await client
+    .query<Props>({
+      query: queryUpload,
+      variables: {
+        orgCode: removeWhiteSpaces(options?.orgcode ?? ''),
+        path: removeWhiteSpaces(options?.name ?? ''),
+        fileName: removeWhiteSpaces(options?.name ?? '')
+      }
+    })
+    .then(async (res) => {
+      if (res?.data?.uploadFileUrl?.url) {
+        await uploadFile(res?.data?.uploadFileUrl?.url, image ?? ({} as File));
+        return res?.data?.uploadFileUrl?.fileName;
+      }
+      return image ?? ({} as File);
+    });
+  return result as any;
+};
 export default uploadImage;

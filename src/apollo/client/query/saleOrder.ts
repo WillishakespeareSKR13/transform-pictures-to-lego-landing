@@ -135,3 +135,17 @@ export const PAYSALEORDER = gql`
     }
   }
 `;
+
+export const PAYSALEORDERCASH = gql`
+  query paySaleOrderCash($id: ID!) {
+    paySaleOrderCash(id: $id) {
+      id
+      stripeId
+      secret
+      board {
+        id
+        pdf
+      }
+    }
+  }
+`;

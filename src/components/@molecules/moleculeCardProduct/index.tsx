@@ -16,7 +16,8 @@ const MoleculeCardProduct: FC<MoleculeCardProductType> = (props) => {
   return (
     <AtomWrapper
       customCSS={css`
-        width: 32%;
+        flex-basis: 250px;
+        flex-grow: 1;
         height: 390px;
         background-color: #202026;
         justify-content: space-between;
@@ -30,13 +31,17 @@ const MoleculeCardProduct: FC<MoleculeCardProductType> = (props) => {
           src={`${image}`}
           alt={`${image}`}
           customCSS={css`
-            width: 220px;
+            width: 100%;
             height: 220px;
             background-color: #1a1a1f;
+            img {
+              object-fit: contain;
+              padding: 10px;
+            }
           `}
         />
       </AtomWrapper>
-      <AtomWrapper padding="0 5%">
+      <AtomWrapper padding="0 10px">
         <AtomText
           customCSS={css`
             color: #dfdfdf;
@@ -124,7 +129,7 @@ const MoleculeCardProduct: FC<MoleculeCardProductType> = (props) => {
               font-size: 12px;
             `}
           >
-            add in cart
+            Add to Cart
           </AtomText>
         </AtomButton>
       </AtomWrapper>

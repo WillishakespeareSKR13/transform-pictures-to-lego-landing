@@ -20,17 +20,12 @@ import {
 } from 'graphql';
 import { GET_BOARDS } from '@Src/apollo/client/query/boards';
 import { GET_ROOM_SIZES, GET_ROOM_TYPES } from '@Src/apollo/client/query/rooms';
-import { useSelector } from 'react-redux';
-import { RootStateType } from '@Src/redux/reducer';
 
 const OrganismsConvertImage: FC = () => {
   const { file } = useContext(ContextFile);
-  const selected = useSelector((state: RootStateType) => state.modal.size);
-  const selectedSize = useSelector(
-    (state: RootStateType) => state.modal.sizeType
-  );
-  // const [selected, setSelected] = useState('SQUARE');
-  // const [selectedSize, setSelectedSize] = useState('SMALL');
+
+  const [selected, setSelected] = useState('SQUARE');
+  const [selectedSize, setSelectedSize] = useState('SMALL');
   const [showBorder, setShowBorder] = useState(false);
   const [selectedRoom, setSelectedRoom] = useState('DEFAULT');
   const [cropImages, setCropImages] = useState<CROPPEDIMAGE>([]);
@@ -186,7 +181,7 @@ const OrganismsConvertImage: FC = () => {
                 flex-direction: row;
               `}
             >
-              {/* {boards?.getBoards?.map((board) => (
+              {boards?.getBoards?.map((board) => (
                 <AtomButton
                   disabled={loading || isLoading}
                   key={board?.id}
@@ -232,9 +227,9 @@ const OrganismsConvertImage: FC = () => {
                     </AtomText>
                   </AtomWrapper>
                 </AtomButton>
-              ))} */}
+              ))}
             </AtomWrapper>
-            {/* <AtomWrapper
+            <AtomWrapper
               customCSS={css`
                 border-radius: 2px;
                 margin: 5px 0px;
@@ -294,7 +289,7 @@ const OrganismsConvertImage: FC = () => {
                     </AtomWrapper>
                   </AtomButton>
                 ))}
-            </AtomWrapper> */}
+            </AtomWrapper>
             <AtomWrapper
               customCSS={css`
                 margin: 5px 0px;

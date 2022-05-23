@@ -48,10 +48,12 @@ const typeDefs = gql`
     getSaleOrders(filter: FilterSaleOrder): [SaleOrder]
     getSaleOrderById(id: ID!): SaleOrder
     paySaleOrder(id: ID!): SaleOrder
+    paySaleOrderCash(id: ID!): SaleOrder
   }
   #####################MUTACION######################
   extend type Mutation {
     newSaleOrder(input: InputSaleOrder): SaleOrder
+    newSaleOrderCash(input: InputSaleOrder): SaleOrder
     updateSaleOrder(id: ID!, input: InputSaleOrder): SaleOrder
   }
 `;

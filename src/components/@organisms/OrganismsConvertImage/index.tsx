@@ -22,7 +22,7 @@ import { GET_BOARDS } from '@Src/apollo/client/query/boards';
 import { GET_ROOM_SIZES, GET_ROOM_TYPES } from '@Src/apollo/client/query/rooms';
 
 const OrganismsConvertImage: FC = () => {
-  const { file } = useContext(ContextFile);
+  const { file, setFile } = useContext(ContextFile);
   const [selected, setSelected] = useState('SQUARE');
   const [selectedSize, setSelectedSize] = useState('SMALL');
   const [showBorder, setShowBorder] = useState(false);
@@ -36,6 +36,7 @@ const OrganismsConvertImage: FC = () => {
   const [selectedImage, setSelectedImage] = useState(0);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const ref = createRef<any>();
+  const refInput = createRef<HTMLInputElement>();
 
   const { data: boards } = useQuery<IQueryFilter<'getBoards'>>(GET_BOARDS);
   const { data: rooms } = useQuery<IQueryFilter<'getRooms'>>(GET_ROOM_TYPES);
@@ -137,6 +138,31 @@ const OrganismsConvertImage: FC = () => {
             }
           `}
         >
+          <AtomButton
+            customCSS={css`
+              border-radius: 4px 0 0 4px;
+              width: 100%;
+              background-color: #e95c10;
+              input {
+                display: none;
+              }
+            `}
+            onClick={() => {
+              refInput.current?.click();
+            }}
+          >
+            Cambiar imagen
+            <input
+              type="file"
+              ref={refInput}
+              onChange={(e) => {
+                if (e.target.files?.[0]) {
+                  const file = e?.target?.files[0];
+                  setFile(file);
+                }
+              }}
+            />
+          </AtomButton>
           <PinturaEditor
             {...getEditorDefaults()}
             enableButtonExport={false}
@@ -191,6 +217,7 @@ const OrganismsConvertImage: FC = () => {
                         ?.name ?? 'SMALL'
                     );
                     setCropImages([]);
+                    setCropImagesBlock([]);
                     setQuantity(0);
                   }}
                   customCSS={css`
@@ -252,6 +279,7 @@ const OrganismsConvertImage: FC = () => {
                     onClick={() => {
                       setSelectedSize(size?.type?.name ?? 'SMALL');
                       setCropImages([]);
+                      setCropImagesBlock([]);
                       setQuantity(0);
                     }}
                     customCSS={css`
@@ -555,11 +583,18 @@ const OrganismsConvertImage: FC = () => {
             type="select"
             errorHeight="0px"
             value={selectedRoom}
-            options={rooms?.getRooms?.map((room) => ({
-              id: `${room?.id}`,
-              value: `${room?.key}`,
-              label: `${room?.title}`
-            }))}
+            options={[
+              {
+                id: 'DEFAULT',
+                value: 'DEFAULT',
+                label: 'View Full Size'
+              },
+              ...(rooms?.getRooms?.map((room) => ({
+                id: `${room?.id}`,
+                value: `${room?.key}`,
+                label: `${room?.title}`
+              })) ?? [])
+            ]}
             onChange={(e) => setSelectedRoom(e.target.value)}
             labelWidth="250px"
             defaultText="Pick a demo room"

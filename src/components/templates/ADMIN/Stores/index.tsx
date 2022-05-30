@@ -37,8 +37,23 @@ const STORES = () => {
         >
           All Stores
         </AtomText>
-        <AtomWrapper width="max-content">
-          <AtomButton onClick={() => router.push('/dashboard/colors')}>
+        <AtomWrapper
+          width="max-content"
+          flexDirection="row"
+          customCSS={css`
+            gap: 10px;
+          `}
+        >
+          <AtomButton
+            backgroundColor="#f1576c"
+            onClick={() => router.push('/dashboard/rooms')}
+          >
+            Rooms
+          </AtomButton>
+          <AtomButton
+            backgroundColor="#f1576c"
+            onClick={() => router.push('/dashboard/colors')}
+          >
             Colors
           </AtomButton>
         </AtomWrapper>

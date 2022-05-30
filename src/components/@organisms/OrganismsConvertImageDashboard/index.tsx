@@ -192,6 +192,7 @@ const OrganismsConvertImage: FC = () => {
                         ?.name ?? 'SMALL'
                     );
                     setCropImages([]);
+                    setCropImagesBlock([]);
                     setQuantity(0);
                   }}
                   customCSS={css`
@@ -253,6 +254,7 @@ const OrganismsConvertImage: FC = () => {
                     onClick={() => {
                       setSelectedSize(size?.type?.name ?? 'SMALL');
                       setCropImages([]);
+                      setCropImagesBlock([]);
                       setQuantity(0);
                     }}
                     customCSS={css`
@@ -556,11 +558,18 @@ const OrganismsConvertImage: FC = () => {
             type="select"
             errorHeight="0px"
             value={selectedRoom}
-            options={rooms?.getRooms?.map((room) => ({
-              id: `${room?.id}`,
-              value: `${room?.key}`,
-              label: `${room?.title}`
-            }))}
+            options={[
+              {
+                id: 'DEFAULT',
+                value: 'DEFAULT',
+                label: 'View Full Size'
+              },
+              ...(rooms?.getRooms?.map((room) => ({
+                id: `${room?.id}`,
+                value: `${room?.key}`,
+                label: `${room?.title}`
+              })) ?? [])
+            ]}
             onChange={(e) => setSelectedRoom(e.target.value)}
             labelWidth="250px"
             defaultText="Pick a demo room"

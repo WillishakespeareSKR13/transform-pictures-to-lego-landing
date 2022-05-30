@@ -96,8 +96,10 @@ export const AtomPdf = (props: AtomPdfProps) => {
   const { images, imagesBlock, colors, width, height, isPortrait } = props;
   const stylesImg = StyleSheet.create({
     image: {
-      width: 750 / Number(width),
-      height: 750 / Number(width)
+      width:
+        750 / (Number(height) > Number(width) ? Number(height) : Number(width)),
+      height:
+        750 / (Number(height) > Number(width) ? Number(height) : Number(width))
     }
   });
   return (
@@ -112,8 +114,8 @@ export const AtomPdf = (props: AtomPdfProps) => {
               flexWrap: 'wrap',
               width:
                 Number(width) > Number(height)
-                  ? (750 / Number(height)) * Number(width)
-                  : (750 / Number(width)) * Number(height) + Number(width) * 4
+                  ? (750 / Number(width)) * Number(width)
+                  : (750 / Number(height)) * Number(width)
             }}
           >
             {imagesBlock.map((image, index) => (
@@ -372,16 +374,31 @@ const DownloadPdf: FC<DocumentProps> = (props) => {
   return (
     <div>
       <PaymentModal {...payment} pdf={pdf} />
-      {/* <PDFViewer>
-        <AtomPdf
-          images={images}
-          colors={colors}
-          height={height}
-          width={width}
-          isPortrait={isPortrait}
-          payment={payment}
-        />
-      </PDFViewer> */}
+      {/* <AtomWrapper
+        customCSS={css`
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 50vw;
+          height: 50vh;
+          iframe {
+            width: 100%;
+            height: 100%;
+          }
+        `}
+      >
+        <PDFViewer>
+          <AtomPdf
+            imagesBlock={imagesBlock}
+            images={images}
+            colors={colors}
+            height={height}
+            width={width}
+            isPortrait={isPortrait}
+            payment={payment}
+          />
+        </PDFViewer>
+      </AtomWrapper> */}
       <PDFDownloadLink
         document={Document}
         fileName={`${new Date().toLocaleString()}.pdf`}

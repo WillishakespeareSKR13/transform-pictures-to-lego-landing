@@ -12,6 +12,7 @@ import MoleculeCardProduct from '@Src/components/@molecules/moleculeCardProduct'
 import PageIndex from '@Src/components/pages/index';
 import { colorsAtoms, ICart, setCartAtom } from '@Src/jotai/cart';
 import { RootStateType } from '@Src/redux/reducer';
+import { InputStyles } from '@Src/styles';
 
 export type ItemCardShopType = {
   id: string;
@@ -39,6 +40,39 @@ import { useAtom } from 'jotai';
 import { useRouter } from 'next/router';
 import React, { FC, useState } from 'react';
 import { useSelector } from 'react-redux';
+
+const ValueOfSale = (
+  cart: ICart[],
+  boards: IQueryFilter<'getBoards'> | undefined,
+  data: IQueryFilter<'getProducts'> | undefined
+) => {
+  return (
+    Math.ceil(
+      (cart.reduce((acc, item) => {
+        const price =
+          item.type === 'BOARD'
+            ? boards?.getBoards
+                ?.find((e) => e?.id === item.board?.id)
+                ?.sizes?.find((e) => e?.id === item.board?.size)?.price
+            : data?.getProducts?.find((e) => e?.id === item.product?.id)?.price;
+
+        return acc + (price ?? 0);
+      }, 0) /
+        (variablesSale.tax + 1)) *
+        variablesSale.tax
+    ) +
+    cart.reduce((acc, item) => {
+      const price =
+        item.type === 'BOARD'
+          ? boards?.getBoards
+              ?.find((e) => e?.id === item.board?.id)
+              ?.sizes?.find((e) => e?.id === item.board?.size)?.price
+          : data?.getProducts?.find((e) => e?.id === item.product?.id)?.price;
+
+      return acc + (price ?? 0);
+    }, 0)
+  );
+};
 
 const variablesSale = {
   tax: 0.16
@@ -571,6 +605,8 @@ const PointSale: FC = () => {
                 `}
                 type="select"
                 value={seller}
+                // selecciona una opcion (ingles)
+                defaultText="Select a option"
                 onChange={(e) => setSeller(e.target.value)}
                 options={dataUsers?.getUsers
                   ?.filter((e) => e?.role?.name === 'AGENT')
@@ -585,7 +621,7 @@ const PointSale: FC = () => {
                 backgroundColor="#f1576c"
                 fontSize="10px"
                 onClick={() => setPay(true)}
-                disabled={seller === 'DEFAULT'}
+                disabled={seller === 'DEFAULT' || cart.length === 0}
               >
                 Pay
               </AtomButton>
@@ -607,12 +643,12 @@ const PointSale: FC = () => {
       <AtomModal
         componentProps={{
           wrapperProps: {
-            backgroundColor: '#313139'
+            backgroundColor: '#2e2e35'
           }
         }}
         isOpen={pay}
         component={
-          <>
+          <AtomWrapper>
             {payed ? (
               <>
                 {payments === 'CASH' && (
@@ -625,124 +661,183 @@ const PointSale: FC = () => {
                       gap: 20px;
                     `}
                   >
-                    <AtomText color="#ffffff">Cash</AtomText>
-                    <AtomText color="#ffffff">
-                      {Math.ceil(
-                        (cart.reduce((acc, item) => {
-                          const price =
-                            item.type === 'BOARD'
-                              ? boards?.getBoards
-                                  ?.find((e) => e?.id === item.board?.id)
-                                  ?.sizes?.find(
-                                    (e) => e?.id === item.board?.size
-                                  )?.price
-                              : data?.getProducts?.find(
-                                  (e) => e?.id === item.product?.id
-                                )?.price;
-
-                          return acc + (price ?? 0);
-                        }, 0) /
-                          (variablesSale.tax + 1)) *
-                          variablesSale.tax
-                      ) +
-                        cart.reduce((acc, item) => {
-                          const price =
-                            item.type === 'BOARD'
-                              ? boards?.getBoards
-                                  ?.find((e) => e?.id === item.board?.id)
-                                  ?.sizes?.find(
-                                    (e) => e?.id === item.board?.size
-                                  )?.price
-                              : data?.getProducts?.find(
-                                  (e) => e?.id === item.product?.id
-                                )?.price;
-
-                          return acc + (price ?? 0);
-                        }, 0)}
-                    </AtomText>
-                    <AtomInput
-                      value={cash}
-                      onChange={(e) => setCash(e.target.value)}
-                    />
-                    <AtomText color="#ffffff">
-                      {Math.ceil(
-                        (cart.reduce((acc, item) => {
-                          const price =
-                            item.type === 'BOARD'
-                              ? boards?.getBoards
-                                  ?.find((e) => e?.id === item.board?.id)
-                                  ?.sizes?.find(
-                                    (e) => e?.id === item.board?.size
-                                  )?.price
-                              : data?.getProducts?.find(
-                                  (e) => e?.id === item.product?.id
-                                )?.price;
-
-                          return acc + (price ?? 0);
-                        }, 0) /
-                          (variablesSale.tax + 1)) *
-                          variablesSale.tax
-                      ) +
-                        cart.reduce((acc, item) => {
-                          const price =
-                            item.type === 'BOARD'
-                              ? boards?.getBoards
-                                  ?.find((e) => e?.id === item.board?.id)
-                                  ?.sizes?.find(
-                                    (e) => e?.id === item.board?.size
-                                  )?.price
-                              : data?.getProducts?.find(
-                                  (e) => e?.id === item.product?.id
-                                )?.price;
-
-                          return acc + (price ?? 0);
-                        }, 0) -
-                        Number(cash)}
-                    </AtomText>
-                    <AtomButton
-                      onClick={() => {
-                        EXENEWCOLORSALEORDER({
-                          variables: {
-                            input: {
-                              colors: colors?.map((color) => ({
-                                color: color.id,
-                                quantity: color.count
-                              }))
+                    <AtomWrapper flexDirection="row" padding="0 30px">
+                      <AtomWrapper width="50%">
+                        <AtomWrapper
+                          maxHeight="300px"
+                          justifyContent="flex-start"
+                          customCSS={css`
+                            gap: 10px;
+                            overflow-y: scroll;
+                          `}
+                        >
+                          {cart.map((e) =>
+                            e.type === 'BOARD' ? (
+                              <BOARD {...e} />
+                            ) : (
+                              <PRODUCT {...e} />
+                            )
+                          )}
+                        </AtomWrapper>
+                      </AtomWrapper>
+                      <AtomWrapper
+                        width="50%"
+                        height="100%"
+                        alignItems="flex-end"
+                      >
+                        <AtomWrapper
+                          flexDirection="row"
+                          flexWrap="wrap"
+                          customCSS={css`
+                            span {
+                              color: #ffffff;
+                              border: 1px solid #ffffff;
+                              padding: 5px;
+                              text-overflow: ellipsis;
+                              overflow: hidden;
+                              white-space: nowrap;
                             }
-                          }
-                        }).then((e) => {
-                          const id = e.data.newColorSaleOrder.id;
-                          EXENEWSALEORDER({
+                          `}
+                        >
+                          <AtomText width="70%">Subtotal</AtomText>
+                          <AtomText width="30%" align="right">
+                            {`$${cart.reduce((acc, item) => {
+                              const price =
+                                item.type === 'BOARD'
+                                  ? boards?.getBoards
+                                      ?.find((e) => e?.id === item.board?.id)
+                                      ?.sizes?.find(
+                                        (e) => e?.id === item.board?.size
+                                      )?.price
+                                  : data?.getProducts?.find(
+                                      (e) => e?.id === item.product?.id
+                                    )?.price;
+
+                              return acc + (price ?? 0);
+                            }, 0)}`}
+                          </AtomText>
+                          <AtomText width="70%">Tax</AtomText>
+                          <AtomText width="30%" align="right" maxWidth="30%">
+                            {`$${Math.ceil(
+                              (cart.reduce((acc, item) => {
+                                const price =
+                                  item.type === 'BOARD'
+                                    ? boards?.getBoards
+                                        ?.find((e) => e?.id === item.board?.id)
+                                        ?.sizes?.find(
+                                          (e) => e?.id === item.board?.size
+                                        )?.price
+                                    : data?.getProducts?.find(
+                                        (e) => e?.id === item.product?.id
+                                      )?.price;
+
+                                return acc + (price ?? 0);
+                              }, 0) /
+                                (variablesSale.tax + 1)) *
+                                variablesSale.tax
+                            )}`}
+                          </AtomText>
+                          <AtomText width="70%">Grand Total</AtomText>
+                          <AtomText width="30%" align="right">
+                            ${ValueOfSale(cart, boards, data)}
+                          </AtomText>
+                          <AtomText width="70%">Client payment</AtomText>
+                          <AtomText width="30%" align="right">
+                            <AtomInput
+                              height="22px"
+                              labelWidth="100%"
+                              type="number"
+                              value={cash}
+                              placeholder="$0.00"
+                              onChange={(e) => setCash(e.target.value)}
+                              customCSS={css`
+                                ${InputStyles}
+                                input {
+                                  text-align: right;
+                                }
+                              `}
+                            />
+                          </AtomText>
+                          <AtomText width="70%">Change</AtomText>
+                          <AtomText
+                            width="30%"
+                            align="right"
+                            customCSS={css`
+                              color: ${Number(cash) <
+                              ValueOfSale(cart, boards, data)
+                                ? '#a83240'
+                                : '#22b620'} !important;
+                            `}
+                          >
+                            ${Number(cash) - ValueOfSale(cart, boards, data)}
+                          </AtomText>
+                        </AtomWrapper>
+                      </AtomWrapper>
+                    </AtomWrapper>
+                    <AtomWrapper
+                      flexDirection="row"
+                      alignItems="flex-end"
+                      customCSS={css`
+                        gap: 50px;
+                      `}
+                    >
+                      <AtomButton
+                        onClick={() => {
+                          setPay(!pay);
+                          setPayments('');
+                          setPayed(false);
+                        }}
+                      >
+                        CANCEL
+                      </AtomButton>
+                      <AtomButton
+                        disabled={
+                          Number(cash) < ValueOfSale(cart, boards, data)
+                        }
+                        onClick={() => {
+                          EXENEWCOLORSALEORDER({
                             variables: {
                               input: {
-                                customer: seller,
-                                board: cart
-                                  ?.filter((e) => e.type === 'BOARD')
-                                  .map((e) => ({
-                                    board: e?.board?.id,
-                                    size: e?.board?.size,
-                                    pdf: e?.board?.pdf
-                                  })),
-                                product: cart
-                                  ?.filter((e) => e.type === 'PRODUCT')
-                                  .map((e) => e?.product?.id),
-                                colorsaleorder: [id]
+                                colors: colors?.map((color) => ({
+                                  color: color.id,
+                                  quantity: color.count
+                                }))
                               }
                             }
                           }).then((e) => {
-                            LAZYPAYSALEORDERCASH({
+                            const id = e.data.newColorSaleOrder.id;
+                            EXENEWSALEORDER({
                               variables: {
-                                id: e.data.newSaleOrderCash.id
+                                input: {
+                                  customer: seller,
+                                  board: cart
+                                    ?.filter((e) => e.type === 'BOARD')
+                                    .map((e) => ({
+                                      board: e?.board?.id,
+                                      size: e?.board?.size,
+                                      pdf: e?.board?.pdf
+                                    })),
+                                  product: cart
+                                    ?.filter((e) => e.type === 'PRODUCT')
+                                    .map((e) => e?.product?.id),
+                                  colorsaleorder: [id]
+                                }
                               }
-                            }).then(() => {
-                              location.reload();
+                            }).then((e) => {
+                              LAZYPAYSALEORDERCASH({
+                                variables: {
+                                  id: e.data.newSaleOrderCash.id
+                                }
+                              }).then(() => {
+                                location.reload();
+                              });
                             });
                           });
-                        });
-                      }}
-                    >
-                      PAY
-                    </AtomButton>
+                        }}
+                      >
+                        PAY
+                      </AtomButton>
+                    </AtomWrapper>
                   </AtomWrapper>
                 )}
                 {payments === 'CARD' && (
@@ -762,6 +857,7 @@ const PointSale: FC = () => {
                   align-items: center;
                   width: 100%;
                   height: 100%;
+                  padding-left: 30px;
                 `}
               >
                 <AtomWrapper
@@ -790,8 +886,8 @@ const PointSale: FC = () => {
                   `}
                 >
                   {[
-                    { id: 1, name: 'Cash', value: 'CASH' },
-                    { id: 2, name: 'Debit/Credit Card', value: 'CARD' }
+                    { id: 1, name: 'Cash', value: 'CASH' }
+                    // { id: 2, name: 'Debit/Credit Card', value: 'CARD' }
                   ].map((e) => (
                     <AtomButton
                       key={e.id}
@@ -821,7 +917,13 @@ const PointSale: FC = () => {
                     justify-content: space-between;
                   `}
                 >
-                  <AtomButton backgroundColor="#f1576c" onClick={close}>
+                  <AtomButton
+                    backgroundColor="#f1576c"
+                    onClick={() => {
+                      setPay(!pay);
+                      setPayments('');
+                    }}
+                  >
                     CANCEL
                   </AtomButton>
                   <AtomButton
@@ -834,7 +936,7 @@ const PointSale: FC = () => {
                 </AtomWrapper>
               </AtomWrapper>
             )}
-          </>
+          </AtomWrapper>
         }
       />
     </>

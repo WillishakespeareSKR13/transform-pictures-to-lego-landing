@@ -48,7 +48,13 @@ const resolvers: Resolvers = {
       const room = await Room.findByIdAndUpdate(id, input, {
         new: true
       });
-      return room;
+      const getRoom = await Room.findById(room._id).populate({
+        path: 'offset',
+        populate: {
+          path: 'key'
+        }
+      });
+      return getRoom;
     }
   }
 };

@@ -381,7 +381,15 @@ const OrganismsConvertImage: FC = () => {
                 ?.title
             }
           </AtomText>
-          <>
+          <AtomWrapper
+            customCSS={css`
+              flex-direction: row;
+              flex-wrap: wrap;
+              align-items: center;
+              justify-content: center;
+              background-color: #313139;
+            `}
+          >
             {selectedRoom === 'DEFAULT' ? (
               <>
                 {loading || isLoading ? (
@@ -389,9 +397,19 @@ const OrganismsConvertImage: FC = () => {
                     isLoading
                     colorLoading="#dadadb"
                     type="small"
+                    widthLoader="2px"
                     customCSS={css`
-                      width: ${selectedConfig?.size?.width};
-                      height: ${selectedConfig?.size?.height};
+                      width: ${(selectedRoomSizeConfig.width ?? 0) * 3}px;
+                      height: ${(selectedRoomSizeConfig.height ?? 0) * 3}px;
+                      .lds-ring {
+                        width: 30px;
+                        height: 30px;
+                        div {
+                          margin: 1px 2px;
+                          width: 30px;
+                          height: 30px;
+                        }
+                      }
                     `}
                   />
                 ) : (
@@ -399,8 +417,8 @@ const OrganismsConvertImage: FC = () => {
                     customCSS={css`
                       flex-direction: row;
                       flex-wrap: wrap;
-                      width: ${selectedConfig?.size?.width ?? '600px'};
-                      height: ${selectedConfig?.size?.height ?? '600px'};
+                      width: ${(selectedRoomSizeConfig.width ?? 0) * 3}px;
+                      height: ${(selectedRoomSizeConfig.height ?? 0) * 3}px;
                       align-items: center;
                       justify-content: center;
                       background-color: #313139;
@@ -428,20 +446,10 @@ const OrganismsConvertImage: FC = () => {
                                 css`
                                   border: 2px solid #202024;
                                 `}
-                                ${(selectedConfig?.y ?? 0) >
-                                (selectedConfig?.x ?? 0)
-                                  ? css`
-                                      width: ${600 /
-                                      (selectedConfig?.y ?? 0)}px;
-                                      height: ${600 /
-                                      (selectedConfig?.y ?? 0)}px;
-                                    `
-                                  : css`
-                                      width: ${600 /
-                                      (selectedConfig?.x ?? 0)}px;
-                                      height: ${600 /
-                                      (selectedConfig?.x ?? 0)}px;
-                                    `}
+                                width: ${((selectedRoomSizeConfig.width ?? 0) *
+                                  4 ?? 0) / (selectedConfig?.x ?? 0)}px;
+                                height: ${((selectedRoomSizeConfig.height ??
+                                  0) * 3 ?? 0) / (selectedConfig?.y ?? 0)}px;
                               `}
                             />
                           </AtomButton>
@@ -455,7 +463,7 @@ const OrganismsConvertImage: FC = () => {
                       >
                         <AtomText
                           color="#dadadb"
-                          fontSize="28px"
+                          fontSize="22px"
                           fontWeight={600}
                           customCSS={css`
                             text-align: center;
@@ -498,8 +506,17 @@ const OrganismsConvertImage: FC = () => {
                       colorLoading="#4a4a54"
                       type="small"
                       customCSS={css`
-                        width: ${selectedRoomSizeConfig?.width}px;
-                        height: ${selectedRoomSizeConfig?.height}px;
+                        width: ${30 * (selectedConfig?.x ?? 0)}px;
+                        height: ${30 * (selectedConfig?.y ?? 0)}px;
+                        .lds-ring {
+                          width: 30px;
+                          height: 30px;
+                          div {
+                            margin: 1px 2px;
+                            width: 30px;
+                            height: 30px;
+                          }
+                        }
                       `}
                     />
                   ) : (
@@ -507,8 +524,9 @@ const OrganismsConvertImage: FC = () => {
                       customCSS={css`
                         flex-direction: row;
                         flex-wrap: wrap;
-                        width: ${selectedRoomSizeConfig?.width ?? 600}px;
-                        height: ${selectedRoomSizeConfig?.height ?? 600}px;
+                        width: ${30 * (selectedConfig?.x ?? 0)}px;
+                        height: ${30 * (selectedConfig?.y ?? 0)}px;
+
                         align-items: center;
                         justify-content: center;
                       `}
@@ -535,20 +553,8 @@ const OrganismsConvertImage: FC = () => {
                                   css`
                                     border: 2px solid #202024;
                                   `}
-                                  ${(selectedConfig?.y ?? 0) >
-                                  (selectedConfig?.x ?? 0)
-                                    ? css`
-                                        width: ${(selectedRoomSizeConfig?.max ??
-                                          0) / (selectedConfig?.y ?? 0)}px;
-                                        height: ${(selectedRoomSizeConfig?.max ??
-                                          0) / (selectedConfig?.y ?? 0)}px;
-                                      `
-                                    : css`
-                                        width: ${(selectedRoomSizeConfig?.max ??
-                                          0) / (selectedConfig?.x ?? 0)}px;
-                                        height: ${(selectedRoomSizeConfig?.max ??
-                                          0) / (selectedConfig?.x ?? 0)}px;
-                                      `}
+                                  width: 30px;
+                                  height: 30px;
                                 `}
                               />
                             </AtomButton>
@@ -562,7 +568,7 @@ const OrganismsConvertImage: FC = () => {
                         >
                           <AtomText
                             color="#4a4a54"
-                            fontSize="28px"
+                            fontSize={`${4 * (selectedConfig?.x ?? 0)}px`}
                             fontWeight={600}
                             customCSS={css`
                               text-align: center;
@@ -577,7 +583,7 @@ const OrganismsConvertImage: FC = () => {
                 </AtomWrapper>
               </AtomWrapper>
             )}
-          </>
+          </AtomWrapper>
 
           <AtomInput
             type="select"

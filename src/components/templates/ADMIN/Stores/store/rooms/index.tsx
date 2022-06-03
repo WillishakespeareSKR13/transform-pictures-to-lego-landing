@@ -1,13 +1,21 @@
-import { useQuery } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client';
 import { css } from '@emotion/react';
 import { GET_BOARDS } from '@Src/apollo/client/query/boards';
-import { GET_ROOM_SIZES, GET_ROOM_TYPES } from '@Src/apollo/client/query/rooms';
+import {
+  GET_ROOM_SIZES,
+  GET_ROOM_TYPES,
+  NEW_ROOM,
+  UPDATE_ROOM
+} from '@Src/apollo/client/query/rooms';
 import { StyledImage } from '@Src/components/@organisms/OrganismsConvertImage/styles';
 import DashWithTitle from '@Src/components/layouts/DashWithTitle';
+import uploadImage from '@Src/utils/uploadImage';
 import { AtomButton, AtomInput, AtomText, AtomWrapper } from '@sweetsyui/ui';
+import { useFormik } from 'formik';
 import { IBoardSize, IQueryFilter, IRoom, IRoomSizesSizes } from 'graphql';
 import { useRouter } from 'next/router';
-import React, { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import * as Yup from 'yup';
 
 const Rooms = () => {
   const router = useRouter();
@@ -16,9 +24,12 @@ const Rooms = () => {
   const [selectedSize, setSelectedSize] = useState('SMALL');
 
   const { data: boards } = useQuery<IQueryFilter<'getBoards'>>(GET_BOARDS);
-  const { data: rooms } = useQuery<IQueryFilter<'getRooms'>>(GET_ROOM_TYPES);
+  const { data: rooms, refetch } =
+    useQuery<IQueryFilter<'getRooms'>>(GET_ROOM_TYPES);
   const { data: roomSizes } =
     useQuery<IQueryFilter<'getRoomSizes'>>(GET_ROOM_SIZES);
+  const [EXEUPDATEROOM] = useMutation(UPDATE_ROOM);
+  const [EXENEWROOM] = useMutation(NEW_ROOM);
 
   const selectedConfig = useMemo(
     () =>
@@ -27,18 +38,12 @@ const Rooms = () => {
         ?.sizes?.find((size) => size?.type?.name === selectedSize),
     [selected, selectedSize, boards]
   ) as IBoardSize;
+
   const selectedRoomConfig = useMemo(
-    () => rooms?.getRooms?.find((room) => room?.key === selectedRoom),
-    // () => ROOMS.find(({ key }) => key === selectedRoom),
+    () => rooms?.getRooms?.find((room) => room?.id === selectedRoom),
     [selectedRoom, rooms]
   ) as IRoom;
-  const selectedRoomSize = useMemo(
-    () =>
-      roomSizes?.getRoomSizes?.find(
-        (roomSize) => roomSize?.key?.name === selected
-      ),
-    [selected, roomSizes]
-  );
+
   const selectedRoomSizeConfig = useMemo(
     () =>
       roomSizes?.getRoomSizes
@@ -46,7 +51,48 @@ const Rooms = () => {
         ?.sizes?.find((size) => size?.key?.name === selectedSize),
     [selected, selectedSize, roomSizes]
   ) as IRoomSizesSizes;
-  console.warn(selectedRoomSizeConfig, selectedRoomSize);
+
+  const [offset, setOffset] = useState(0);
+  useEffect(() => {
+    const getoffset = selectedRoomConfig?.offset?.find(
+      (off) => off?.key?.name === selected
+    )?.top;
+    setOffset(getoffset ?? 0);
+  }, [selectedRoomSizeConfig, selected, selectedRoom]);
+
+  const formik = useFormik({
+    initialValues: {
+      key: '',
+      title: '',
+      image: null as unknown as File
+    },
+    validationSchema: Yup.object({
+      key: Yup.string().required('Required'),
+      title: Yup.string().required('Required'),
+      image: Yup.mixed().required('Required')
+    }),
+    onSubmit: async (values) => {
+      EXENEWROOM({
+        variables: {
+          input: {
+            key: values.key,
+            title: values.title,
+            image: await uploadImage(values.image, {
+              name: 'store',
+              orgcode: 'LGO-0001'
+            }),
+            offset: boards?.getBoards?.map((board) => ({
+              key: board?.type?.id,
+              top: 200
+            }))
+          }
+        }
+      }).then(() => {
+        refetch();
+        formik.resetForm();
+      });
+    }
+  });
 
   return (
     <DashWithTitle
@@ -83,6 +129,11 @@ const Rooms = () => {
               key={board?.id}
               onClick={() => {
                 setSelected(board?.type?.name as string);
+                setOffset(
+                  selectedRoomConfig?.offset?.find(
+                    (off) => off?.key?.name === selected
+                  )?.top ?? 0
+                );
                 setSelectedSize(
                   board?.sizes?.find((_, index) => index === 0)?.type?.name ??
                     'SMALL'
@@ -145,6 +196,11 @@ const Rooms = () => {
                 key={size?.id}
                 onClick={() => {
                   setSelectedSize(size?.type?.name ?? 'SMALL');
+                  setOffset(
+                    selectedRoomConfig?.offset?.find(
+                      (off) => off?.key?.name === selected
+                    )?.top ?? 0
+                  );
                 }}
                 customCSS={css`
                   padding: 5px 0px;
@@ -199,8 +255,8 @@ const Rooms = () => {
               customCSS={css`
                 flex-direction: row;
                 flex-wrap: wrap;
-                width: ${selectedConfig?.size?.width ?? '600px'};
-                height: ${selectedConfig?.size?.height ?? '600px'};
+                width: ${(selectedRoomSizeConfig?.width ?? 0) * 3}px;
+                height: ${(selectedRoomSizeConfig?.height ?? 0) * 3}px;
                 align-items: center;
                 justify-content: center;
                 background-color: #313139;
@@ -230,9 +286,7 @@ const Rooms = () => {
                   width: max-content;
                   height: max-content;
                   position: absolute;
-                  top: ${selectedRoomConfig.offset?.find(
-                    (off) => off?.key?.name === selected
-                  )?.top}px;
+                  top: ${offset}px;
                   right: 50%;
                   transform: translate(50%, -50%);
                   background-color: #313139;
@@ -244,8 +298,8 @@ const Rooms = () => {
                   customCSS={css`
                     flex-direction: row;
                     flex-wrap: wrap;
-                    width: ${selectedRoomSizeConfig?.width ?? 600}px;
-                    height: ${selectedRoomSizeConfig?.height ?? 600}px;
+                    width: ${30 * (selectedConfig?.x ?? 0)}px;
+                    height: ${30 * (selectedConfig?.y ?? 0)}px;
                     align-items: center;
                     justify-content: center;
                   `}
@@ -262,19 +316,8 @@ const Rooms = () => {
                       src="/images/demoroom.jpg"
                       alt="croppedImage"
                       customCSS={css`
-                        ${(selectedConfig?.y ?? 0) > (selectedConfig?.x ?? 0)
-                          ? css`
-                              width: ${(selectedRoomSizeConfig?.max ?? 0) /
-                              (selectedConfig?.y ?? 0)}px;
-                              height: ${(selectedRoomSizeConfig?.max ?? 0) /
-                              (selectedConfig?.y ?? 0)}px;
-                            `
-                          : css`
-                              width: ${(selectedRoomSizeConfig?.max ?? 0) /
-                              (selectedConfig?.x ?? 0)}px;
-                              height: ${(selectedRoomSizeConfig?.max ?? 0) /
-                              (selectedConfig?.x ?? 0)}px;
-                            `}
+                        width: 30px;
+                        height: 30px;
                       `}
                     />
                   ))}
@@ -286,11 +329,18 @@ const Rooms = () => {
             type="select"
             errorHeight="0px"
             value={selectedRoom}
-            options={rooms?.getRooms?.map((room) => ({
-              id: `${room?.id}`,
-              value: `${room?.key}`,
-              label: `${room?.title}`
-            }))}
+            options={[
+              {
+                id: 'DEFAULT',
+                value: 'DEFAULT',
+                label: 'View Full Size'
+              },
+              ...(rooms?.getRooms?.map((room) => ({
+                id: `${room?.id}`,
+                value: `${room?.id}`,
+                label: `${room?.title}`
+              })) ?? [])
+            ]}
             onChange={(e) => setSelectedRoom(e.target.value)}
             labelWidth="250px"
             defaultText="Pick a demo room"
@@ -308,10 +358,81 @@ const Rooms = () => {
         </AtomWrapper>
         <AtomWrapper
           customCSS={css`
-            background-color: red;
+            gap: 10px;
           `}
         >
-          config
+          <AtomText fontSize="18px" color="white">
+            Frame offset: {offset}px
+          </AtomText>
+          <AtomInput
+            type="number"
+            value={`${offset}`}
+            onChange={(e) => setOffset(e.target.value)}
+          />
+          <AtomButton
+            backgroundColor="#f1576c"
+            onClick={() => {
+              EXEUPDATEROOM({
+                variables: {
+                  id: selectedRoom,
+                  input: {
+                    offset: selectedRoomConfig?.offset?.map((e) => {
+                      const isSelect = e?.key?.name === selected;
+                      const topselect = isSelect ? offset : e?.top;
+                      return {
+                        key: e?.key?.id,
+                        top: Number(topselect)
+                      };
+                    })
+                  }
+                }
+              }).then(() => refetch());
+            }}
+          >
+            SAVE
+          </AtomButton>
+        </AtomWrapper>
+      </AtomWrapper>
+      <AtomWrapper>
+        <AtomText fontSize="18px" color="white">
+          Add a new room
+        </AtomText>
+        <AtomWrapper
+          flexDirection="row"
+          justifyContent="flex-start"
+          customCSS={css`
+            gap: 20px;
+          `}
+        >
+          <AtomWrapper width="max-content">
+            <AtomInput
+              labelWidth="300px"
+              formik={formik}
+              id="key"
+              label="Key"
+              labelColor="white"
+              spanMargin="10px 0px 10px 0px"
+            />
+            <AtomInput
+              labelWidth="300px"
+              formik={formik}
+              id="title"
+              label="Title"
+              labelColor="white"
+              spanMargin="10px 0px 10px 0px"
+            />
+            <AtomButton width="100%" onClick={() => formik.submitForm()}>
+              ADD
+            </AtomButton>
+          </AtomWrapper>
+          <AtomInput
+            formik={formik}
+            id="image"
+            type="dragdrop"
+            label="Image"
+            labelColor="white"
+            spanMargin="10px 0px 10px 0px"
+          />
         </AtomWrapper>
       </AtomWrapper>
     </DashWithTitle>

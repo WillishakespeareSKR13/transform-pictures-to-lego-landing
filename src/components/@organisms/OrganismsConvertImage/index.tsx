@@ -399,8 +399,8 @@ const OrganismsConvertImage: FC = () => {
                     type="small"
                     widthLoader="2px"
                     customCSS={css`
-                      width: ${(selectedRoomSizeConfig.width ?? 0) * 3}px;
-                      height: ${(selectedRoomSizeConfig.height ?? 0) * 3}px;
+                      width: ${(selectedRoomSizeConfig?.width ?? 0) * 3}px;
+                      height: ${(selectedRoomSizeConfig?.height ?? 0) * 3}px;
                       .lds-ring {
                         width: 30px;
                         height: 30px;
@@ -417,8 +417,8 @@ const OrganismsConvertImage: FC = () => {
                     customCSS={css`
                       flex-direction: row;
                       flex-wrap: wrap;
-                      width: ${(selectedRoomSizeConfig.width ?? 0) * 3}px;
-                      height: ${(selectedRoomSizeConfig.height ?? 0) * 3}px;
+                      width: ${(selectedRoomSizeConfig?.width ?? 0) * 3}px;
+                      height: ${(selectedRoomSizeConfig?.height ?? 0) * 3}px;
                       align-items: center;
                       justify-content: center;
                       background-color: #313139;
@@ -446,9 +446,9 @@ const OrganismsConvertImage: FC = () => {
                                 css`
                                   border: 2px solid #202024;
                                 `}
-                                width: ${((selectedRoomSizeConfig.width ?? 0) *
-                                  4 ?? 0) / (selectedConfig?.x ?? 0)}px;
-                                height: ${((selectedRoomSizeConfig.height ??
+                                width: ${((selectedRoomSizeConfig?.width ?? 0) *
+                                  3 ?? 0) / (selectedConfig?.x ?? 0)}px;
+                                height: ${((selectedRoomSizeConfig?.height ??
                                   0) * 3 ?? 0) / (selectedConfig?.y ?? 0)}px;
                               `}
                             />

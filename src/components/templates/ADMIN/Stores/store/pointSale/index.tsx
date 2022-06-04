@@ -1,11 +1,15 @@
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client';
 import { css, SerializedStyles } from '@emotion/react';
 import { NEWCOLORSALEORDER } from '@Src/apollo/client/mutation/color';
-import { NEWSALEORDERCASH } from '@Src/apollo/client/mutation/saleOrder';
+import {
+  NEWSALEORDER,
+  NEWSALEORDERCASH
+} from '@Src/apollo/client/mutation/saleOrder';
 import { GET_BOARDS } from '@Src/apollo/client/query/boards';
 import { GETPRODUCTS } from '@Src/apollo/client/query/products';
 import { PAYSALEORDERCASH } from '@Src/apollo/client/query/saleOrder';
 import { GETUSERS } from '@Src/apollo/client/query/user';
+import { Elements } from '@stripe/react-stripe-js';
 // import MoleculeCardBoard from '@Src/components/@molecules/moleculeCardBoard';
 import MoleculeCardBoardAll from '@Src/components/@molecules/moleculeCardBoardAll';
 import MoleculeCardProduct from '@Src/components/@molecules/moleculeCardProduct';
@@ -13,6 +17,8 @@ import PageIndex from '@Src/components/pages/index';
 import { colorsAtoms, ICart, setCartAtom } from '@Src/jotai/cart';
 import { RootStateType } from '@Src/redux/reducer';
 import { InputStyles } from '@Src/styles';
+
+const stripePromise = loadStripe('pk_test_8rT8GD6ByXYXhSxzRhhwcwBD00wfxfcg7a');
 
 export type ItemCardShopType = {
   id: string;
@@ -38,8 +44,9 @@ import {
 import { IQueryFilter } from 'graphql';
 import { useAtom } from 'jotai';
 import { useRouter } from 'next/router';
-import React, { FC, useState } from 'react';
+import React, { FC, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { loadStripe } from '@stripe/stripe-js';
 
 const ValueOfSale = (
   cart: ICart[],
@@ -110,6 +117,12 @@ const PointSale: FC = () => {
   const [EXENEWSALEORDER] = useMutation(NEWSALEORDERCASH);
   const [EXENEWCOLORSALEORDER] = useMutation(NEWCOLORSALEORDER);
   const [LAZYPAYSALEORDERCASH] = useLazyQuery(PAYSALEORDERCASH);
+  const [EXENEWSALEORDERCARD, { data: dataCard }] = useMutation(NEWSALEORDER);
+
+  const secret = useMemo(
+    () => dataCard?.newSaleOrder,
+    [dataCard?.newSaleOrder]
+  );
 
   const BOARD = (e: ICart) => {
     const board = boards?.getBoards?.find((x) => x?.id === e.id);
@@ -655,6 +668,7 @@ const PointSale: FC = () => {
                   <AtomWrapper
                     customCSS={css`
                       max-width: 700px;
+                      align-self: center;
                       align-items: center;
                       width: 100%;
                       height: 100%;
@@ -679,6 +693,23 @@ const PointSale: FC = () => {
                             )
                           )}
                         </AtomWrapper>
+                      </AtomWrapper>
+
+                      <AtomWrapper
+                        width="50%"
+                        height="100%"
+                        alignItems="flex-end"
+                      >
+                        {secret && (
+                          <Elements
+                            stripe={stripePromise}
+                            options={{
+                              clientSecret: secret.secret
+                            }}
+                          >
+                            <CheckoutForm saleOrder={secret} />
+                          </Elements>
+                        )}
                       </AtomWrapper>
                       <AtomWrapper
                         width="50%"
@@ -841,13 +872,108 @@ const PointSale: FC = () => {
                   </AtomWrapper>
                 )}
                 {payments === 'CARD' && (
-                  <AtomText
+                  <AtomWrapper
                     customCSS={css`
-                      color: #ffffff;
+                      max-width: 700px;
+                      align-self: center;
+                      align-items: center;
+                      width: 100%;
+                      height: 100%;
+                      gap: 20px;
                     `}
                   >
-                    Card
-                  </AtomText>
+                    <AtomWrapper flexDirection="row" padding="0 30px">
+                      <AtomWrapper width="50%">
+                        <AtomWrapper
+                          maxHeight="300px"
+                          justifyContent="flex-start"
+                          customCSS={css`
+                            gap: 10px;
+                            overflow-y: scroll;
+                          `}
+                        >
+                          {cart.map((e) =>
+                            e.type === 'BOARD' ? (
+                              <BOARD {...e} />
+                            ) : (
+                              <PRODUCT {...e} />
+                            )
+                          )}
+                        </AtomWrapper>
+                      </AtomWrapper>
+                      <AtomWrapper
+                        width="50%"
+                        height="100%"
+                        alignItems="flex-end"
+                      >
+                        {secret && (
+                          <Elements
+                            stripe={stripePromise}
+                            options={{
+                              clientSecret: secret.secret
+                            }}
+                          >
+                            <CheckoutForm saleOrder={secret} />
+                          </Elements>
+                        )}
+                        {!secret && (
+                          <AtomButton
+                            onClick={() => {
+                              EXENEWCOLORSALEORDER({
+                                variables: {
+                                  input: {
+                                    colors: colors?.map((color) => ({
+                                      color: color.id,
+                                      quantity: color.count
+                                    }))
+                                  }
+                                }
+                              }).then((e) => {
+                                const id = e.data.newColorSaleOrder.id;
+                                EXENEWSALEORDERCARD({
+                                  variables: {
+                                    input: {
+                                      customer: seller,
+                                      board: cart
+                                        ?.filter((e) => e.type === 'BOARD')
+                                        .map((e) => ({
+                                          board: e?.board?.id,
+                                          size: e?.board?.size,
+                                          pdf: e?.board?.pdf
+                                        })),
+                                      product: cart
+                                        ?.filter((e) => e.type === 'PRODUCT')
+                                        .map((e) => e?.product?.id),
+                                      colorsaleorder: [id]
+                                    }
+                                  }
+                                });
+                              });
+                            }}
+                          >
+                            ADD CARD
+                          </AtomButton>
+                        )}
+                      </AtomWrapper>
+                    </AtomWrapper>
+                    <AtomWrapper
+                      flexDirection="row"
+                      alignItems="flex-end"
+                      customCSS={css`
+                        gap: 50px;
+                      `}
+                    >
+                      <AtomButton
+                        onClick={() => {
+                          setPay(!pay);
+                          setPayments('');
+                          setPayed(false);
+                        }}
+                      >
+                        CANCEL
+                      </AtomButton>
+                    </AtomWrapper>
+                  </AtomWrapper>
                 )}
               </>
             ) : (
@@ -855,9 +981,10 @@ const PointSale: FC = () => {
                 customCSS={css`
                   max-width: 700px;
                   align-items: center;
+                  justify-content: center;
+                  align-self: center;
                   width: 100%;
                   height: 100%;
-                  padding-left: 30px;
                 `}
               >
                 <AtomWrapper
@@ -886,8 +1013,8 @@ const PointSale: FC = () => {
                   `}
                 >
                   {[
-                    { id: 1, name: 'Cash', value: 'CASH' }
-                    // { id: 2, name: 'Debit/Credit Card', value: 'CARD' }
+                    { id: 1, name: 'Cash', value: 'CASH' },
+                    { id: 2, name: 'Debit/Credit Card', value: 'CARD' }
                   ].map((e) => (
                     <AtomButton
                       key={e.id}
@@ -943,3 +1070,117 @@ const PointSale: FC = () => {
   );
 };
 export default PointSale;
+
+import {
+  useStripe,
+  useElements,
+  PaymentElement
+} from '@stripe/react-stripe-js';
+import { ISaleOrder } from '@Src/apollo/server/models/saleOrder';
+
+type CheckoutFormProps = {
+  saleOrder?: ISaleOrder;
+  setSaleOrder?: (saleOrder: ISaleOrder | undefined) => void;
+};
+
+const CheckoutForm: FC<CheckoutFormProps> = (props) => {
+  const { saleOrder, setSaleOrder } = props;
+  const [loading, setLoading] = useState(true);
+  const [loadingButton, setLoadingButton] = useState(false);
+  const stripe = useStripe();
+  const elements = useElements();
+  const router = useRouter();
+
+  const handleSubmit = async (event: { preventDefault: () => void }) => {
+    event.preventDefault();
+    setLoadingButton(true);
+    if (!stripe || !elements) {
+      return;
+    }
+
+    const result = await stripe.confirmPayment({
+      //`Elements` instance that was used to create the Payment Element
+      elements,
+      confirmParams: {
+        return_url: `http://${location.host}/dashboard/${
+          Array.isArray(router?.query?.id) ? router?.query?.id?.join('/') : ''
+        }/complete/${saleOrder?.id}`
+      }
+    });
+
+    if (result.error) {
+      // Show error to your customer (for example, payment details incomplete)
+      console.warn(result.error.message);
+      setLoadingButton(false);
+    } else {
+      setSaleOrder?.(saleOrder);
+      setLoadingButton(false);
+      // Your customer will be redirected to your `return_url`. For some payment
+      // methods like iDEAL, your customer will be redirected to an intermediate
+      // site first to authorize the payment, then redirected to the `return_url`.
+    }
+  };
+
+  return (
+    <AtomWrapper
+      customCSS={css`
+        width: 400px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        #paymentElement {
+          opacity: ${loading ? 0 : 1};
+          transition: opacity 0.5s ease-in-out;
+        }
+        form {
+          width: 100%;
+          height: 100%;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
+        }
+      `}
+    >
+      <form onSubmit={handleSubmit}>
+        {loading && (
+          <AtomLoader type="small" isLoading colorLoading="#313139" />
+        )}
+
+        <PaymentElement onReady={() => setLoading(false)} id="paymentElement" />
+
+        {!loading && (
+          <AtomButton
+            disabled={loading}
+            customCSS={css`
+              margin: 20px 0px 0px 0px;
+            `}
+          >
+            {loadingButton ? (
+              <AtomLoader
+                type="small"
+                isLoading
+                colorLoading="white"
+                widthLoader="2px"
+                customCSS={css`
+                  .lds-ring {
+                    transform: translate(-40%, -45%);
+                    width: 18px;
+                    height: 18px;
+                    div {
+                      width: 18px;
+                      height: 18px;
+                    }
+                  }
+                `}
+              />
+            ) : (
+              'Pay'
+            )}
+          </AtomButton>
+        )}
+      </form>
+    </AtomWrapper>
+  );
+};

@@ -35,9 +35,9 @@ const CompleteOrderPay = () => {
   const { data, loading } = useQuery<IQueryFilter<'paySaleOrder'>>(
     PAYSALEORDER,
     {
-      skip: !router.query.id,
+      skip: !router.query.id?.[router.query.id.length - 1],
       variables: {
-        id: router.query.id
+        id: router.query.id?.[router.query.id.length - 1]
       }
     }
   );
@@ -131,7 +131,11 @@ const CompleteOrderPay = () => {
 
           <AtomButton
             onClick={() => {
-              router.push('/');
+              router.push(
+                `/dashboard/${[...(router?.query?.id ?? [])]
+                  ?.filter((_, id) => id < 3)
+                  .join('/')}`
+              );
             }}
             customCSS={css`
               border: 2px solid #48d496;
@@ -143,7 +147,7 @@ const CompleteOrderPay = () => {
               }
             `}
           >
-            <AtomText>Go to home page</AtomText>
+            <AtomText>Back to PointSale</AtomText>
           </AtomButton>
         </AtomWrapper>
       )}

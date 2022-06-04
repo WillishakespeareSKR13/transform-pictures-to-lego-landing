@@ -10,6 +10,7 @@ import Details from './Stores/store/details';
 import Products from './Stores/store/products';
 import Colors from './Stores/store/colors';
 import Rooms from './Stores/store/rooms';
+import CompleteOrderPay from './Stores/store/pointSale/complete/[id]';
 
 const ADMIN = () => {
   return (
@@ -22,6 +23,10 @@ const ADMIN = () => {
       <Route path="/store/add/storeType" element={<StoreAddStoreType />} />
       <Route path="/store/:id/users" element={<StoreAddUser />} />
       <Route path="/store/:id/pointsale" element={<PointSale />} />
+      <Route
+        path="/store/:id/pointsale/complete/:order"
+        element={<CompleteOrderPay />}
+      />
       <Route path="/store/:id/products" element={<Products />} />
       <Route path="/colors" element={<Colors />} />
       <Route path="/rooms" element={<Rooms />} />

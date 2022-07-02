@@ -26,7 +26,7 @@ import { useFormik } from 'formik';
 import { IQueryFilter, ISaleOrder, IUser } from 'graphql';
 import { useRouter } from 'next/router';
 
-const arrayToCsv = (data?: string[][]) =>
+export const arrayToCsv = (data?: string[][]) =>
   data
     ?.map((row) =>
       row
@@ -36,7 +36,7 @@ const arrayToCsv = (data?: string[][]) =>
     )
     .join('\r\n');
 
-const downloadCsv = (data: string, filename: string) => {
+export const downloadCsv = (data: string, filename: string) => {
   const blob = new Blob([data], {
     type: 'text/csv;charset=utf-8;'
   });
@@ -333,16 +333,33 @@ const VIEW = () => {
           {((dataProducts?.getProducts?.length ?? 0) &&
             (dataOrders?.getSaleOrders?.length ?? 0)) > 0 && (
             <>
-              <AtomText
-                customCSS={css`
-                  font-size: 20px;
-                  font-weight: bold;
-                  color: #dfdfdf;
-                  margin-bottom: 10px;
-                `}
-              >
-                Store Orders
-              </AtomText>
+              <AtomWrapper flexDirection="row" justifyContent="space-between">
+                <AtomText
+                  customCSS={css`
+                    font-size: 20px;
+                    font-weight: bold;
+                    color: #dfdfdf;
+                    margin-bottom: 10px;
+                  `}
+                >
+                  Store Orders
+                </AtomText>
+                <AtomButton
+                  customCSS={css`
+                    background-color: #f1576c;
+                    padding: 8px 20px;
+                    font-size: 10px;
+                  `}
+                  onClick={() => {
+                    router.push(
+                      `/dashboard/store/[id]/saleorders`,
+                      `/dashboard/store/${data?.getStoreById?.id}/saleorders`
+                    );
+                  }}
+                >
+                  See all sale orders
+                </AtomButton>
+              </AtomWrapper>
               <AtomWrapper
                 customCSS={css`
                   max-width: 100%;

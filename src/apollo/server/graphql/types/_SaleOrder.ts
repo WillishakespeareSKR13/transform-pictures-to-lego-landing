@@ -16,6 +16,7 @@ const typeDefs = gql`
     currency: String
     status: String
     colorsaleorder: [ColorSaleOrder]
+    createdAt: String
   }
 
   #######################INPUT#######################

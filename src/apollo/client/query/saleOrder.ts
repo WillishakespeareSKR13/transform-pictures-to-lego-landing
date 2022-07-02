@@ -6,6 +6,7 @@ export const GETSALEORDES = gql`
       id
       stripeId
       secret
+      createdAt
       product {
         id
         name

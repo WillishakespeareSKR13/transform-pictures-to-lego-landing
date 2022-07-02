@@ -43,7 +43,18 @@ export const TableStyles = css`
     }
   }
 `;
-
+export const InputDatesStyles = css`
+  input[type='date']::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    border-radius: 4px;
+    margin-right: 10px;
+    opacity: 0.6;
+    filter: invert(0.8);
+  }
+  input[type='date']::-webkit-calendar-picker-indicator:hover {
+    opacity: 1;
+  }
+`;
 export const InputStyles = css`
   span {
     margin: 0px 0px 10px 0px;

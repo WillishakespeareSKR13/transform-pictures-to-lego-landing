@@ -143,6 +143,7 @@ declare module 'graphql' {
     currency?: string;
     status?: string;
     colorsaleorder?: Array<IColorSaleOrder | null>;
+    createdAt?: string;
   }
 
   export interface IProducts {

@@ -1,6 +1,6 @@
 import { useQuery } from '@apollo/client';
 import { css } from '@emotion/react';
-import { PAYSALEORDER } from '@Src/apollo/client/query/saleOrder';
+import { GETSALEORDERBYID } from '@Src/apollo/client/query/saleOrder';
 import {
   AtomButton,
   AtomImage,
@@ -33,8 +33,8 @@ const config = {
 
 const CompleteOrderPay = () => {
   const router = useRouter();
-  const { data, loading } = useQuery<IQueryFilter<'paySaleOrder'>>(
-    PAYSALEORDER,
+  const { data, loading } = useQuery<IQueryFilter<'getSaleOrderById'>>(
+    GETSALEORDERBYID,
     {
       skip: !router.query.id?.[router.query.id.length - 1],
       variables: {
@@ -74,9 +74,9 @@ const CompleteOrderPay = () => {
           transform: translate(-50%, -50%);
         `}
       >
-        <ConfettiComponent active={!!data?.paySaleOrder} config={config} />
+        <ConfettiComponent active={!!data?.getSaleOrderById} config={config} />
       </AtomWrapper>
-      {data?.paySaleOrder && (
+      {data?.getSaleOrderById && (
         <AtomWrapper
           maxWidth="max-content"
           borderRadius="5px"
@@ -103,7 +103,7 @@ const CompleteOrderPay = () => {
             width="max-content"
             margin="40px 0"
           />
-          {data?.paySaleOrder?.board?.map((e) => (
+          {data?.getSaleOrderById?.board?.map((e) => (
             <AtomButton
               key={e?.id}
               onClick={() => {

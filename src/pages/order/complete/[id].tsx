@@ -12,7 +12,6 @@ import Confetti, { ConfettiConfig } from 'react-dom-confetti';
 import { useRouter } from 'next/router';
 import React from 'react';
 import { IQueryFilter } from 'graphql';
-import DownloadTicket from '@Src/components/@organisms/DownloadTicket';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const ConfettiComponent = Confetti as any;
@@ -36,9 +35,9 @@ const CompleteOrderPay = () => {
   const { data, loading } = useQuery<IQueryFilter<'paySaleOrder'>>(
     PAYSALEORDER,
     {
-      skip: !router.query.id?.[router.query.id.length - 1],
+      skip: !router.query.id,
       variables: {
-        id: router.query.id?.[router.query.id.length - 1]
+        id: router.query.id
       }
     }
   );
@@ -130,15 +129,9 @@ const CompleteOrderPay = () => {
             </AtomButton>
           ))}
 
-          <DownloadTicket id={router.query.id?.[router.query.id.length - 1]} />
-
           <AtomButton
             onClick={() => {
-              router.push(
-                `/dashboard/${[...(router?.query?.id ?? [])]
-                  ?.filter((_, id) => id < 3)
-                  .join('/')}`
-              );
+              router.push('/');
             }}
             customCSS={css`
               border: 2px solid #48d496;
@@ -150,7 +143,7 @@ const CompleteOrderPay = () => {
               }
             `}
           >
-            <AtomText>Back to PointSale</AtomText>
+            <AtomText>Go to home page</AtomText>
           </AtomButton>
         </AtomWrapper>
       )}

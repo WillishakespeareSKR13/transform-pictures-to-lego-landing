@@ -20,6 +20,10 @@ const typeDefs = gql`
   }
 
   #######################INPUT#######################
+  input InputProductQuantity {
+    id: ID
+    quantity: Int
+  }
 
   input InputSaleOrder {
     product: [String]
@@ -27,6 +31,8 @@ const typeDefs = gql`
     store: String
     customer: String
     colorsaleorder: [String]
+    price: Float
+    productQuantity: [InputProductQuantity]
   }
 
   input FilterSaleOrder {

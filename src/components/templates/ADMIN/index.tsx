@@ -12,6 +12,7 @@ import Colors from './Stores/store/colors';
 import Rooms from './Stores/store/rooms';
 import CompleteOrderPay from './Stores/store/pointSale/complete/[id]';
 import SaleOrder from './Stores/store/saleOrders';
+import CompleteTicketOrderPay from './Stores/store/pointSale/ticket/[id]';
 
 const ADMIN = () => {
   return (
@@ -29,6 +30,10 @@ const ADMIN = () => {
         element={<CompleteOrderPay />}
       />
       <Route path="/store/:id/saleorders" element={<SaleOrder />} />
+      <Route
+        path="/store/:id/pointsale/ticket/:order"
+        element={<CompleteTicketOrderPay />}
+      />
       <Route path="/store/:id/products" element={<Products />} />
       <Route path="/colors" element={<Colors />} />
       <Route path="/rooms" element={<Rooms />} />

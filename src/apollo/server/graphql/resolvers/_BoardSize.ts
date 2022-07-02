@@ -47,8 +47,8 @@ const resolvers: Resolvers = {
     },
     updateBoardSize: async (_, { id, input }) => {
       const boardSizeExist = await BoardSize.findById(id);
-      if (!boardSizeExist) throw new Error('BoardSize does not exist');
 
+      if (!boardSizeExist) throw new Error('BoardSize does not exist');
       const boardSize = await BoardSize.findByIdAndUpdate(id, input, {
         new: true
       });

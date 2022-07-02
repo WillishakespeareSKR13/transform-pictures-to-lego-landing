@@ -40,6 +40,7 @@ const typeDefs = gql`
   extend type Mutation {
     newRoom(input: InputRoom): Room
     updateRoom(id: ID!, input: InputRoom): Room
+    deleteRoom(id: ID!): Room
   }
 `;
 

@@ -13,6 +13,7 @@ import Room from './_Room';
 import RoomSizes from './_RoomSizes';
 import Color from './_Color';
 import ColorSaleOrder from './_ColorSaleOrders';
+import ProductQuantity from './_ProductsQuantity';
 
 const resolvers: Resolvers = {
   Query: {
@@ -29,7 +30,8 @@ const resolvers: Resolvers = {
     ...Room.Query,
     ...RoomSizes.Query,
     ...Color.Query,
-    ...ColorSaleOrder.Query
+    ...ColorSaleOrder.Query,
+    ...ProductQuantity.Query
   },
   Mutation: {
     ...User.Mutation,

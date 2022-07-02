@@ -2,6 +2,7 @@ import { useMutation, useQuery } from '@apollo/client';
 import { css } from '@emotion/react';
 import { GET_BOARDS } from '@Src/apollo/client/query/boards';
 import {
+  DELETE_ROOM,
   GET_ROOM_SIZES,
   GET_ROOM_TYPES,
   NEW_ROOM,
@@ -19,6 +20,7 @@ import * as Yup from 'yup';
 
 const Rooms = () => {
   const router = useRouter();
+  const [addRoom, setAddRoom] = useState(false);
   const [selectedRoom, setSelectedRoom] = useState('DEFAULT');
   const [selected, setSelected] = useState('SQUARE');
   const [selectedSize, setSelectedSize] = useState('SMALL');
@@ -30,6 +32,7 @@ const Rooms = () => {
     useQuery<IQueryFilter<'getRoomSizes'>>(GET_ROOM_SIZES);
   const [EXEUPDATEROOM] = useMutation(UPDATE_ROOM);
   const [EXENEWROOM] = useMutation(NEW_ROOM);
+  const [EXEDELETE] = useMutation(DELETE_ROOM);
 
   const selectedConfig = useMemo(
     () =>
@@ -91,6 +94,49 @@ const Rooms = () => {
         refetch();
         formik.resetForm();
       });
+    }
+  });
+
+  const formikEdit = useFormik({
+    initialValues: {
+      key: selectedRoomConfig?.key,
+      title: selectedRoomConfig?.title,
+      image: selectedRoomConfig?.image,
+      offset: offset
+    },
+    enableReinitialize: true,
+    validationSchema: Yup.object({
+      key: Yup.string().required('Required'),
+      title: Yup.string().required('Required'),
+      image: Yup.mixed().required('Required')
+    }),
+    onSubmit: async (values) => {
+      const { key, title, image, offset } = values;
+      const isImage =
+        typeof image === 'string'
+          ? image
+          : await uploadImage(image as unknown as File, {
+              name: 'store',
+              orgcode: 'LGO-0001'
+            });
+      EXEUPDATEROOM({
+        variables: {
+          id: selectedRoom,
+          input: {
+            key,
+            title,
+            image: isImage,
+            offset: selectedRoomConfig?.offset?.map((e) => {
+              const isSelect = e?.key?.name === selected;
+              const topselect = isSelect ? offset : e?.top;
+              return {
+                key: e?.key?.id,
+                top: Number(topselect)
+              };
+            })
+          }
+        }
+      }).then(() => refetch());
     }
   });
 
@@ -361,80 +407,148 @@ const Rooms = () => {
             gap: 10px;
           `}
         >
+          <AtomWrapper
+            flexDirection="row"
+            width="100%"
+            justifyContent="space-between"
+            alignItems="center"
+          >
+            <AtomText fontSize="18px" color="white">
+              Edit room size
+            </AtomText>
+            {selectedRoom !== 'DEFAULT' && (
+              <AtomButton
+                backgroundColor="#f1576c"
+                onClick={() => {
+                  EXEDELETE({
+                    variables: {
+                      id: selectedRoom
+                    }
+                  })
+                    .catch(() => null)
+                    .then(() => {
+                      setSelectedRoom('DEFAULT');
+                      refetch();
+                    });
+                }}
+              >
+                Delete Room
+              </AtomButton>
+            )}
+          </AtomWrapper>
           <AtomText fontSize="18px" color="white">
             Frame offset: {offset}px
+            {'   '}
+            <AtomText fontSize="12px" color="white">
+              *offset is for all sizes
+            </AtomText>
           </AtomText>
-          <AtomInput
-            type="number"
-            value={`${offset}`}
-            onChange={(e) => setOffset(e.target.value)}
-          />
-          <AtomButton
-            backgroundColor="#f1576c"
-            onClick={() => {
-              EXEUPDATEROOM({
-                variables: {
-                  id: selectedRoom,
-                  input: {
-                    offset: selectedRoomConfig?.offset?.map((e) => {
-                      const isSelect = e?.key?.name === selected;
-                      const topselect = isSelect ? offset : e?.top;
-                      return {
-                        key: e?.key?.id,
-                        top: Number(topselect)
-                      };
-                    })
-                  }
-                }
-              }).then(() => refetch());
-            }}
+          <AtomWrapper
+            flexDirection="row"
+            width="max-content"
+            customCSS={css`
+              gap: 10px;
+            `}
           >
-            SAVE
-          </AtomButton>
-        </AtomWrapper>
-      </AtomWrapper>
-      <AtomWrapper>
-        <AtomText fontSize="18px" color="white">
-          Add a new room
-        </AtomText>
-        <AtomWrapper
-          flexDirection="row"
-          justifyContent="flex-start"
-          customCSS={css`
-            gap: 20px;
-          `}
-        >
-          <AtomWrapper width="max-content">
             <AtomInput
-              labelWidth="300px"
-              formik={formik}
-              id="key"
-              label="Key"
-              labelColor="white"
-              spanMargin="10px 0px 10px 0px"
+              type="number"
+              value={`${offset}`}
+              onChange={(e) => setOffset(e.target.value)}
             />
-            <AtomInput
-              labelWidth="300px"
-              formik={formik}
-              id="title"
-              label="Title"
-              labelColor="white"
-              spanMargin="10px 0px 10px 0px"
-            />
-            <AtomButton width="100%" onClick={() => formik.submitForm()}>
-              ADD
-            </AtomButton>
           </AtomWrapper>
-          <AtomInput
-            formik={formik}
-            id="image"
-            type="dragdrop"
-            label="Image"
-            labelColor="white"
-            spanMargin="10px 0px 10px 0px"
-          />
+          <AtomWrapper
+            flexDirection="row"
+            justifyContent="flex-start"
+            customCSS={css`
+              gap: 20px;
+            `}
+          >
+            <AtomWrapper width="max-content">
+              <AtomInput
+                labelWidth="300px"
+                formik={formikEdit}
+                id="key"
+                label="Key"
+                labelColor="white"
+                spanMargin="10px 0px 10px 0px"
+              />
+              <AtomInput
+                labelWidth="300px"
+                formik={formikEdit}
+                id="title"
+                label="Title"
+                labelColor="white"
+                spanMargin="10px 0px 10px 0px"
+              />
+              <AtomButton
+                width="100%"
+                backgroundColor="#f1576c"
+                onClick={() => {
+                  formikEdit.submitForm();
+                }}
+              >
+                SAVE
+              </AtomButton>
+            </AtomWrapper>
+            <AtomInput
+              formik={formikEdit}
+              id="image"
+              type="dragdrop"
+              imagePreview={selectedRoomConfig?.image}
+              label="Image"
+              labelColor="white"
+              spanMargin="10px 0px 10px 0px"
+            />
+          </AtomWrapper>
         </AtomWrapper>
       </AtomWrapper>
+      <AtomButton onClick={() => setAddRoom(!addRoom)}>
+        Add a New Room
+      </AtomButton>
+      {addRoom && (
+        <AtomWrapper>
+          <AtomText fontSize="18px" color="white">
+            Add a new room
+          </AtomText>
+          <AtomWrapper
+            flexDirection="row"
+            justifyContent="flex-start"
+            customCSS={css`
+              gap: 20px;
+            `}
+          >
+            <AtomWrapper width="max-content">
+              <AtomInput
+                labelWidth="300px"
+                formik={formik}
+                id="key"
+                label="Key"
+                labelColor="white"
+                spanMargin="10px 0px 10px 0px"
+              />
+              <AtomInput
+                labelWidth="300px"
+                formik={formik}
+                id="title"
+                label="Title"
+                labelColor="white"
+                spanMargin="10px 0px 10px 0px"
+              />
+              <AtomButton width="100%" onClick={() => formik.submitForm()}>
+                ADD
+              </AtomButton>
+            </AtomWrapper>
+            <AtomInput
+              formik={formik}
+              id="image"
+              type="dragdrop"
+              label="Image"
+              labelColor="white"
+              spanMargin="10px 0px 10px 0px"
+            />
+          </AtomWrapper>
+        </AtomWrapper>
+      )}
     </DashWithTitle>
   );
 };

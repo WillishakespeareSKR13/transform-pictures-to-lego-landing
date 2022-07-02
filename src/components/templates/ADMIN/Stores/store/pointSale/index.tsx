@@ -48,49 +48,13 @@ import React, { FC, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { loadStripe } from '@stripe/stripe-js';
 
-const ValueOfSale = (
-  cart: ICart[],
-  boards: IQueryFilter<'getBoards'> | undefined,
-  data: IQueryFilter<'getProducts'> | undefined
-) => {
-  return (
-    Math.ceil(
-      (cart.reduce((acc, item) => {
-        const price =
-          item.type === 'BOARD'
-            ? boards?.getBoards
-                ?.find((e) => e?.id === item.board?.id)
-                ?.sizes?.find((e) => e?.id === item.board?.size)?.price
-            : data?.getProducts?.find((e) => e?.id === item.product?.id)?.price;
-
-        return acc + (price ?? 0);
-      }, 0) /
-        (variablesSale.tax + 1)) *
-        variablesSale.tax
-    ) +
-    cart.reduce((acc, item) => {
-      const price =
-        item.type === 'BOARD'
-          ? boards?.getBoards
-              ?.find((e) => e?.id === item.board?.id)
-              ?.sizes?.find((e) => e?.id === item.board?.size)?.price
-          : data?.getProducts?.find((e) => e?.id === item.product?.id)?.price;
-
-      return acc + (price ?? 0);
-    }, 0)
-  );
-};
-
-const variablesSale = {
-  tax: 0.16
-};
-
 const PointSale: FC = () => {
   const [pay, setPay] = useState(false);
   const [cash, setCash] = useState('');
   const [cart, setCart] = useAtom(setCartAtom);
   const [colors] = useAtom(colorsAtoms);
   const router = useRouter();
+  const params = useParams();
   const [seller, setSeller] = useState<string>('DEFAULT');
   const modal = useSelector((state: RootStateType) => state.modal);
   const { data: boards } = useQuery<IQueryFilter<'getBoards'>>(GET_BOARDS);
@@ -118,6 +82,10 @@ const PointSale: FC = () => {
   const [EXENEWCOLORSALEORDER] = useMutation(NEWCOLORSALEORDER);
   const [LAZYPAYSALEORDERCASH] = useLazyQuery(PAYSALEORDERCASH);
   const [EXENEWSALEORDERCARD, { data: dataCard }] = useMutation(NEWSALEORDER);
+
+  const [discount, setDiscount] = useState(0);
+
+  const [tax, setTax] = useState(0);
 
   const secret = useMemo(
     () => dataCard?.newSaleOrder,
@@ -293,6 +261,30 @@ const PointSale: FC = () => {
     );
   };
 
+  const SubTotal = useMemo(
+    () =>
+      cart.reduce((acc, item) => {
+        const price =
+          item.type === 'BOARD'
+            ? boards?.getBoards
+                ?.find((e) => e?.id === item.board?.id)
+                ?.sizes?.find((e) => e?.id === item.board?.size)?.price
+            : data?.getProducts?.find((e) => e?.id === item.product?.id)?.price;
+        const priceQuantity = (price ?? 0) * item.quantity;
+        return acc + (priceQuantity ?? 0);
+      }, 0),
+    [cart, boards, data]
+  );
+  const Discount = useMemo(
+    () => Number((SubTotal * (discount / 100)).toFixed(2)),
+    [SubTotal, discount]
+  );
+
+  const Tax = useMemo(
+    () => Number((SubTotal * (tax / 100)).toFixed(2)),
+    [SubTotal, tax]
+  );
+
   return (
     <>
       <AtomWrapper
@@ -466,7 +458,6 @@ const PointSale: FC = () => {
                         font-weight: bold;
                       `}
                     >
-                      {/* {e.count} */}
                       {e.rest > 0 ? e.rest : `+${Math.abs(e.rest)}`} {nameColor}
                     </AtomText>
                   </AtomWrapper>
@@ -517,9 +508,13 @@ const PointSale: FC = () => {
               flexWrap="wrap"
               customCSS={css`
                 span {
+                  font-size: 12px;
+                  background-color: #202026;
+                  border-radius: 4px;
+                  border: 2px solid #2e2e35;
                   color: #ffffff;
-                  border: 1px solid #ffffff;
-                  padding: 5px;
+                  padding: 8px 15px;
+
                   text-overflow: ellipsis;
                   overflow: hidden;
                   white-space: nowrap;
@@ -528,73 +523,85 @@ const PointSale: FC = () => {
             >
               <AtomText width="70%">Subtotal</AtomText>
               <AtomText width="30%" align="right">
-                {`$${cart.reduce((acc, item) => {
-                  const price =
-                    item.type === 'BOARD'
-                      ? boards?.getBoards
-                          ?.find((e) => e?.id === item.board?.id)
-                          ?.sizes?.find((e) => e?.id === item.board?.size)
-                          ?.price
-                      : data?.getProducts?.find(
-                          (e) => e?.id === item.product?.id
-                        )?.price;
-
-                  return acc + (price ?? 0);
-                }, 0)}`}
+                {`$${SubTotal}`}
               </AtomText>
-              <AtomText width="70%">Tax</AtomText>
+              <AtomText
+                width="70%"
+                customCSS={css`
+                  display: flex;
+                  flex-direction: row;
+                  align-items: center;
+                  gap: 20px;
+                `}
+              >
+                Discount
+                <AtomWrapper
+                  customCSS={css`
+                    flex-direction: row;
+                    gap: 10px;
+                  `}
+                >
+                  <AtomInput
+                    value={`${discount}`}
+                    onChange={(e) => setDiscount(e.target.value)}
+                    type="number"
+                    customCSS={css`
+                      input {
+                        color: #ffffff;
+                        background-color: #2e2e35;
+                        border: none;
+                        border-radius: 2px;
+                      }
+                      height: 18px;
+                      width: 50px;
+                    `}
+                  />
+                  %
+                </AtomWrapper>
+              </AtomText>
               <AtomText width="30%" align="right" maxWidth="30%">
-                {`$${Math.ceil(
-                  (cart.reduce((acc, item) => {
-                    const price =
-                      item.type === 'BOARD'
-                        ? boards?.getBoards
-                            ?.find((e) => e?.id === item.board?.id)
-                            ?.sizes?.find((e) => e?.id === item.board?.size)
-                            ?.price
-                        : data?.getProducts?.find(
-                            (e) => e?.id === item.product?.id
-                          )?.price;
-
-                    return acc + (price ?? 0);
-                  }, 0) /
-                    (variablesSale.tax + 1)) *
-                    variablesSale.tax
-                )}`}
+                -${Discount}
+              </AtomText>
+              <AtomText
+                width="70%"
+                customCSS={css`
+                  display: flex;
+                  flex-direction: row;
+                  align-items: center;
+                  gap: 20px;
+                `}
+              >
+                Tax
+                <AtomWrapper
+                  customCSS={css`
+                    flex-direction: row;
+                    gap: 10px;
+                  `}
+                >
+                  <AtomInput
+                    value={`${tax}`}
+                    onChange={(e) => setTax(e.target.value)}
+                    type="number"
+                    customCSS={css`
+                      input {
+                        color: #ffffff;
+                        background-color: #2e2e35;
+                        border: none;
+                        border-radius: 2px;
+                      }
+                      height: 18px;
+                      width: 50px;
+                    `}
+                  />
+                  %
+                </AtomWrapper>
+              </AtomText>
+              <AtomText width="30%" align="right" maxWidth="30%">
+                ${Tax}
               </AtomText>
               <AtomText width="70%">Grand Total</AtomText>
               <AtomText width="30%" align="right">
-                $
-                {Math.ceil(
-                  (cart.reduce((acc, item) => {
-                    const price =
-                      item.type === 'BOARD'
-                        ? boards?.getBoards
-                            ?.find((e) => e?.id === item.board?.id)
-                            ?.sizes?.find((e) => e?.id === item.board?.size)
-                            ?.price
-                        : data?.getProducts?.find(
-                            (e) => e?.id === item.product?.id
-                          )?.price;
-
-                    return acc + (price ?? 0);
-                  }, 0) /
-                    (variablesSale.tax + 1)) *
-                    variablesSale.tax
-                ) +
-                  cart.reduce((acc, item) => {
-                    const price =
-                      item.type === 'BOARD'
-                        ? boards?.getBoards
-                            ?.find((e) => e?.id === item.board?.id)
-                            ?.sizes?.find((e) => e?.id === item.board?.size)
-                            ?.price
-                        : data?.getProducts?.find(
-                            (e) => e?.id === item.product?.id
-                          )?.price;
-
-                    return acc + (price ?? 0);
-                  }, 0)}
+                ${SubTotal - Discount + Tax}
               </AtomText>
             </AtomWrapper>
             <AtomWrapper
@@ -700,30 +707,18 @@ const PointSale: FC = () => {
                         height="100%"
                         alignItems="flex-end"
                       >
-                        {secret && (
-                          <Elements
-                            stripe={stripePromise}
-                            options={{
-                              clientSecret: secret.secret
-                            }}
-                          >
-                            <CheckoutForm saleOrder={secret} />
-                          </Elements>
-                        )}
-                      </AtomWrapper>
-                      <AtomWrapper
-                        width="50%"
-                        height="100%"
-                        alignItems="flex-end"
-                      >
                         <AtomWrapper
                           flexDirection="row"
                           flexWrap="wrap"
                           customCSS={css`
                             span {
+                              font-size: 12px;
+                              background-color: #202026;
+                              border-radius: 4px;
+                              border: 2px solid #2e2e35;
                               color: #ffffff;
-                              border: 1px solid #ffffff;
-                              padding: 5px;
+                              padding: 8px 15px;
+
                               text-overflow: ellipsis;
                               overflow: hidden;
                               white-space: nowrap;
@@ -732,45 +727,85 @@ const PointSale: FC = () => {
                         >
                           <AtomText width="70%">Subtotal</AtomText>
                           <AtomText width="30%" align="right">
-                            {`$${cart.reduce((acc, item) => {
-                              const price =
-                                item.type === 'BOARD'
-                                  ? boards?.getBoards
-                                      ?.find((e) => e?.id === item.board?.id)
-                                      ?.sizes?.find(
-                                        (e) => e?.id === item.board?.size
-                                      )?.price
-                                  : data?.getProducts?.find(
-                                      (e) => e?.id === item.product?.id
-                                    )?.price;
-
-                              return acc + (price ?? 0);
-                            }, 0)}`}
+                            {`$${SubTotal}`}
                           </AtomText>
-                          <AtomText width="70%">Tax</AtomText>
+                          <AtomText
+                            width="70%"
+                            customCSS={css`
+                              display: flex;
+                              flex-direction: row;
+                              align-items: center;
+                              gap: 20px;
+                            `}
+                          >
+                            Discount
+                            <AtomWrapper
+                              customCSS={css`
+                                flex-direction: row;
+                                gap: 10px;
+                              `}
+                            >
+                              <AtomInput
+                                value={`${discount}`}
+                                onChange={(e) => setDiscount(e.target.value)}
+                                type="number"
+                                customCSS={css`
+                                  input {
+                                    color: #ffffff;
+                                    background-color: #2e2e35;
+                                    border: none;
+                                    border-radius: 2px;
+                                  }
+                                  height: 18px;
+                                  width: 50px;
+                                `}
+                              />
+                              %
+                            </AtomWrapper>
+                          </AtomText>
                           <AtomText width="30%" align="right" maxWidth="30%">
-                            {`$${Math.ceil(
-                              (cart.reduce((acc, item) => {
-                                const price =
-                                  item.type === 'BOARD'
-                                    ? boards?.getBoards
-                                        ?.find((e) => e?.id === item.board?.id)
-                                        ?.sizes?.find(
-                                          (e) => e?.id === item.board?.size
-                                        )?.price
-                                    : data?.getProducts?.find(
-                                        (e) => e?.id === item.product?.id
-                                      )?.price;
-
-                                return acc + (price ?? 0);
-                              }, 0) /
-                                (variablesSale.tax + 1)) *
-                                variablesSale.tax
-                            )}`}
+                            -${Discount}
+                          </AtomText>
+                          <AtomText
+                            width="70%"
+                            customCSS={css`
+                              display: flex;
+                              flex-direction: row;
+                              align-items: center;
+                              gap: 20px;
+                            `}
+                          >
+                            Tax
+                            <AtomWrapper
+                              customCSS={css`
+                                flex-direction: row;
+                                gap: 10px;
+                              `}
+                            >
+                              <AtomInput
+                                value={`${tax}`}
+                                onChange={(e) => setTax(e.target.value)}
+                                type="number"
+                                customCSS={css`
+                                  input {
+                                    color: #ffffff;
+                                    background-color: #2e2e35;
+                                    border: none;
+                                    border-radius: 2px;
+                                  }
+                                  height: 18px;
+                                  width: 50px;
+                                `}
+                              />
+                              %
+                            </AtomWrapper>
+                          </AtomText>
+                          <AtomText width="30%" align="right" maxWidth="30%">
+                            ${Tax}
                           </AtomText>
                           <AtomText width="70%">Grand Total</AtomText>
                           <AtomText width="30%" align="right">
-                            ${ValueOfSale(cart, boards, data)}
+                            ${SubTotal - Discount + Tax}
                           </AtomText>
                           <AtomText width="70%">Client payment</AtomText>
                           <AtomText width="30%" align="right">
@@ -794,13 +829,12 @@ const PointSale: FC = () => {
                             width="30%"
                             align="right"
                             customCSS={css`
-                              color: ${Number(cash) <
-                              ValueOfSale(cart, boards, data)
+                              color: ${Number(cash) < SubTotal - Discount + Tax
                                 ? '#a83240'
                                 : '#22b620'} !important;
                             `}
                           >
-                            ${Number(cash) - ValueOfSale(cart, boards, data)}
+                            ${Number(cash) - SubTotal - Discount + Tax}
                           </AtomText>
                         </AtomWrapper>
                       </AtomWrapper>
@@ -822,9 +856,7 @@ const PointSale: FC = () => {
                         CANCEL
                       </AtomButton>
                       <AtomButton
-                        disabled={
-                          Number(cash) < ValueOfSale(cart, boards, data)
-                        }
+                        disabled={Number(cash) < SubTotal - Discount + Tax}
                         onClick={() => {
                           EXENEWCOLORSALEORDER({
                             variables: {
@@ -840,6 +872,7 @@ const PointSale: FC = () => {
                             EXENEWSALEORDER({
                               variables: {
                                 input: {
+                                  store: params.id,
                                   customer: seller,
                                   board: cart
                                     ?.filter((e) => e.type === 'BOARD')
@@ -851,7 +884,14 @@ const PointSale: FC = () => {
                                   product: cart
                                     ?.filter((e) => e.type === 'PRODUCT')
                                     .map((e) => e?.product?.id),
-                                  colorsaleorder: [id]
+                                  colorsaleorder: [id],
+                                  price: SubTotal - Discount + Tax,
+                                  productQuantity: cart
+                                    ?.filter((e) => e.type === 'PRODUCT')
+                                    .map((e) => ({
+                                      id: e?.product?.id,
+                                      quantity: e.quantity
+                                    }))
                                 }
                               }
                             }).then((e) => {
@@ -859,9 +899,15 @@ const PointSale: FC = () => {
                                 variables: {
                                   id: e.data.newSaleOrderCash.id
                                 }
-                              }).then(() => {
-                                location.reload();
-                              });
+                              }).then(() =>
+                                router.push(
+                                  `http://${location.host}/dashboard/${
+                                    Array.isArray(router?.query?.id)
+                                      ? router?.query?.id?.join('/')
+                                      : ''
+                                  }/ticket/${e.data.newSaleOrderCash.id.toString()}`
+                                )
+                              );
                             });
                           });
                         }}
@@ -933,6 +979,7 @@ const PointSale: FC = () => {
                                 EXENEWSALEORDERCARD({
                                   variables: {
                                     input: {
+                                      store: params.id,
                                       customer: seller,
                                       board: cart
                                         ?.filter((e) => e.type === 'BOARD')
@@ -944,7 +991,14 @@ const PointSale: FC = () => {
                                       product: cart
                                         ?.filter((e) => e.type === 'PRODUCT')
                                         .map((e) => e?.product?.id),
-                                      colorsaleorder: [id]
+                                      colorsaleorder: [id],
+                                      price: SubTotal - Discount + Tax,
+                                      productQuantity: cart
+                                        ?.filter((e) => e.type === 'PRODUCT')
+                                        .map((e) => ({
+                                          id: e?.product?.id,
+                                          quantity: e.quantity
+                                        }))
                                     }
                                   }
                                 });
@@ -1077,6 +1131,7 @@ import {
   PaymentElement
 } from '@stripe/react-stripe-js';
 import { ISaleOrder } from '@Src/apollo/server/models/saleOrder';
+import { useParams } from 'react-router-dom';
 
 type CheckoutFormProps = {
   saleOrder?: ISaleOrder;
@@ -1099,7 +1154,6 @@ const CheckoutForm: FC<CheckoutFormProps> = (props) => {
     }
 
     const result = await stripe.confirmPayment({
-      //`Elements` instance that was used to create the Payment Element
       elements,
       confirmParams: {
         return_url: `http://${location.host}/dashboard/${

@@ -56,3 +56,15 @@ export const DELETEPRODUCT = gql`
     }
   }
 `;
+
+export const GETPRODUCTQUANTITY = gql`
+  query getProductQuantityBySaleOrder($id: ID!) {
+    getProductQuantityBySaleOrder(id: $id) {
+      id
+      products {
+        id
+        quantity
+      }
+    }
+  }
+`;

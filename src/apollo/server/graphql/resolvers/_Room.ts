@@ -55,6 +55,13 @@ const resolvers: Resolvers = {
         }
       });
       return getRoom;
+    },
+    deleteRoom: async (_, { id }) => {
+      const roomExist = await Room.findById(id);
+      if (!roomExist) throw new Error('Room does not exist');
+
+      const room = await Room.findByIdAndDelete(id);
+      return room;
     }
   }
 };

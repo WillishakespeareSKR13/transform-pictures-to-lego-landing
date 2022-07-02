@@ -74,6 +74,7 @@ export const GETSALEORDERBYID = gql`
       }
       board {
         id
+        pdf
         board {
           id
           title

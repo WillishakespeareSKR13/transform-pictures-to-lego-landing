@@ -1,6 +1,7 @@
 import { Resolvers } from '@apollo/client';
 import SaleOrder from '../../models/saleOrder';
 import Product from '../../models/products';
+import ProductQuantity from '../../models/productsQuantity';
 import Board from '../../models/board';
 import BoardSize from '../../models/boardSize';
 import BoardSelected from '../../models/boardSelected';
@@ -128,7 +129,24 @@ const resolvers: Resolvers = {
       if (!paymentRetrieve) throw new Error('Payment intent not found');
       if (paymentRetrieve.status !== 'succeeded')
         throw new Error('Payment intent not succeeded');
+
+      if (saleOrder.status === 'PAID')
+        throw new Error('Sale order already paid');
       saleOrder.status = 'PAID';
+      const getStore = await Store.findById(saleOrder.store?._id);
+      if (!getStore) throw new Error('Store not found');
+      getStore.cash += saleOrder.total;
+      getStore.save();
+      const GetAllProducts = await ProductQuantity.findOne({
+        saleOrder: saleOrder._id
+      });
+      GetAllProducts.products.forEach(
+        async (product: { id: string; quantity: number }) => {
+          const productToUpdate = await Product.findById(product.id);
+          productToUpdate.stock -= product.quantity;
+          await productToUpdate.save();
+        }
+      );
       saleOrder.save();
       return saleOrder;
     },
@@ -165,20 +183,38 @@ const resolvers: Resolvers = {
           }
         });
       if (!saleOrder) throw new Error('No sale order found');
+      if (saleOrder.status === 'PAID')
+        throw new Error('Sale order already paid');
+      saleOrder.status = 'PAID';
       const getStore = await Store.findById(saleOrder.store?._id);
       if (!getStore) throw new Error('Store not found');
-      if (getStore?.cash < saleOrder.total)
-        throw new Error('Store cash not enough');
-      getStore.cash -= saleOrder.total;
+      getStore.cash += saleOrder.total;
       getStore.save();
-      saleOrder.status = 'PAID';
+      const GetAllProducts = await ProductQuantity.findOne({
+        saleOrder: saleOrder._id
+      });
+      GetAllProducts.products.forEach(
+        async (product: { id: string; quantity: number }) => {
+          const productToUpdate = await Product.findById(product.id);
+          productToUpdate.stock -= product.quantity;
+          await productToUpdate.save();
+        }
+      );
       saleOrder.save();
       return saleOrder;
     }
   },
   Mutation: {
     newSaleOrder: async (_, { input }) => {
-      const { product, board, customer, store, colorsaleorder } = input;
+      const {
+        product,
+        board,
+        customer,
+        store,
+        colorsaleorder,
+        price,
+        productQuantity
+      } = input;
 
       if (!product && !board) {
         throw new Error('Product or board is required');
@@ -246,16 +282,6 @@ const resolvers: Resolvers = {
         return productQuantity() + boardQuantity();
       };
 
-      const priceExist = () => {
-        const productPrice = () => {
-          return getProduct?.reduce((a, b) => a + b.price, 0) ?? 0;
-        };
-        const boardPrice = () => {
-          return getBoard?.reduce((a, b) => a + b.size.price, 0) ?? 0;
-        };
-        return productPrice() + boardPrice();
-      };
-
       const currencyExist = () => {
         const productCurrency = () => {
           return getProduct?.reduce((a, b) => [...a, b.currency], []) ?? [];
@@ -284,12 +310,11 @@ const resolvers: Resolvers = {
       const getProduct = await productExist();
       const getBoard = await boardExist();
       const getQuantity = quantityExist();
-      const getPrice = priceExist();
       const getCurrency = currencyExist();
       const getColorSaleOrder = await colorSaleOrderExist();
 
       const paymentIntent = await stripe.paymentIntents.create({
-        amount: Math.round(getPrice) * 100,
+        amount: Math.round(price) * 100,
         currency: getCurrency,
         payment_method_types: ['card']
       });
@@ -334,10 +359,14 @@ const resolvers: Resolvers = {
         ...getColorSaleOrder,
         store: storeGet._id,
         quantity: getQuantity,
-        total: getPrice,
+        total: price,
         currency: getCurrency
       });
       if (!saleOrder) throw new Error('Error creating sale order');
+      await ProductQuantity.create({
+        saleOrder: saleOrder._id,
+        products: productQuantity
+      });
       const getSaleOrder = await SaleOrder.findById(saleOrder._id)
         .populate('customer')
         .populate('product')
@@ -370,7 +399,15 @@ const resolvers: Resolvers = {
       return getSaleOrder;
     },
     newSaleOrderCash: async (_, { input }) => {
-      const { product, board, customer, store, colorsaleorder } = input;
+      const {
+        product,
+        board,
+        customer,
+        store,
+        colorsaleorder,
+        price,
+        productQuantity
+      } = input;
 
       if (!product && !board) {
         throw new Error('Product or board is required');
@@ -438,16 +475,6 @@ const resolvers: Resolvers = {
         return productQuantity() + boardQuantity();
       };
 
-      const priceExist = () => {
-        const productPrice = () => {
-          return getProduct?.reduce((a, b) => a + b.price, 0) ?? 0;
-        };
-        const boardPrice = () => {
-          return getBoard?.reduce((a, b) => a + b.size.price, 0) ?? 0;
-        };
-        return productPrice() + boardPrice();
-      };
-
       const currencyExist = () => {
         const productCurrency = () => {
           return getProduct?.reduce((a, b) => [...a, b.currency], []) ?? [];
@@ -476,7 +503,6 @@ const resolvers: Resolvers = {
       const getProduct = await productExist();
       const getBoard = await boardExist();
       const getQuantity = quantityExist();
-      const getPrice = priceExist();
       const getCurrency = currencyExist();
       const getColorSaleOrder = await colorSaleOrderExist();
 
@@ -518,10 +544,14 @@ const resolvers: Resolvers = {
         ...getColorSaleOrder,
         store: storeGet._id,
         quantity: getQuantity,
-        total: getPrice,
+        total: price,
         currency: getCurrency
       });
       if (!saleOrder) throw new Error('Error creating sale order');
+      await ProductQuantity.create({
+        saleOrder: saleOrder._id,
+        products: productQuantity
+      });
       const getSaleOrder = await SaleOrder.findById(saleOrder._id)
         .populate('customer')
         .populate('product')

@@ -48,12 +48,9 @@ const PaymentModal: FC<Props> = (props) => {
           };
 
           const urlPdf = await uploadImage(
-            BlobToFile(
-              instance?.blob as Blob,
-              `${new Date().toDateString()}.pdf`
-            ),
+            BlobToFile(instance?.blob as Blob, `${Date.now().toString()}.pdf`),
             {
-              name: 'pdf',
+              name: '.pdf',
               orgcode: 'LGO-0001'
             }
           );

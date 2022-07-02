@@ -114,7 +114,7 @@ const PaymentModal: FC<Props> = (props) => {
             const urlPdf = await uploadImage(
               BlobToFile(
                 instance?.blob as Blob,
-                `${new Date().toDateString()}.pdf`
+                `${Date.now().toString()}.pdf`
               ),
               {
                 name: 'pdf',

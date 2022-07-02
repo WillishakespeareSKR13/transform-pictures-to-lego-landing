@@ -1,16 +1,20 @@
-import { useQuery } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client';
 import { css } from '@emotion/react';
-import { GETPRODUCTS } from '@Src/apollo/client/query/products';
+import { GETCOLORS } from '@Src/apollo/client/query/colors';
+import { GETPRODUCTS, NEWPRODUCT } from '@Src/apollo/client/query/products';
 import { GETSALEORDES } from '@Src/apollo/client/query/saleOrder';
 import { GETSTOREBYID } from '@Src/apollo/client/query/stores';
 import { GETUSERS } from '@Src/apollo/client/query/user';
 import DashWithTitle from '@Src/components/layouts/DashWithTitle';
-import { TableStyles } from '@Src/styles';
+import { InputStyles, TableStyles } from '@Src/styles';
 import { convertDate } from '@Src/utils/convertDate';
+// import uidd
+import { v4 } from 'uuid';
 import {
   AtomButton,
   AtomCarruosell,
   AtomImage,
+  AtomInput,
   AtomLink,
   AtomLoader,
   AtomSeparator,
@@ -18,6 +22,7 @@ import {
   AtomText,
   AtomWrapper
 } from '@sweetsyui/ui';
+import { useFormik } from 'formik';
 import { IQueryFilter, ISaleOrder, IUser } from 'graphql';
 import { useRouter } from 'next/router';
 
@@ -58,6 +63,13 @@ const VIEW = () => {
       }
     }
   );
+  const { data: colors } = useQuery<IQueryFilter<'getColors'>>(GETCOLORS);
+
+  const [newProduct] = useMutation(NEWPRODUCT, {
+    onCompleted: () => {
+      router.reload();
+    }
+  });
 
   const { data: dataOrders } = useQuery<IQueryFilter<'getSaleOrders'>>(
     GETSALEORDES,
@@ -80,17 +92,43 @@ const VIEW = () => {
     }
   });
 
-  const { data: dataProducts } = useQuery<IQueryFilter<'getProducts'>>(
-    GETPRODUCTS,
-    {
-      variables: {
-        filter: {
-          store: router?.query?.id?.[1]
-        }
+  const {
+    data: dataProducts,
+    refetch: refetchProducts,
+    loading: loadProducts
+  } = useQuery<IQueryFilter<'getProducts'>>(GETPRODUCTS, {
+    variables: {
+      filter: {
+        store: router?.query?.id?.[1]
       }
     }
-  );
+  });
 
+  const formik = useFormik({
+    initialValues: {
+      preci: 5,
+      stock: 1000
+    },
+    onSubmit: async (values) => {
+      colors?.getColors?.map(async (color) => {
+        newProduct({
+          variables: {
+            input: {
+              store: router?.query?.id?.[1],
+              name: color?.name,
+              description: color?.name,
+              sku: `${color?.name}_${v4()}`,
+              image: color?.icon,
+              color: color?.id,
+              price: values.preci,
+              stock: values.stock
+            }
+          }
+        });
+      });
+      refetchProducts();
+    }
+  });
   if (loading)
     return (
       <AtomLoader isLoading backgroundColor="#2e2e35" colorLoading="white" />
@@ -103,21 +141,23 @@ const VIEW = () => {
         location.href = `/dashboard/`;
       }}
       button={
-        <AtomButton
-          customCSS={css`
-            background-color: #f1576c;
-            padding: 8px 20px;
-            font-size: 10px;
-          `}
-          onClick={() => {
-            router.push(
-              `/dashboard/store/[id]/pointSale`,
-              `/dashboard/store/${data?.getStoreById?.id}/pointSale`
-            );
-          }}
-        >
-          Create sale order
-        </AtomButton>
+        (dataProducts?.getProducts?.length ?? 0) > 0 && (
+          <AtomButton
+            customCSS={css`
+              background-color: #f1576c;
+              padding: 8px 20px;
+              font-size: 10px;
+            `}
+            onClick={() => {
+              router.push(
+                `/dashboard/store/[id]/pointSale`,
+                `/dashboard/store/${data?.getStoreById?.id}/pointSale`
+              );
+            }}
+          >
+            Create sale order
+          </AtomButton>
+        )
       }
     >
       <AtomWrapper
@@ -132,7 +172,7 @@ const VIEW = () => {
             width: 60%;
           `}
         >
-          {(dataProducts?.getProducts?.length ?? 0) > 0 && (
+          {(dataProducts?.getProducts?.length ?? 0) > 0 ? (
             <>
               <AtomWrapper flexDirection="row" justifyContent="space-between">
                 <AtomText
@@ -196,6 +236,10 @@ const VIEW = () => {
                           margin-bottom: 10px;
                           overflow: hidden;
                           border-radius: 4px;
+                          background-color: ${product?.color?.color};
+                          img {
+                            object-fit: contain !important;
+                          }
                         `}
                       />
                       <AtomText
@@ -240,152 +284,206 @@ const VIEW = () => {
                 </AtomCarruosell>
               </AtomWrapper>
             </>
+          ) : (
+            <>
+              {loadProducts ? (
+                <AtomLoader
+                  isLoading
+                  backgroundColor="#2e2e35"
+                  colorLoading="white"
+                />
+              ) : (
+                <AtomWrapper
+                  alignItems="center"
+                  height="400px"
+                  justifyContent="center"
+                >
+                  <AtomInput
+                    id="preci"
+                    type="number"
+                    label="price"
+                    labelFontSize="14px"
+                    formik={formik}
+                    customCSS={InputStyles}
+                  />
+                  <AtomInput
+                    id="stock"
+                    type="number"
+                    label="stock"
+                    labelFontSize="14px"
+                    formik={formik}
+                    customCSS={InputStyles}
+                  />
+                  <AtomButton
+                    customCSS={css`
+                      background-color: #f1576c;
+                      padding: 8px 20px;
+                      font-size: 10px;
+                    `}
+                    onClick={() => {
+                      formik.submitForm();
+                    }}
+                  >
+                    Generate products
+                  </AtomButton>
+                </AtomWrapper>
+              )}
+            </>
           )}
-          <AtomText
-            customCSS={css`
-              font-size: 20px;
-              font-weight: bold;
-              color: #dfdfdf;
-              margin-bottom: 10px;
-            `}
-          >
-            Store Orders
-          </AtomText>
-          <AtomWrapper
-            customCSS={css`
-              max-width: 100%;
-              overflow-x: scroll;
-            `}
-          >
-            <AtomTable
-              customCSS={TableStyles}
-              data={dataOrders?.getSaleOrders as ISaleOrder[]}
-              columns={[
-                {
-                  title: 'Details',
-                  view: (item) => (
-                    <AtomWrapper
-                      flexDirection="row"
-                      customCSS={css`
-                        gap: 10px;
-                      `}
-                    >
-                      <AtomButton
-                        onClick={() => {
-                          router.push({
-                            pathname: `${router.pathname}/${item?.id}`,
-                            query: {
-                              ...router.query
-                            }
-                          });
-                        }}
-                        customCSS={css`
-                          padding: 8px 20px;
-                          background-color: #f1576c;
-                        `}
-                      >
-                        Details
-                      </AtomButton>
-                      {item?.board?.map((e) => (
-                        <AtomButton
-                          key={e?.id}
-                          onClick={() => {
-                            const pdf = e?.pdf;
-                            if (pdf) {
-                              const a = document.createElement('a');
-                              a.href = pdf;
-                              a.download = 'invoice.pdf';
-                              a.click();
-                            }
-                          }}
+          {((dataProducts?.getProducts?.length ?? 0) &&
+            (dataOrders?.getSaleOrders?.length ?? 0)) > 0 && (
+            <>
+              <AtomText
+                customCSS={css`
+                  font-size: 20px;
+                  font-weight: bold;
+                  color: #dfdfdf;
+                  margin-bottom: 10px;
+                `}
+              >
+                Store Orders
+              </AtomText>
+              <AtomWrapper
+                customCSS={css`
+                  max-width: 100%;
+                  overflow-x: scroll;
+                `}
+              >
+                <AtomTable
+                  customCSS={TableStyles}
+                  data={dataOrders?.getSaleOrders as ISaleOrder[]}
+                  columns={[
+                    {
+                      title: 'Details',
+                      view: (item) => (
+                        <AtomWrapper
+                          flexDirection="row"
                           customCSS={css`
-                            padding: 8px 20px;
-                            background-color: #f1576c;
+                            gap: 10px;
                           `}
                         >
-                          PDF
-                        </AtomButton>
-                      ))}
-                      {item?.colorsaleorder?.map((e) => (
-                        <AtomButton
-                          key={e?.id}
-                          onClick={() => {
-                            const map =
-                              e?.colors?.map((e) => [
-                                `${e?.color?.name}`,
-                                `${e?.color?.color}`,
-                                `${e?.quantity}`
-                              ]) ?? [];
-                            const csv =
-                              arrayToCsv([
-                                ['Color', 'Code', 'Quantity'],
-                                ...map
-                              ]) ?? '';
-                            downloadCsv(
-                              csv,
-                              `${e?.id}_${convertDate(new Date())}.csv`
-                            );
-                          }}
-                          customCSS={css`
-                            padding: 8px 20px;
-                            background-color: #f1576c;
-                          `}
-                        >
-                          CSV
-                        </AtomButton>
-                      ))}
-                    </AtomWrapper>
-                  )
-                },
+                          <AtomButton
+                            onClick={() => {
+                              router.push({
+                                pathname: `${router.pathname}/${item?.id}`,
+                                query: {
+                                  ...router.query
+                                }
+                              });
+                            }}
+                            customCSS={css`
+                              padding: 8px 20px;
+                              background-color: #f1576c;
+                            `}
+                          >
+                            Details
+                          </AtomButton>
+                          {item?.board?.map((e) => (
+                            <AtomButton
+                              key={e?.id}
+                              onClick={() => {
+                                const pdf = e?.pdf;
+                                if (pdf) {
+                                  const a = document.createElement('a');
+                                  a.href = pdf;
+                                  a.download = 'invoice.pdf';
+                                  a.click();
+                                }
+                              }}
+                              customCSS={css`
+                                padding: 8px 20px;
+                                background-color: #f1576c;
+                              `}
+                            >
+                              PDF
+                            </AtomButton>
+                          ))}
+                          {item?.colorsaleorder?.map((e) => (
+                            <AtomButton
+                              key={e?.id}
+                              onClick={() => {
+                                const map =
+                                  e?.colors?.map((e) => [
+                                    `${e?.color?.name}`,
+                                    `${e?.color?.color}`,
+                                    `${e?.quantity}`
+                                  ]) ?? [];
+                                const csv =
+                                  arrayToCsv([
+                                    ['Color', 'Code', 'Quantity'],
+                                    ...map
+                                  ]) ?? '';
+                                downloadCsv(
+                                  csv,
+                                  `${e?.id}_${convertDate(new Date())}.csv`
+                                );
+                              }}
+                              customCSS={css`
+                                padding: 8px 20px;
+                                background-color: #f1576c;
+                              `}
+                            >
+                              CSV
+                            </AtomButton>
+                          ))}
+                        </AtomWrapper>
+                      )
+                    },
 
-                {
-                  title: 'Product',
-                  view: (item) => (
-                    <>
-                      {`${item?.board?.length ?? 0 > 0 ? 'Board ' : ''}`}
-                      {`${item?.product?.length ?? 0 > 0 ? ', Product' : ''}`}
-                    </>
-                  )
-                },
-                {
-                  title: 'Name',
-                  view: (item) => (
-                    <AtomText
-                      customCSS={css`
-                        color: #dfdfdf;
-                        font-weight: 600;
-                        max-width: 10px;
-                        text-overflow: ellipsis;
-                      `}
-                    >
-                      {[
-                        item?.board?.map((board) => board?.board?.title),
-                        item?.product?.map((product) => product?.name)
-                      ]
-                        .flat()
-                        .join(', ')}
-                    </AtomText>
-                  )
-                },
-                {
-                  title: 'Quantity',
-                  view: (item) => <>{`${item?.quantity}`}</>
-                },
-                {
-                  title: 'Status',
-                  view: (item) => <>{`${item?.status}`}</>
-                },
-                {
-                  title: 'Seller',
-                  view: (item) => <>{`${item?.customer?.name ?? 'WEBSITE'}`}</>
-                },
-                {
-                  title: 'Price',
-                  view: (item) => <>{`$ ${item?.total}`}</>
-                }
-              ]}
-            />
-          </AtomWrapper>
+                    {
+                      title: 'Product',
+                      view: (item) => (
+                        <>
+                          {`${item?.board?.length ?? 0 > 0 ? 'Board ' : ''}`}
+                          {`${
+                            item?.product?.length ?? 0 > 0 ? ', Product' : ''
+                          }`}
+                        </>
+                      )
+                    },
+                    {
+                      title: 'Name',
+                      view: (item) => (
+                        <AtomText
+                          customCSS={css`
+                            color: #dfdfdf;
+                            font-weight: 600;
+                            max-width: 10px;
+                            text-overflow: ellipsis;
+                          `}
+                        >
+                          {[
+                            item?.board?.map((board) => board?.board?.title),
+                            item?.product?.map((product) => product?.name)
+                          ]
+                            .flat()
+                            .join(', ')}
+                        </AtomText>
+                      )
+                    },
+                    {
+                      title: 'Quantity',
+                      view: (item) => <>{`${item?.quantity}`}</>
+                    },
+                    {
+                      title: 'Status',
+                      view: (item) => <>{`${item?.status}`}</>
+                    },
+                    {
+                      title: 'Seller',
+                      view: (item) => (
+                        <>{`${item?.customer?.name ?? 'WEBSITE'}`}</>
+                      )
+                    },
+                    {
+                      title: 'Price',
+                      view: (item) => <>{`$ ${item?.total}`}</>
+                    }
+                  ]}
+                />
+              </AtomWrapper>
+            </>
+          )}
         </AtomWrapper>
         <AtomWrapper
           customCSS={css`

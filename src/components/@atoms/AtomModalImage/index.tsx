@@ -8,7 +8,7 @@ import {
   AtomWrapper
 } from '@sweetsyui/ui';
 
-import { Dispatch, FC, SetStateAction } from 'react';
+import { Dispatch, FC, SetStateAction, useEffect, useRef } from 'react';
 
 type AtomModalImageProps = {
   images?: string[];
@@ -32,10 +32,23 @@ const animation = {
 
 const AtomModalImage: FC<AtomModalImageProps> = (props) => {
   const { images, selected, setSelected, state, setState } = props;
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (ref.current && !ref.current.contains(event.target as Node)) {
+        setState?.(false);
+      }
+    };
 
+    document.addEventListener(`mousedown`, handleClickOutside, true);
+    return () => {
+      document.removeEventListener(`mousedown`, handleClickOutside, true);
+    };
+  }, [ref]);
   return (
     <AtomModal
       isOpen={state}
+      setIsOpen={setState}
       componentProps={{
         containerProps: {
           customCSS: css`
@@ -50,9 +63,10 @@ const AtomModalImage: FC<AtomModalImageProps> = (props) => {
         },
         wrapperProps: {
           width: 'max-content',
-          height: 'max-content',
+          height: '60vh',
           backgroundColor: 'transparent',
-          position: 'relative'
+          position: 'relative',
+          margin: '-60px 0 0 0'
         }
       }}
       component={
@@ -121,14 +135,16 @@ const AtomModalImage: FC<AtomModalImageProps> = (props) => {
           <AtomWrapper
             flexDirection="row"
             width="max-content"
-            maxWidth="90vw"
-            // flexWrap="wrap"
-            margin="60px 0px -30px 0px"
+            maxWidth="70vw"
+            margin="0px 0px -30px 0px"
             padding="0px 0px 5px 0px"
             overflowX="scroll"
-            alignItems="flex-start"
-            justifyContent="flex-start"
+            alignItems="center"
+            justifyContent="center"
+            position="absolute"
             customCSS={css`
+              transform: translate(0, 50%);
+              bottom: -50px;
               ::-webkit-scrollbar {
                 height: 4px;
               }
@@ -181,7 +197,8 @@ const AtomModalImage: FC<AtomModalImageProps> = (props) => {
               background-color: transparent;
               position: absolute;
               right: 0;
-              top: 0px;
+              top: -40px;
+
               z-index: 9999;
               * {
                 color: #fff;
@@ -190,7 +207,9 @@ const AtomModalImage: FC<AtomModalImageProps> = (props) => {
               }
             `}
           >
-            <AtomText>X</AtomText>
+            <AtomText fontSize="24px" color="#fff">
+              X
+            </AtomText>
           </AtomButton>
         </>
       }

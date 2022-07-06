@@ -1,24 +1,17 @@
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client';
 import { css, SerializedStyles } from '@emotion/react';
 import { NEWCOLORSALEORDER } from '@Src/apollo/client/mutation/color';
-import {
-  NEWSALEORDER,
-  NEWSALEORDERCASH
-} from '@Src/apollo/client/mutation/saleOrder';
+import { NEWSALEORDERCASH } from '@Src/apollo/client/mutation/saleOrder';
 import { GET_BOARDS } from '@Src/apollo/client/query/boards';
 import { GETPRODUCTS } from '@Src/apollo/client/query/products';
 import { PAYSALEORDERCASH } from '@Src/apollo/client/query/saleOrder';
 import { GETUSERS } from '@Src/apollo/client/query/user';
-import { Elements } from '@stripe/react-stripe-js';
 // import MoleculeCardBoard from '@Src/components/@molecules/moleculeCardBoard';
 import MoleculeCardBoardAll from '@Src/components/@molecules/moleculeCardBoardAll';
 import MoleculeCardProduct from '@Src/components/@molecules/moleculeCardProduct';
 import PageIndex from '@Src/components/pages/index';
 import { colorsAtoms, ICart, setCartAtom } from '@Src/jotai/cart';
 import { RootStateType } from '@Src/redux/reducer';
-import { InputStyles } from '@Src/styles';
-
-const stripePromise = loadStripe('pk_test_8rT8GD6ByXYXhSxzRhhwcwBD00wfxfcg7a');
 
 export type ItemCardShopType = {
   id: string;
@@ -42,20 +35,42 @@ import {
   AtomWrapper
 } from '@sweetsyui/ui';
 import { IQueryFilter } from 'graphql';
-import { useAtom } from 'jotai';
+import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { useRouter } from 'next/router';
-import React, { FC, useMemo, useState } from 'react';
+import React, { FC, useMemo } from 'react';
 import { useSelector } from 'react-redux';
-import { loadStripe } from '@stripe/stripe-js';
+
+const cashAtom = atom(null as null | number);
+const cashTempAtom = atom(null as null | number);
+const payAtom = atom(false);
+const payedAtom = atom(false);
+const paymentsAtom = atom(null as null | string);
+const cartOnlyBoardAtom = atom((get) =>
+  get(setCartAtom).filter((e) => e.type === 'BOARD')
+);
+const cartOnlyProductAtom = atom((get) =>
+  get(setCartAtom).filter((e) => e.type !== 'BOARD')
+);
+const sellerAtom = atom('DEFAULT');
+const taxAtom = atom(0);
+const discountAtom = atom(0);
+
+const cardTaxAtom = atom(0);
 
 const PointSale: FC = () => {
-  const [pay, setPay] = useState(false);
-  const [cash, setCash] = useState('');
+  const [pay, setPay] = useAtom(payAtom);
+  const [payments, setPayments] = useAtom(paymentsAtom);
+  const [payed, setPayed] = useAtom(payedAtom);
+  const [cash, setCash] = useAtom(cashAtom);
+  const [cashTemp, setCashTemp] = useAtom(cashTempAtom);
   const [cart, setCart] = useAtom(setCartAtom);
+  const cartOnlyBoard = useAtomValue(cartOnlyBoardAtom);
+  const cartOnlyProduct = useAtomValue(cartOnlyProductAtom);
+  const [cardTax, setCardTax] = useAtom(cardTaxAtom);
   const [colors] = useAtom(colorsAtoms);
   const router = useRouter();
   const params = useParams();
-  const [seller, setSeller] = useState<string>('DEFAULT');
+  const [seller, setSeller] = useAtom(sellerAtom);
   const modal = useSelector((state: RootStateType) => state.modal);
   const { data: boards } = useQuery<IQueryFilter<'getBoards'>>(GET_BOARDS);
   const { data, loading } = useQuery<IQueryFilter<'getProducts'>>(GETPRODUCTS, {
@@ -75,191 +90,15 @@ const PointSale: FC = () => {
     }
   });
 
-  const [payments, setPayments] = useState<string>();
-  const [payed, setPayed] = useState(false);
+  const [EXENEWSALEORDER, { loading: load1 }] = useMutation(NEWSALEORDERCASH);
+  const [EXENEWCOLORSALEORDER, { loading: load2 }] =
+    useMutation(NEWCOLORSALEORDER);
+  const [LAZYPAYSALEORDERCASH, { loading: load3 }] =
+    useLazyQuery(PAYSALEORDERCASH);
 
-  const [EXENEWSALEORDER] = useMutation(NEWSALEORDERCASH);
-  const [EXENEWCOLORSALEORDER] = useMutation(NEWCOLORSALEORDER);
-  const [LAZYPAYSALEORDERCASH] = useLazyQuery(PAYSALEORDERCASH);
-  const [EXENEWSALEORDERCARD, { data: dataCard }] = useMutation(NEWSALEORDER);
+  const [discount, setDiscount] = useAtom(discountAtom);
 
-  const [discount, setDiscount] = useState(0);
-
-  const [tax, setTax] = useState(0);
-
-  const secret = useMemo(
-    () => dataCard?.newSaleOrder,
-    [dataCard?.newSaleOrder]
-  );
-
-  const BOARD = (e: ICart) => {
-    const board = boards?.getBoards?.find((x) => x?.id === e.id);
-    const size = board?.sizes?.find((x) => x?.id === e.board?.size);
-    return (
-      <AtomWrapper
-        key={e.id}
-        customCSS={css`
-          width: 100%;
-          padding: 15px 20px;
-          flex-direction: row;
-          background-color: #202026;
-          border-radius: 4px;
-          gap: 20px;
-          color: #fff;
-          font-weight: bold;
-        `}
-      >
-        <AtomImage
-          customCSS={css`
-            width: 60px;
-            height: 60px;
-          `}
-          src={board?.image ?? 'http://via.placeholder.com/300x300'}
-          alt={e.id}
-        />
-        <AtomWrapper
-          customCSS={css`
-            width: calc(100% - 80px);
-            display: flex;
-            flex-direction: column;
-          `}
-        >
-          <AtomText
-            customCSS={css`
-              font-size: 12px;
-              font-weight: bold;
-              color: #fff;
-              margin-bottom: 10px;
-            `}
-          >
-            {board?.description} {size?.title}
-          </AtomText>
-          <AtomWrapper
-            customCSS={css`
-              display: flex;
-              flex-direction: row;
-              width: max-content;
-              gap: 10px;
-            `}
-          >
-            <AtomText color="#ffffff">{e.quantity}</AtomText>
-
-            <AtomButton
-              padding="4px"
-              onClick={() =>
-                setCart({
-                  key: 'REMOVECART',
-                  payload: board?.id
-                })
-              }
-            >
-              <AtomIcon
-                width="13px"
-                height="13px"
-                icon="https://storage.googleapis.com/cdn-bucket-ixulabs-platform/IXU-0001/icons8-basura.svg"
-                color="#ffffff"
-              />
-            </AtomButton>
-          </AtomWrapper>
-        </AtomWrapper>
-      </AtomWrapper>
-    );
-  };
-
-  const PRODUCT = (e: ICart) => {
-    const { image, name } = e?.product ?? {};
-    return (
-      <AtomWrapper
-        key={e.id}
-        customCSS={css`
-          width: 100%;
-          padding: 15px 20px;
-          flex-direction: row;
-          background-color: #202026;
-          border-radius: 4px;
-          gap: 20px;
-          color: #fff;
-          font-weight: bold;
-        `}
-      >
-        <AtomImage
-          customCSS={css`
-            width: 60px;
-            height: 60px;
-          `}
-          src={image ?? 'http://via.placeholder.com/300x300'}
-          alt={e.id}
-        />
-        <AtomWrapper
-          customCSS={css`
-            width: calc(100% - 80px);
-            display: flex;
-            flex-direction: column;
-          `}
-        >
-          <AtomText
-            customCSS={css`
-              font-size: 12px;
-              font-weight: bold;
-              color: #fff;
-              margin-bottom: 10px;
-            `}
-          >
-            {name}
-          </AtomText>
-          <AtomWrapper
-            customCSS={css`
-              display: flex;
-              flex-direction: row;
-              width: max-content;
-              gap: 10px;
-            `}
-          >
-            <AtomButton
-              padding="0px 10px"
-              disabled={e.quantity <= 1}
-              onClick={() =>
-                setCart({
-                  key: 'REMOVEQUANTITY',
-                  payload: e.id
-                })
-              }
-            >
-              <AtomText color="white">-</AtomText>
-            </AtomButton>
-            <AtomText color="#ffffff">{e.quantity}</AtomText>
-            <AtomButton
-              padding="0px 10px"
-              onClick={() =>
-                setCart({
-                  key: 'ADDQUANTITY',
-                  payload: e.id
-                })
-              }
-            >
-              <AtomText color="white">+</AtomText>
-            </AtomButton>
-            <AtomButton
-              padding="4px"
-              onClick={() =>
-                setCart({
-                  key: 'REMOVECART',
-                  payload: e.id
-                })
-              }
-            >
-              <AtomIcon
-                width="13px"
-                height="13px"
-                icon="https://storage.googleapis.com/cdn-bucket-ixulabs-platform/IXU-0001/icons8-basura.svg"
-                color="white"
-              />
-            </AtomButton>
-          </AtomWrapper>
-        </AtomWrapper>
-      </AtomWrapper>
-    );
-  };
+  const [tax, setTax] = useAtom(taxAtom);
 
   const SubTotal = useMemo(
     () =>
@@ -273,7 +112,7 @@ const PointSale: FC = () => {
         const priceQuantity = (price ?? 0) * item.quantity;
         return acc + (priceQuantity ?? 0);
       }, 0),
-    [cart, boards, data]
+    [cart.length, boards?.getBoards?.length, data?.getProducts?.length]
   );
   const Discount = useMemo(
     () => Number((SubTotal * (discount / 100)).toFixed(2)),
@@ -398,9 +237,12 @@ const PointSale: FC = () => {
               gap: 10px;
             `}
           >
-            {cart.map((e) =>
-              e.type === 'BOARD' ? <BOARD {...e} /> : <PRODUCT {...e} />
-            )}
+            {cartOnlyBoard.map((e) => (
+              <BOARD key={e.id} {...e} boards={boards} />
+            ))}
+            {cartOnlyProduct.map((e) => (
+              <PRODUCT key={e.id} {...e} />
+            ))}
           </AtomWrapper>
 
           <AtomWrapper
@@ -549,6 +391,9 @@ const PointSale: FC = () => {
                       input {
                         color: #ffffff;
                         background-color: #2e2e35;
+                        :focus {
+                          background-color: #fe6a6a;
+                        }
                         border: none;
                         border-radius: 2px;
                       }
@@ -586,6 +431,9 @@ const PointSale: FC = () => {
                       input {
                         color: #ffffff;
                         background-color: #2e2e35;
+                        :focus {
+                          background-color: #fe6a6a;
+                        }
                         border: none;
                         border-radius: 2px;
                       }
@@ -692,13 +540,12 @@ const PointSale: FC = () => {
                             overflow-y: scroll;
                           `}
                         >
-                          {cart.map((e) =>
-                            e.type === 'BOARD' ? (
-                              <BOARD {...e} />
-                            ) : (
-                              <PRODUCT {...e} />
-                            )
-                          )}
+                          {cartOnlyBoard.map((e) => (
+                            <BOARD key={e.id} {...e} boards={boards} />
+                          ))}
+                          {cartOnlyProduct.map((e) => (
+                            <PRODUCT key={e.id} {...e} />
+                          ))}
                         </AtomWrapper>
                       </AtomWrapper>
 
@@ -753,6 +600,9 @@ const PointSale: FC = () => {
                                   input {
                                     color: #ffffff;
                                     background-color: #2e2e35;
+                                    :focus {
+                                      background-color: #fe6a6a;
+                                    }
                                     border: none;
                                     border-radius: 2px;
                                   }
@@ -790,6 +640,9 @@ const PointSale: FC = () => {
                                   input {
                                     color: #ffffff;
                                     background-color: #2e2e35;
+                                    :focus {
+                                      background-color: #fe6a6a;
+                                    }
                                     border: none;
                                     border-radius: 2px;
                                   }
@@ -807,23 +660,41 @@ const PointSale: FC = () => {
                           <AtomText width="30%" align="right">
                             ${SubTotal - Discount + Tax}
                           </AtomText>
-                          <AtomText width="70%">Client payment</AtomText>
-                          <AtomText width="30%" align="right">
+                          <AtomText
+                            width="100%"
+                            customCSS={css`
+                              display: flex;
+                              flex-direction: row;
+                              align-items: center;
+                              gap: 20px;
+                            `}
+                          >
+                            Client payment
                             <AtomInput
                               height="22px"
                               labelWidth="100%"
                               type="number"
-                              value={cash}
+                              autoFocus
+                              value={`${cashTemp}`}
                               placeholder="$0.00"
-                              onChange={(e) => setCash(e.target.value)}
+                              onChange={(e) => setCashTemp(e.target.value)}
+                              onBlur={() => setCash(cashTemp)}
                               customCSS={css`
-                                ${InputStyles}
                                 input {
-                                  text-align: right;
+                                  color: #ffffff;
+                                  border: none;
+                                  border-radius: 2px;
+                                  background-color: #2e2e35;
+                                  :focus {
+                                    background-color: #fe6a6a;
+                                  }
                                 }
+                                height: 18px;
+                                width: 100%;
                               `}
                             />
                           </AtomText>
+
                           <AtomText width="70%">Change</AtomText>
                           <AtomText
                             width="30%"
@@ -856,6 +727,7 @@ const PointSale: FC = () => {
                         CANCEL
                       </AtomButton>
                       <AtomButton
+                        loading={load2 || load1 || load3}
                         disabled={Number(cash) < SubTotal - Discount + Tax}
                         onClick={() => {
                           EXENEWCOLORSALEORDER({
@@ -899,14 +771,15 @@ const PointSale: FC = () => {
                                 variables: {
                                   id: e.data.newSaleOrderCash.id
                                 }
-                              }).then(() =>
-                                router.push(
-                                  `http://${location.host}/dashboard/${
+                              }).then(
+                                () =>
+                                  (window.location.href = `http://${
+                                    location.host
+                                  }/dashboard/${
                                     Array.isArray(router?.query?.id)
                                       ? router?.query?.id?.join('/')
                                       : ''
-                                  }/ticket/${e.data.newSaleOrderCash.id.toString()}`
-                                )
+                                  }/ticket/${e.data.newSaleOrderCash.id.toString()}`)
                               );
                             });
                           });
@@ -919,6 +792,7 @@ const PointSale: FC = () => {
                 )}
                 {payments === 'CARD' && (
                   <AtomWrapper
+                    key="card"
                     customCSS={css`
                       max-width: 700px;
                       align-self: center;
@@ -938,76 +812,171 @@ const PointSale: FC = () => {
                             overflow-y: scroll;
                           `}
                         >
-                          {cart.map((e) =>
-                            e.type === 'BOARD' ? (
-                              <BOARD {...e} />
-                            ) : (
-                              <PRODUCT {...e} />
-                            )
-                          )}
+                          {cartOnlyBoard.map((e) => (
+                            <BOARD key={e.id} {...e} boards={boards} />
+                          ))}
+                          {cartOnlyProduct.map((e) => (
+                            <PRODUCT key={e.id} {...e} />
+                          ))}
                         </AtomWrapper>
                       </AtomWrapper>
+
                       <AtomWrapper
                         width="50%"
                         height="100%"
                         alignItems="flex-end"
                       >
-                        {secret && (
-                          <Elements
-                            stripe={stripePromise}
-                            options={{
-                              clientSecret: secret.secret
-                            }}
+                        <AtomWrapper
+                          flexDirection="row"
+                          flexWrap="wrap"
+                          customCSS={css`
+                            span {
+                              font-size: 12px;
+                              background-color: #202026;
+                              border-radius: 4px;
+                              border: 2px solid #2e2e35;
+                              color: #ffffff;
+                              padding: 8px 15px;
+
+                              text-overflow: ellipsis;
+                              overflow: hidden;
+                              white-space: nowrap;
+                            }
+                          `}
+                        >
+                          <AtomText width="70%">Subtotal</AtomText>
+                          <AtomText width="30%" align="right">
+                            {`$${SubTotal}`}
+                          </AtomText>
+                          <AtomText
+                            width="70%"
+                            customCSS={css`
+                              display: flex;
+                              flex-direction: row;
+                              align-items: center;
+                              gap: 20px;
+                            `}
                           >
-                            <CheckoutForm saleOrder={secret} />
-                          </Elements>
-                        )}
-                        {!secret && (
-                          <AtomButton
-                            onClick={() => {
-                              EXENEWCOLORSALEORDER({
-                                variables: {
-                                  input: {
-                                    colors: colors?.map((color) => ({
-                                      color: color.id,
-                                      quantity: color.count
-                                    }))
+                            Discount
+                            <AtomWrapper
+                              customCSS={css`
+                                flex-direction: row;
+                                gap: 10px;
+                              `}
+                            >
+                              <AtomInput
+                                value={`${discount}`}
+                                onChange={(e) => setDiscount(e.target.value)}
+                                type="number"
+                                customCSS={css`
+                                  input {
+                                    color: #ffffff;
+                                    background-color: #2e2e35;
+                                    :focus {
+                                      background-color: #fe6a6a;
+                                    }
+                                    border: none;
+                                    border-radius: 2px;
+                                  }
+                                  height: 18px;
+                                  width: 50px;
+                                `}
+                              />
+                              %
+                            </AtomWrapper>
+                          </AtomText>
+                          <AtomText width="30%" align="right" maxWidth="30%">
+                            -${Discount}
+                          </AtomText>
+                          <AtomText
+                            width="70%"
+                            customCSS={css`
+                              display: flex;
+                              flex-direction: row;
+                              align-items: center;
+                              gap: 20px;
+                            `}
+                          >
+                            Tax
+                            <AtomWrapper
+                              customCSS={css`
+                                flex-direction: row;
+                                gap: 10px;
+                              `}
+                            >
+                              <AtomInput
+                                value={`${tax}`}
+                                onChange={(e) => setTax(e.target.value)}
+                                type="number"
+                                customCSS={css`
+                                  input {
+                                    color: #ffffff;
+                                    background-color: #2e2e35;
+                                    :focus {
+                                      background-color: #fe6a6a;
+                                    }
+                                    border: none;
+                                    border-radius: 2px;
+                                  }
+                                  height: 18px;
+                                  width: 50px;
+                                `}
+                              />
+                              %
+                            </AtomWrapper>
+                          </AtomText>
+                          <AtomText width="30%" align="right" maxWidth="30%">
+                            ${Tax}
+                          </AtomText>
+                          <AtomText width="70%">Grand Total</AtomText>
+                          <AtomText width="30%" align="right">
+                            ${SubTotal - Discount + Tax}
+                          </AtomText>
+                          <AtomText
+                            width="100%"
+                            customCSS={css`
+                              display: flex;
+                              flex-direction: row;
+                              align-items: center;
+                              gap: 20px;
+                            `}
+                          >
+                            Tax Card
+                            <AtomInput
+                              height="22px"
+                              labelWidth="100%"
+                              type="number"
+                              autoFocus
+                              value={`${cardTax}`}
+                              placeholder="$0.00"
+                              onChange={(e) => setCardTax(e.target.value)}
+                              customCSS={css`
+                                input {
+                                  color: #ffffff;
+                                  border: none;
+                                  border-radius: 2px;
+                                  background-color: #2e2e35;
+                                  :focus {
+                                    background-color: #fe6a6a;
                                   }
                                 }
-                              }).then((e) => {
-                                const id = e.data.newColorSaleOrder.id;
-                                EXENEWSALEORDERCARD({
-                                  variables: {
-                                    input: {
-                                      store: params.id,
-                                      customer: seller,
-                                      board: cart
-                                        ?.filter((e) => e.type === 'BOARD')
-                                        .map((e) => ({
-                                          board: e?.board?.id,
-                                          size: e?.board?.size,
-                                          pdf: e?.board?.pdf
-                                        })),
-                                      product: cart
-                                        ?.filter((e) => e.type === 'PRODUCT')
-                                        .map((e) => e?.product?.id),
-                                      colorsaleorder: [id],
-                                      price: SubTotal - Discount + Tax,
-                                      productQuantity: cart
-                                        ?.filter((e) => e.type === 'PRODUCT')
-                                        .map((e) => ({
-                                          id: e?.product?.id,
-                                          quantity: e.quantity
-                                        }))
-                                    }
-                                  }
-                                });
-                              });
-                            }}
+                                height: 18px;
+                                width: 100%;
+                              `}
+                            />
+                          </AtomText>
+
+                          <AtomText width="70%">To Pay</AtomText>
+                          <AtomText
+                            width="30%"
+                            align="right"
+                            customCSS={css`
+                              color: #22b620 !important;
+                            `}
                           >
-                            ADD CARD
-                          </AtomButton>
-                        )}
+                            ${SubTotal - Discount + Tax + Number(cardTax)}
+                          </AtomText>
+                        </AtomWrapper>
                       </AtomWrapper>
                     </AtomWrapper>
                     <AtomWrapper
@@ -1025,6 +994,67 @@ const PointSale: FC = () => {
                         }}
                       >
                         CANCEL
+                      </AtomButton>
+                      <AtomButton
+                        loading={load2 || load1 || load3}
+                        onClick={() => {
+                          EXENEWCOLORSALEORDER({
+                            variables: {
+                              input: {
+                                colors: colors?.map((color) => ({
+                                  color: color.id,
+                                  quantity: color.count
+                                }))
+                              }
+                            }
+                          }).then((e) => {
+                            const id = e.data.newColorSaleOrder.id;
+                            EXENEWSALEORDER({
+                              variables: {
+                                input: {
+                                  store: params.id,
+                                  customer: seller,
+                                  board: cart
+                                    ?.filter((e) => e.type === 'BOARD')
+                                    .map((e) => ({
+                                      board: e?.board?.id,
+                                      size: e?.board?.size,
+                                      pdf: e?.board?.pdf
+                                    })),
+                                  product: cart
+                                    ?.filter((e) => e.type === 'PRODUCT')
+                                    .map((e) => e?.product?.id),
+                                  colorsaleorder: [id],
+                                  price:
+                                    SubTotal - Discount + Tax + Number(cardTax),
+                                  productQuantity: cart
+                                    ?.filter((e) => e.type === 'PRODUCT')
+                                    .map((e) => ({
+                                      id: e?.product?.id,
+                                      quantity: e.quantity
+                                    }))
+                                }
+                              }
+                            }).then((e) => {
+                              LAZYPAYSALEORDERCASH({
+                                variables: {
+                                  id: e.data.newSaleOrderCash.id
+                                }
+                              }).then(
+                                () =>
+                                  (window.location.href = `http://${
+                                    location.host
+                                  }/dashboard/${
+                                    Array.isArray(router?.query?.id)
+                                      ? router?.query?.id?.join('/')
+                                      : ''
+                                  }/ticket/${e.data.newSaleOrderCash.id.toString()}`)
+                              );
+                            });
+                          });
+                        }}
+                      >
+                        PAY
                       </AtomButton>
                     </AtomWrapper>
                   </AtomWrapper>
@@ -1125,116 +1155,176 @@ const PointSale: FC = () => {
 };
 export default PointSale;
 
-import {
-  useStripe,
-  useElements,
-  PaymentElement
-} from '@stripe/react-stripe-js';
-import { ISaleOrder } from '@Src/apollo/server/models/saleOrder';
 import { useParams } from 'react-router-dom';
 
-type CheckoutFormProps = {
-  saleOrder?: ISaleOrder;
-  setSaleOrder?: (saleOrder: ISaleOrder | undefined) => void;
-};
-
-const CheckoutForm: FC<CheckoutFormProps> = (props) => {
-  const { saleOrder, setSaleOrder } = props;
-  const [loading, setLoading] = useState(true);
-  const [loadingButton, setLoadingButton] = useState(false);
-  const stripe = useStripe();
-  const elements = useElements();
-  const router = useRouter();
-
-  const handleSubmit = async (event: { preventDefault: () => void }) => {
-    event.preventDefault();
-    setLoadingButton(true);
-    if (!stripe || !elements) {
-      return;
-    }
-
-    const result = await stripe.confirmPayment({
-      elements,
-      confirmParams: {
-        return_url: `http://${location.host}/dashboard/${
-          Array.isArray(router?.query?.id) ? router?.query?.id?.join('/') : ''
-        }/complete/${saleOrder?.id}`
-      }
-    });
-
-    if (result.error) {
-      // Show error to your customer (for example, payment details incomplete)
-      console.warn(result.error.message);
-      setLoadingButton(false);
-    } else {
-      setSaleOrder?.(saleOrder);
-      setLoadingButton(false);
-      // Your customer will be redirected to your `return_url`. For some payment
-      // methods like iDEAL, your customer will be redirected to an intermediate
-      // site first to authorize the payment, then redirected to the `return_url`.
-    }
-  };
-
+const BOARD = (e: ICart) => {
+  const { boards } = e;
+  const setCart = useSetAtom(setCartAtom);
+  const board = boards?.getBoards?.find((x) => x?.id === e.id);
+  const size = board?.sizes?.find((x) => x?.id === e.board?.size);
   return (
     <AtomWrapper
+      key={e.id}
       customCSS={css`
-        width: 400px;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        #paymentElement {
-          opacity: ${loading ? 0 : 1};
-          transition: opacity 0.5s ease-in-out;
-        }
-        form {
-          width: 100%;
-          height: 100%;
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-          align-items: center;
-        }
+        width: 100%;
+        padding: 15px 20px;
+        flex-direction: row;
+        background-color: #202026;
+        border-radius: 4px;
+        gap: 20px;
+        color: #fff;
+        font-weight: bold;
       `}
     >
-      <form onSubmit={handleSubmit}>
-        {loading && (
-          <AtomLoader type="small" isLoading colorLoading="#313139" />
-        )}
+      <AtomImage
+        customCSS={css`
+          width: 60px;
+          height: 60px;
+        `}
+        src={board?.image ?? 'http://via.placeholder.com/300x300'}
+        alt={e.id}
+      />
+      <AtomWrapper
+        customCSS={css`
+          width: calc(100% - 80px);
+          display: flex;
+          flex-direction: column;
+        `}
+      >
+        <AtomText
+          customCSS={css`
+            font-size: 12px;
+            font-weight: bold;
+            color: #fff;
+            margin-bottom: 10px;
+          `}
+        >
+          {board?.description} {size?.title}
+        </AtomText>
+        <AtomWrapper
+          customCSS={css`
+            display: flex;
+            flex-direction: row;
+            width: max-content;
+            gap: 10px;
+          `}
+        >
+          <AtomText color="#ffffff">{e.quantity}</AtomText>
 
-        <PaymentElement onReady={() => setLoading(false)} id="paymentElement" />
-
-        {!loading && (
           <AtomButton
-            disabled={loading}
-            customCSS={css`
-              margin: 20px 0px 0px 0px;
-            `}
+            padding="4px"
+            onClick={() =>
+              setCart({
+                key: 'REMOVECART',
+                payload: board?.id
+              })
+            }
           >
-            {loadingButton ? (
-              <AtomLoader
-                type="small"
-                isLoading
-                colorLoading="white"
-                widthLoader="2px"
-                customCSS={css`
-                  .lds-ring {
-                    transform: translate(-40%, -45%);
-                    width: 18px;
-                    height: 18px;
-                    div {
-                      width: 18px;
-                      height: 18px;
-                    }
-                  }
-                `}
-              />
-            ) : (
-              'Pay'
-            )}
+            <AtomIcon
+              width="13px"
+              height="13px"
+              icon="https://storage.googleapis.com/cdn-bucket-ixulabs-platform/IXU-0001/icons8-basura.svg"
+              color="#ffffff"
+            />
           </AtomButton>
-        )}
-      </form>
+        </AtomWrapper>
+      </AtomWrapper>
+    </AtomWrapper>
+  );
+};
+
+const PRODUCT = (e: ICart) => {
+  const setCart = useSetAtom(setCartAtom);
+  const { image, name } = e?.product ?? {};
+  return (
+    <AtomWrapper
+      key={e.id}
+      customCSS={css`
+        width: 100%;
+        padding: 15px 20px;
+        flex-direction: row;
+        background-color: #202026;
+        border-radius: 4px;
+        gap: 20px;
+        color: #fff;
+        font-weight: bold;
+      `}
+    >
+      <AtomImage
+        customCSS={css`
+          width: 60px;
+          height: 60px;
+        `}
+        src={image ?? 'http://via.placeholder.com/300x300'}
+        alt={e.id}
+      />
+      <AtomWrapper
+        customCSS={css`
+          width: calc(100% - 80px);
+          display: flex;
+          flex-direction: column;
+        `}
+      >
+        <AtomText
+          customCSS={css`
+            font-size: 12px;
+            font-weight: bold;
+            color: #fff;
+            margin-bottom: 10px;
+          `}
+        >
+          {name}
+        </AtomText>
+        <AtomWrapper
+          customCSS={css`
+            display: flex;
+            flex-direction: row;
+            width: max-content;
+            gap: 10px;
+          `}
+        >
+          <AtomButton
+            padding="0px 10px"
+            disabled={e.quantity <= 1}
+            onClick={() =>
+              setCart({
+                key: 'REMOVEQUANTITY',
+                payload: e.id
+              })
+            }
+          >
+            <AtomText color="white">-</AtomText>
+          </AtomButton>
+          <AtomText color="#ffffff">{e.quantity}</AtomText>
+          <AtomButton
+            padding="0px 10px"
+            onClick={() =>
+              setCart({
+                key: 'ADDQUANTITY',
+                payload: e.id
+              })
+            }
+          >
+            <AtomText color="white">+</AtomText>
+          </AtomButton>
+          <AtomButton
+            padding="4px"
+            onClick={() =>
+              setCart({
+                key: 'REMOVECART',
+                payload: e.id
+              })
+            }
+          >
+            <AtomIcon
+              width="13px"
+              height="13px"
+              icon="https://storage.googleapis.com/cdn-bucket-ixulabs-platform/IXU-0001/icons8-basura.svg"
+              color="white"
+            />
+          </AtomButton>
+        </AtomWrapper>
+      </AtomWrapper>
     </AtomWrapper>
   );
 };

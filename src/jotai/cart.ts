@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { IProducts } from 'graphql';
+import { IProducts, IQueryFilter } from 'graphql';
 import { atom, Setter, Getter } from 'jotai';
 
 const reducerAtom = {
@@ -58,6 +58,7 @@ export type ICart = {
     size?: string;
     pdf?: string;
   };
+  boards?: IQueryFilter<'getBoards'>;
   product?: IProducts;
 };
 

@@ -25,6 +25,7 @@ export const TableStyles = css`
   font-weight: bold;
   thead {
     background-color: #1a1a1f !important;
+    border-bottom: 1px solid #2e2e35;
     tr th {
       color: #dfdfdf;
     }
@@ -32,6 +33,7 @@ export const TableStyles = css`
   tbody {
     background-color: #202026;
     tr {
+      background-color: #202026;
       :hover {
         background-color: #1a1a1f;
         color: #dfdfdf;

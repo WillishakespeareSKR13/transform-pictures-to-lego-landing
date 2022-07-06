@@ -41,7 +41,6 @@ import React, { FC, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
 const cashAtom = atom(null as null | number);
-const cashTempAtom = atom(null as null | number);
 const payAtom = atom(false);
 const payedAtom = atom(false);
 const paymentsAtom = atom(null as null | string);
@@ -55,14 +54,13 @@ const sellerAtom = atom('DEFAULT');
 const taxAtom = atom(0);
 const discountAtom = atom(0);
 
-const cardTaxAtom = atom(0);
+const cardTaxAtom = atom(null as null | number);
 
 const PointSale: FC = () => {
   const [pay, setPay] = useAtom(payAtom);
   const [payments, setPayments] = useAtom(paymentsAtom);
   const [payed, setPayed] = useAtom(payedAtom);
   const [cash, setCash] = useAtom(cashAtom);
-  const [cashTemp, setCashTemp] = useAtom(cashTempAtom);
   const [cart, setCart] = useAtom(setCartAtom);
   const cartOnlyBoard = useAtomValue(cartOnlyBoardAtom);
   const cartOnlyProduct = useAtomValue(cartOnlyProductAtom);
@@ -675,10 +673,9 @@ const PointSale: FC = () => {
                               labelWidth="100%"
                               type="number"
                               autoFocus
-                              value={`${cashTemp}`}
+                              value={`${cash}`}
                               placeholder="$0.00"
-                              onChange={(e) => setCashTemp(e.target.value)}
-                              onBlur={() => setCash(cashTemp)}
+                              onChange={(e) => setCash(e.target.value)}
                               customCSS={css`
                                 input {
                                   color: #ffffff;

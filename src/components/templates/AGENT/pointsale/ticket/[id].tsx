@@ -11,8 +11,8 @@ import {
 import Confetti, { ConfettiConfig } from 'react-dom-confetti';
 import { useRouter } from 'next/router';
 import React from 'react';
-import DownloadTicket from '@Src/components/@organisms/DownloadTicket';
 import { IQueryFilter } from 'graphql';
+import DownloadTicket from '@Src/components/@organisms/DownloadTicket';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const ConfettiComponent = Confetti as any;
@@ -134,11 +134,7 @@ const CompleteOrderPay = () => {
 
           <AtomButton
             onClick={() => {
-              router.push(
-                `/dashboard/${[...(router?.query?.id ?? [])]
-                  ?.filter((_, id) => id < 3)
-                  .join('/')}`
-              );
+              router.push(`/dashboard`);
             }}
             customCSS={css`
               border: 2px solid #48d496;

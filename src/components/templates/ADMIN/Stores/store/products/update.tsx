@@ -8,7 +8,7 @@ import {
   AtomWrapper
 } from '@sweetsyui/ui';
 import { useFormik } from 'formik';
-import React, { Dispatch, FC, SetStateAction } from 'react';
+import React, { Dispatch, FC, SetStateAction, useEffect, useRef } from 'react';
 import { ProductModalType } from './index';
 import * as Yup from 'yup';
 import { UPDATEPRODUCT } from '@Src/apollo/client/query/products';
@@ -81,12 +81,27 @@ const ModalUpdateProduct: FC<ModalUpdateProductType> = (props) => {
       });
     }
   });
+
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (ref.current && !ref.current.contains(event.target as Node)) {
+        setState?.({ openModal: false });
+      }
+    };
+
+    document.addEventListener(`mousedown`, handleClickOutside, true);
+    return () => {
+      document.removeEventListener(`mousedown`, handleClickOutside, true);
+    };
+  }, [ref]);
+
   return (
     <AtomModal
       isOpen={state.openModal}
-      setIsOpen={() => setState({ openModal: false })}
       componentProps={{
         wrapperProps: {
+          refObject: ref,
           backgroundColor: '#2e2e35',
           padding: '0 30px'
         }

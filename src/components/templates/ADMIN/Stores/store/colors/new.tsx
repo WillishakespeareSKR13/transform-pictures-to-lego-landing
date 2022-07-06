@@ -11,7 +11,7 @@ import {
 } from '@sweetsyui/ui';
 import uploadImage from '@Src/utils/uploadImage';
 import { useFormik } from 'formik';
-import React, { Dispatch, FC, SetStateAction } from 'react';
+import React, { Dispatch, FC, SetStateAction, useEffect, useRef } from 'react';
 import * as Yup from 'yup';
 import { useRouter } from 'next/router';
 import { GETCOLORS } from '@Src/apollo/client/query/colors';
@@ -73,12 +73,27 @@ const ModalNewProduct: FC<ModalNewProductType> = (props) => {
       });
     }
   });
+
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (ref.current && !ref.current.contains(event.target as Node)) {
+        setState?.(false);
+      }
+    };
+
+    document.addEventListener(`mousedown`, handleClickOutside, true);
+    return () => {
+      document.removeEventListener(`mousedown`, handleClickOutside, true);
+    };
+  }, [ref]);
+
   return (
     <AtomModal
       isOpen={state}
-      setIsOpen={() => setState(false)}
       componentProps={{
         wrapperProps: {
+          refObject: ref,
           backgroundColor: '#2e2e35',
           padding: '0 30px'
         }

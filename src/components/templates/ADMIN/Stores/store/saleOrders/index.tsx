@@ -28,12 +28,6 @@ const SaleOrder: FC = () => {
       }
     }
   );
-  console.log(
-    dataOrders?.getSaleOrders?.map((order) => ({
-      ...order,
-      createdAt: new Date(Number(order?.createdAt) ?? 0)
-    }))
-  );
 
   return (
     <>

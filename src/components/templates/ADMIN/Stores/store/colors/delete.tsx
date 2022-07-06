@@ -10,7 +10,7 @@ import {
   AtomText,
   AtomWrapper
 } from '@sweetsyui/ui';
-import { Dispatch, FC, SetStateAction } from 'react';
+import { Dispatch, FC, SetStateAction, useEffect, useRef } from 'react';
 import { ColorModalType } from './index';
 
 interface ModalDeleteColorType {
@@ -26,12 +26,26 @@ const ModalDeleteColor: FC<ModalDeleteColorType> = (props) => {
     }
   });
 
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (ref.current && !ref.current.contains(event.target as Node)) {
+        setState?.({ ...state, openModal: false });
+      }
+    };
+
+    document.addEventListener(`mousedown`, handleClickOutside, true);
+    return () => {
+      document.removeEventListener(`mousedown`, handleClickOutside, true);
+    };
+  }, [ref]);
+
   return (
     <AtomModal
       isOpen={state.openModal}
-      setIsOpen={() => setState({ ...state, openModal: false })}
       componentProps={{
         wrapperProps: {
+          refObject: ref,
           backgroundColor: '#2e2e35',
           height: 'max-content',
           padding: '10 30px'

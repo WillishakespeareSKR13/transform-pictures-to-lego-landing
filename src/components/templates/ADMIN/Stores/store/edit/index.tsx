@@ -18,7 +18,7 @@ import {
 import { useFormik } from 'formik';
 import { IQueryFilter } from 'graphql';
 import { useRouter } from 'next/router';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import * as Yup from 'yup';
 
 const ADD = () => {
@@ -127,6 +127,20 @@ const ADD = () => {
       });
     }
   });
+
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (ref.current && !ref.current.contains(event.target as Node)) {
+        setModal?.(false);
+      }
+    };
+
+    document.addEventListener(`mousedown`, handleClickOutside, true);
+    return () => {
+      document.removeEventListener(`mousedown`, handleClickOutside, true);
+    };
+  }, [ref]);
 
   return (
     <DashWithTitle
@@ -390,9 +404,9 @@ const ADD = () => {
       </AtomWrapper>
       <AtomModal
         isOpen={modal}
-        setIsOpen={() => setModal(false)}
         componentProps={{
           wrapperProps: {
+            refObject: ref,
             backgroundColor: '#202026'
           }
         }}

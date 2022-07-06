@@ -48,7 +48,6 @@ const AtomModalImage: FC<AtomModalImageProps> = (props) => {
   return (
     <AtomModal
       isOpen={state}
-      setIsOpen={setState}
       componentProps={{
         containerProps: {
           customCSS: css`

@@ -11,6 +11,10 @@ const GlobalStyles: FC = () => (
         body {
           background-color: #202024;
         }
+        ::-webkit-scrollbar {
+          width: 4px;
+          height: 4px;
+        }
       `}
     />
   </>
@@ -41,6 +45,7 @@ export const TableStyles = css`
       td {
         color: #dfdfdf;
         border-bottom: 1px solid #2e2e35;
+        padding: 10px 15px;
       }
     }
   }

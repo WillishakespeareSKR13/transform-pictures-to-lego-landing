@@ -33,7 +33,7 @@ const reducerAtom = {
   },
   REMOVECART: (get: Getter, set: Setter, action: string) => {
     const cart = get(cartAtom);
-    const newCart = cart.filter((item) => item.id !== action);
+    const newCart = cart.filter((item) => (item.keyid ?? item.id) !== action);
     set(cartAtom, newCart);
   }
 };
@@ -49,6 +49,7 @@ type IColor = {
 
 export type ICart = {
   id: string;
+  keyid: string;
   type: 'BOARD' | 'PRODUCT';
   quantity: number;
   color?: IColor;

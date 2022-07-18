@@ -37,7 +37,7 @@ import {
 import { IQueryFilter } from 'graphql';
 import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { useRouter } from 'next/router';
-import React, { FC, useMemo } from 'react';
+import React, { FC, useEffect, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
 const cashAtom = atom(null as null | number);
@@ -79,6 +79,43 @@ const PointSale: FC = () => {
     }
   });
 
+  const cartOnlyBoardsLessColor = useMemo(
+    () => Boolean(colors?.find((e) => e.rest / 50 > 0)),
+    [colors, cartOnlyBoard]
+  );
+
+  useEffect(() => {
+    const AddedColor = colors.map((e) => ({
+      ...e,
+      add: Math.ceil(e.rest / 50)
+    }));
+
+    AddedColor?.map((e) => {
+      const product = data?.getProducts?.find(
+        (color) => color?.color?.id === e.id
+      );
+      const isCart = cart.find((item) => item.id === product?.id);
+      if (isCart) {
+        Array.from({ length: Math.abs(e.add) }, () => {
+          setCart({
+            key: e.add > 0 ? 'ADDQUANTITY' : 'REMOVEQUANTITY',
+            payload: product?.id
+          });
+        });
+      } else {
+        setCart({
+          key: 'ADDCART',
+          payload: {
+            id: product?.id,
+            type: 'PRODUCT',
+            quantity: Math.abs(e.add),
+            product: product
+          } as ICart
+        });
+      }
+    });
+  }, [cartOnlyBoardsLessColor]);
+
   const { data: dataUsers } = useQuery<IQueryFilter<'getUsers'>>(GETUSERS, {
     variables: {
       skip: !router?.query?.id?.[1],
@@ -107,10 +144,24 @@ const PointSale: FC = () => {
                 ?.find((e) => e?.id === item.board?.id)
                 ?.sizes?.find((e) => e?.id === item.board?.size)?.price
             : data?.getProducts?.find((e) => e?.id === item.product?.id)?.price;
-        const priceQuantity = (price ?? 0) * item.quantity;
+        const moreColors =
+          item.type === 'BOARD'
+            ? undefined
+            : Math.abs(
+                Math.ceil(
+                  (colors?.find(
+                    (e) =>
+                      e?.id ===
+                      data?.getProducts?.find((e) => e?.id === item.product?.id)
+                        ?.color?.id
+                  )?.rest ?? 0) / 50
+                )
+              );
+
+        const priceQuantity = (price ?? 0) * (moreColors ?? item.quantity);
         return acc + (priceQuantity ?? 0);
       }, 0),
-    [cart.length, boards?.getBoards?.length, data?.getProducts?.length]
+    [cart, boards?.getBoards, data?.getProducts, colors]
   );
   const Discount = useMemo(
     () => Number((SubTotal * (discount / 100)).toFixed(2)),
@@ -236,10 +287,10 @@ const PointSale: FC = () => {
             `}
           >
             {cartOnlyBoard.map((e) => (
-              <BOARD key={e.id} {...e} boards={boards} />
+              <BOARD {...e} boards={boards} key={e.keyid} />
             ))}
             {cartOnlyProduct.map((e) => (
-              <PRODUCT key={e.id} {...e} />
+              <PRODUCT {...e} key={e.keyid} />
             ))}
           </AtomWrapper>
 
@@ -337,10 +388,10 @@ const PointSale: FC = () => {
                   });
                 }}
                 width="100%"
-                backgroundColor="#eeeeee"
-                color="#000000"
+                backgroundColor="#e6485d"
+                color="white"
               >
-                Add All Colors
+                Just Enough Colors
               </AtomButton>
             )}
             <AtomWrapper
@@ -539,10 +590,10 @@ const PointSale: FC = () => {
                           `}
                         >
                           {cartOnlyBoard.map((e) => (
-                            <BOARD key={e.id} {...e} boards={boards} />
+                            <BOARD {...e} boards={boards} key={e.keyid} />
                           ))}
                           {cartOnlyProduct.map((e) => (
-                            <PRODUCT key={e.id} {...e} />
+                            <PRODUCT {...e} key={e.keyid} />
                           ))}
                         </AtomWrapper>
                       </AtomWrapper>
@@ -810,10 +861,10 @@ const PointSale: FC = () => {
                           `}
                         >
                           {cartOnlyBoard.map((e) => (
-                            <BOARD key={e.id} {...e} boards={boards} />
+                            <BOARD {...e} boards={boards} key={e.keyid} />
                           ))}
                           {cartOnlyProduct.map((e) => (
-                            <PRODUCT key={e.id} {...e} />
+                            <PRODUCT {...e} key={e.keyid} />
                           ))}
                         </AtomWrapper>
                       </AtomWrapper>
@@ -1155,7 +1206,7 @@ export default PointSale;
 import { useParams } from 'react-router-dom';
 
 const BOARD = (e: ICart) => {
-  const { boards } = e;
+  const { boards, keyid } = e;
   const setCart = useSetAtom(setCartAtom);
   const board = boards?.getBoards?.find((x) => x?.id === e.id);
   const size = board?.sizes?.find((x) => x?.id === e.board?.size);
@@ -1213,7 +1264,7 @@ const BOARD = (e: ICart) => {
             onClick={() =>
               setCart({
                 key: 'REMOVECART',
-                payload: board?.id
+                payload: keyid
               })
             }
           >

@@ -13,6 +13,7 @@ import { v4 } from 'uuid';
 import {
   AtomButton,
   AtomCarruosell,
+  AtomIcon,
   AtomImage,
   AtomInput,
   AtomLink,
@@ -368,7 +369,18 @@ const VIEW = () => {
               >
                 <AtomTable
                   customCSS={TableStyles}
-                  data={dataOrders?.getSaleOrders as ISaleOrder[]}
+                  data={
+                    dataOrders?.getSaleOrders?.reduce((acc, _, idx, array) => {
+                      if (acc?.length <= 5) {
+                        const last = array[
+                          array.length - 1 - idx
+                        ] as ISaleOrder;
+
+                        return [...acc, last];
+                      }
+                      return acc;
+                    }, [] as ISaleOrder[]) as ISaleOrder[]
+                  }
                   columns={[
                     {
                       title: 'Details',
@@ -376,7 +388,8 @@ const VIEW = () => {
                         <AtomWrapper
                           flexDirection="row"
                           customCSS={css`
-                            gap: 10px;
+                            gap: 5px;
+                            justify-content: flex-start;
                           `}
                         >
                           <AtomButton
@@ -389,11 +402,14 @@ const VIEW = () => {
                               });
                             }}
                             customCSS={css`
-                              padding: 8px 20px;
-                              background-color: #f1576c;
+                              padding: 0px;
+                              background-color: transparent;
                             `}
                           >
-                            Details
+                            <AtomIcon
+                              color="#f1576c"
+                              icon="https://storage.googleapis.com/cdn-bucket-ixulabs-platform/LGO-0001/assets/details.svg"
+                            />
                           </AtomButton>
                           {item?.board?.map((e) => (
                             <AtomButton
@@ -408,11 +424,14 @@ const VIEW = () => {
                                 }
                               }}
                               customCSS={css`
-                                padding: 8px 20px;
-                                background-color: #f1576c;
+                                padding: 0px;
+                                background-color: transparent;
                               `}
                             >
-                              PDF
+                              <AtomIcon
+                                color="#f1576c"
+                                icon="https://storage.googleapis.com/cdn-bucket-ixulabs-platform/LGO-0001/assets/pdf.svg"
+                              />
                             </AtomButton>
                           ))}
                           {item?.colorsaleorder?.map((e) => (
@@ -436,11 +455,14 @@ const VIEW = () => {
                                 );
                               }}
                               customCSS={css`
-                                padding: 8px 20px;
-                                background-color: #f1576c;
+                                padding: 0px;
+                                background-color: transparent;
                               `}
                             >
-                              CSV
+                              <AtomIcon
+                                color="#f1576c"
+                                icon="https://storage.googleapis.com/cdn-bucket-ixulabs-platform/LGO-0001/assets/csv.svg"
+                              />
                             </AtomButton>
                           ))}
                         </AtomWrapper>
@@ -460,12 +482,16 @@ const VIEW = () => {
                     },
                     {
                       title: 'Name',
+                      width: '10px',
                       view: (item) => (
                         <AtomText
                           customCSS={css`
+                            display: block;
                             color: #dfdfdf;
                             font-weight: 600;
-                            max-width: 10px;
+                            max-width: 80px;
+                            white-space: nowrap;
+                            overflow: hidden;
                             text-overflow: ellipsis;
                           `}
                         >
@@ -480,7 +506,14 @@ const VIEW = () => {
                     },
                     {
                       title: 'Quantity',
-                      view: (item) => <>{`${item?.quantity}`}</>
+                      view: (item) => (
+                        <>
+                          {`Boards: ${item?.board?.length ?? 0}`}
+                          {` `}
+                          {`Products: 
+                          ${item?.product?.length ?? 0}`}
+                        </>
+                      )
                     },
                     {
                       title: 'Status',

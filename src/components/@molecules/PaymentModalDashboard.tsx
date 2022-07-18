@@ -9,6 +9,7 @@ import { IBoard, IBoardSize } from 'graphql';
 import { useAtom } from 'jotai';
 import { FC } from 'react';
 import { useDispatch } from 'react-redux';
+import { v4 as uuidv4 } from 'uuid';
 
 type Props = {
   board?: IBoard;
@@ -77,6 +78,7 @@ const PaymentModal: FC<Props> = (props) => {
             key: 'ADDCART',
             payload: {
               id: board?.id,
+              keyid: uuidv4(),
               type: 'BOARD',
               quantity: 1,
               board: {

@@ -6,6 +6,8 @@ const typeDefs = gql`
   type Store {
     id: ID
     name: String
+    numberoffice: Int
+    numberstore: Int
     description: String
     phone: String
     email: String
@@ -24,6 +26,8 @@ const typeDefs = gql`
 
   input InputStore {
     name: String
+    numberoffice: Int
+    numberstore: Int
     description: String
     phone: String
     email: String

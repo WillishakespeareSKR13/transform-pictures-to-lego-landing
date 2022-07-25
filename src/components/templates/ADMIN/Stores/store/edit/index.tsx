@@ -25,15 +25,12 @@ const ADD = () => {
   const router = useRouter();
   const [modal, setModal] = useState(false);
   const [loading, setLoading] = useState(true);
-  const { data: dataById } = useQuery<IQueryFilter<'getStoreById'>>(
-    GETSTOREBYID,
-    {
-      onCompleted: () => setLoading(false),
-      variables: {
-        id: router?.query?.id?.[router.query.id.length - 1]
-      }
+  const { data: dataById } = useQuery(GETSTOREBYID, {
+    onCompleted: () => setLoading(false),
+    variables: {
+      id: router?.query?.id?.[router.query.id.length - 1]
     }
-  );
+  });
 
   const { data } = useQuery<IQueryFilter<'getStoreTypes'>>(GETSTORETYPES);
   const [EXEUPDATESTORE] = useMutation(UPDATESTORE, {
@@ -50,6 +47,8 @@ const ADD = () => {
   const formik = useFormik({
     initialValues: {
       name: dataById?.getStoreById?.name || '',
+      numberoffice: dataById?.getStoreById?.numberoffice || '',
+      numberstore: dataById?.getStoreById?.numberstore || '',
       description: dataById?.getStoreById?.description || '',
       phone: dataById?.getStoreById?.phone || '',
       email: dataById?.getStoreById?.email || '',
@@ -66,6 +65,8 @@ const ADD = () => {
     enableReinitialize: true,
     validationSchema: Yup.object({
       name: Yup.string().required('Required'),
+      numberoffice: Yup.string().required('Required'),
+      numberstore: Yup.string().required('Required'),
       description: Yup.string().required('Required'),
       phone: Yup.string()
         .required('Required')
@@ -104,6 +105,8 @@ const ADD = () => {
           id: router?.query?.id?.[router.query.id.length - 1],
           input: {
             name: values.name,
+            numberoffice: values.numberoffice,
+            numberstore: values.numberstore,
             description: values.description,
             phone: values.phone,
             email: values.email,
@@ -227,6 +230,24 @@ const ADD = () => {
               id="name"
               type="text"
               label="Name of store"
+              labelFontSize="14px"
+              labelWidth="45%"
+              formik={formik}
+              customCSS={InputStyles}
+            />
+            <AtomInput
+              id="numberoffice"
+              type="number"
+              label="Number of office"
+              labelFontSize="14px"
+              labelWidth="45%"
+              formik={formik}
+              customCSS={InputStyles}
+            />
+            <AtomInput
+              id="numberstore"
+              type="number"
+              label="Number of store"
               labelFontSize="14px"
               labelWidth="45%"
               formik={formik}

@@ -3,6 +3,7 @@ import mongoose, { Schema, Document, ObjectId } from 'mongoose';
 export interface ISaleOrder extends Document {
   stripeId: string;
   secret: string;
+  number: string;
   product: [ObjectId];
   board: [ObjectId];
   customer: ObjectId;
@@ -18,6 +19,7 @@ const SaleOrderSchema: Schema = new Schema(
   {
     stripeId: { type: String, required: true },
     secret: { type: String, required: true },
+    number: { type: String },
     product: [{ type: Schema.Types.ObjectId, ref: 'Product' }],
     board: [{ type: Schema.Types.ObjectId, ref: 'BoardSelected' }],
     customer: { type: Schema.Types.ObjectId, ref: 'User' },

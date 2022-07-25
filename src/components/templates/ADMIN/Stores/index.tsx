@@ -46,6 +46,12 @@ const STORES = () => {
         >
           <AtomButton
             backgroundColor="#f1576c"
+            onClick={() => router.push('/dashboard/termsconditions')}
+          >
+            Terms & Conditions
+          </AtomButton>
+          <AtomButton
+            backgroundColor="#f1576c"
             onClick={() => router.push('/dashboard/rooms')}
           >
             Rooms

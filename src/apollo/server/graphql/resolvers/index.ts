@@ -14,6 +14,7 @@ import RoomSizes from './_RoomSizes';
 import Color from './_Color';
 import ColorSaleOrder from './_ColorSaleOrders';
 import ProductQuantity from './_ProductsQuantity';
+import TermsConditions from './_TermsConditions';
 
 const resolvers: Resolvers = {
   Query: {
@@ -31,7 +32,8 @@ const resolvers: Resolvers = {
     ...RoomSizes.Query,
     ...Color.Query,
     ...ColorSaleOrder.Query,
-    ...ProductQuantity.Query
+    ...ProductQuantity.Query,
+    ...TermsConditions.Query
   },
   Mutation: {
     ...User.Mutation,
@@ -47,7 +49,9 @@ const resolvers: Resolvers = {
     ...Room.Mutation,
     ...RoomSizes.Mutation,
     ...Color.Mutation,
-    ...ColorSaleOrder.Mutation
+    ...ColorSaleOrder.Mutation,
+    ...ProductQuantity.Mutation,
+    ...TermsConditions.Mutation
   }
 };
 

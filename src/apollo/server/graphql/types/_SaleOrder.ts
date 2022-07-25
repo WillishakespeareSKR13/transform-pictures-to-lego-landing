@@ -7,6 +7,7 @@ const typeDefs = gql`
     id: ID
     stripeId: String
     secret: String
+    number: String
     product: [Products]
     board: [BoardSelected]
     customer: User

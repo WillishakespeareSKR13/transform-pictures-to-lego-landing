@@ -10,9 +10,12 @@ import {
 } from '@sweetsyui/ui';
 import Confetti, { ConfettiConfig } from 'react-dom-confetti';
 import { useRouter } from 'next/router';
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import DownloadTicket from '@Src/components/@organisms/DownloadTicket';
 import { IQueryFilter } from 'graphql';
+import { GETSTOREBYID } from '@Src/apollo/client/query/stores';
+import { useParams } from 'react-router-dom';
+import QRCode from 'qrcode.react';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const ConfettiComponent = Confetti as any;
@@ -33,15 +36,41 @@ const config = {
 
 const CompleteOrderPay = () => {
   const router = useRouter();
+  const params = useParams();
   const { data, loading } = useQuery<IQueryFilter<'getSaleOrderById'>>(
     GETSALEORDERBYID,
     {
-      skip: !router.query.id?.[router.query.id.length - 1],
+      skip: !params?.order,
       variables: {
-        id: router.query.id?.[router.query.id.length - 1]
+        id: params?.order
       }
     }
   );
+
+  const { data: dataById } = useQuery(GETSTOREBYID, {
+    variables: {
+      id: params?.id
+    }
+  });
+
+  const ref = useRef(null);
+  const [qrImages, setQrImages] = useState<string[]>([]);
+  useEffect(() => {
+    const images =
+      data?.getSaleOrderById?.board?.reduce((acc, item) => {
+        const canvas = document.getElementById(
+          'qr-gen' + item?.id
+        ) as HTMLCanvasElement;
+        const pngUrl = canvas
+          ?.toDataURL('image/png')
+          .replace('image/png', 'image/octet-stream');
+        if (!pngUrl) return acc;
+        return [...acc, pngUrl];
+      }, [] as string[]) ?? [];
+    if (images?.length > 0 && qrImages?.length === 0) {
+      setQrImages(images ?? []);
+    }
+  });
 
   return (
     <AtomWrapper
@@ -130,7 +159,7 @@ const CompleteOrderPay = () => {
             </AtomButton>
           ))}
 
-          <DownloadTicket id={router.query.id?.[router.query.id.length - 1]} />
+          <DownloadTicket id={params?.order} store={dataById} qrs={qrImages} />
 
           <AtomButton
             onClick={() => {
@@ -154,6 +183,17 @@ const CompleteOrderPay = () => {
           </AtomButton>
         </AtomWrapper>
       )}
+      {data?.getSaleOrderById?.board?.map((e) => (
+        <QRCode
+          key={e?.id}
+          ref={ref}
+          id={'qr-gen' + e?.id}
+          value={e?.pdf ?? ''}
+          size={120}
+          level={'H'}
+          includeMargin={true}
+        />
+      ))}
     </AtomWrapper>
   );
 };

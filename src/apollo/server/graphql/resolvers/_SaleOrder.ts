@@ -349,10 +349,11 @@ const resolvers: Resolvers = {
 
       const customerGet = await customerExist();
       const storeGet = await storeTypeExist();
-
+      const getAllSaleOrders = await SaleOrder.find({ store: storeGet._id });
       const saleOrder = await SaleOrder.create({
         stripeId: paymentIntent.id,
         secret: paymentIntent.client_secret,
+        number: getAllSaleOrders.length + 1,
         product: getProduct?.map((e) => e._id),
         board: getBoard?.map((e) => e._id),
         ...customerGet,
@@ -535,9 +536,12 @@ const resolvers: Resolvers = {
       const customerGet = await customerExist();
       const storeGet = await storeTypeExist();
 
+      const getAllSaleOrders = await SaleOrder.find({ store: storeGet._id });
+
       const saleOrder = await SaleOrder.create({
         stripeId: 'CASH',
         secret: 'CASH',
+        number: getAllSaleOrders.length + 1,
         product: getProduct?.map((e) => e._id),
         board: getBoard?.map((e) => e._id),
         ...customerGet,

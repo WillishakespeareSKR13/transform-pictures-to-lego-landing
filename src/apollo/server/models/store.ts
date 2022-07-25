@@ -2,6 +2,8 @@ import mongoose, { Schema, Document, ObjectId } from 'mongoose';
 
 export interface IStore extends Document {
   name: string;
+  numberoffice: number;
+  numberstore: number;
   description: string;
   phone: string;
   email: string;
@@ -23,6 +25,14 @@ const StoreSchema: Schema = new Schema(
       required: true,
       trim: true,
       unique: true
+    },
+    numberoffice: {
+      type: Number,
+      required: true
+    },
+    numberstore: {
+      type: Number,
+      required: true
     },
     description: {
       type: String,

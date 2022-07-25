@@ -15,6 +15,7 @@ import RoomSize from './_RoomSize';
 import Colors from './_Colors';
 import ColorSaleOrders from './_ColorSaleOrders';
 import ProductQuantity from './_ProductsQuantity';
+import TermsConditions from './_TermsConditions';
 
 const typeDefs = gql`
   ${User}
@@ -33,6 +34,7 @@ const typeDefs = gql`
   ${Colors}
   ${ColorSaleOrders}
   ${ProductQuantity}
+  ${TermsConditions}
 
   type Query {
     ping: String

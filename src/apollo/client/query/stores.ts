@@ -5,6 +5,8 @@ export const GETSTORES = gql`
     getStores {
       id
       name
+      numberoffice
+      numberstore
       description
       phone
       email
@@ -29,6 +31,8 @@ export const GETSTOREBYID = gql`
     getStoreById(id: $id) {
       id
       name
+      numberoffice
+      numberstore
       description
       phone
       email

@@ -64,6 +64,7 @@ export const GETSALEORDERBYID = gql`
   query getSaleOrderById($id: ID!) {
     getSaleOrderById(id: $id) {
       id
+      number
       stripeId
       secret
       product {

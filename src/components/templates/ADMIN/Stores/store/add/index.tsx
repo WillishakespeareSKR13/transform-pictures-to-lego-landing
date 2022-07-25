@@ -23,6 +23,8 @@ const ADD = () => {
   const formik = useFormik({
     initialValues: {
       name: '',
+      numberoffice: '',
+      numberstore: '',
       description: '',
       phone: '',
       email: '',
@@ -38,6 +40,8 @@ const ADD = () => {
     },
     validationSchema: Yup.object({
       name: Yup.string().required('Required'),
+      numberoffice: Yup.string().required('Required'),
+      numberstore: Yup.string().required('Required'),
       description: Yup.string().required('Required'),
       phone: Yup.string()
         .required('Required')
@@ -157,6 +161,24 @@ const ADD = () => {
               id="name"
               type="text"
               label="Name of store"
+              labelFontSize="14px"
+              labelWidth="45%"
+              formik={formik}
+              customCSS={InputStyles}
+            />
+            <AtomInput
+              id="numberoffice"
+              type="number"
+              label="Number of office"
+              labelFontSize="14px"
+              labelWidth="45%"
+              formik={formik}
+              customCSS={InputStyles}
+            />
+            <AtomInput
+              id="numberstore"
+              type="number"
+              label="Number of store"
               labelFontSize="14px"
               labelWidth="45%"
               formik={formik}
